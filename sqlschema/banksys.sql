@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS `account`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `account` (
   `account_number` int(11) NOT NULL AUTO_INCREMENT,
-  `client_id` int(11) NOT NULL,
+  `client_id` int(11) NOT NULL REFERENCES client(id),
   `balance` double NOT NULL DEFAULT '0',
   `real_time_balance` double NOT NULL DEFAULT '0',
   `created_date` datetime NOT NULL,
@@ -93,6 +93,85 @@ LOCK TABLES `employee` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `transaction`
+--
+
+DROP TABLE IF EXISTS `transaction`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `transaction` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `origin_account_id` int(11) NOT NULL REFERENCES client(id),
+  `destination_account_id` int(11) DEFAULT NULL REFERENCES client(id),
+  `amount` double NOT NULL,
+  `transaction_type` int(11) NOT NULL REFERENCES transaction_type(id),
+  `created_date` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `transaction`
+--
+
+LOCK TABLES `transaction` WRITE;
+/*!40000 ALTER TABLE `transaction` DISABLE KEYS */;
+/*!40000 ALTER TABLE `transaction` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `transaction_history`
+--
+
+DROP TABLE IF EXISTS `transaction_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `transaction_history` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `origin_account_id` int(11) NOT NULL REFERENCES client(id),
+  `destination_account_id` int(11) NOT NULL REFERENCES client(id),
+  `amount` double NOT NULL,
+  `transaction_type` int(11) NOT NULL REFERENCES transaction_type(id),
+  `created_date` datetime NOT NULL,
+  `aproved_date` datetime NOT NULL,
+  `approved_by` int(11) NOT NULL REFERENCES employee(id),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `transaction_history`
+--
+
+LOCK TABLES `transaction_history` WRITE;
+/*!40000 ALTER TABLE `transaction_history` DISABLE KEYS */;
+/*!40000 ALTER TABLE `transaction_history` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `transaction_type`
+--
+
+DROP TABLE IF EXISTS `transaction_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `transaction_type` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `description` varchar(128) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `transaction_type`
+--
+
+LOCK TABLES `transaction_type` WRITE;
+/*!40000 ALTER TABLE `transaction_type` DISABLE KEYS */;
+/*!40000 ALTER TABLE `transaction_type` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `user`
 --
 
@@ -129,7 +208,7 @@ CREATE TABLE `user_type` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` varchar(128) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -138,6 +217,7 @@ CREATE TABLE `user_type` (
 
 LOCK TABLES `user_type` WRITE;
 /*!40000 ALTER TABLE `user_type` DISABLE KEYS */;
+INSERT INTO `user_type` VALUES (1,'Client'),(2,'Employee');
 /*!40000 ALTER TABLE `user_type` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -150,4 +230,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-10-12 23:22:17
+-- Dump completed on 2014-10-13 14:30:21
