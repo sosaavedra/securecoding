@@ -192,6 +192,7 @@ DROP TABLE IF EXISTS `transaction_type`;
 CREATE TABLE `transaction_type` (
   `id` int(8) NOT NULL AUTO_INCREMENT,
   `description` varchar(128) NOT NULL,
+  `short_description` char(1) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -202,7 +203,7 @@ CREATE TABLE `transaction_type` (
 
 LOCK TABLES `transaction_type` WRITE;
 /*!40000 ALTER TABLE `transaction_type` DISABLE KEYS */;
-INSERT INTO `transaction_type` VALUES (1,'Deposit'),(2,'Withdrawal'),(3,'Transfer');
+INSERT INTO `transaction_type` VALUES (1,'Deposit','D'),(2,'Withdrawal','W'),(3,'Transfer','T');
 /*!40000 ALTER TABLE `transaction_type` ENABLE KEYS */;
 UNLOCK TABLES;
 
