@@ -23,13 +23,14 @@ DROP TABLE IF EXISTS `account`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `account` (
-  `account_number` int(11) NOT NULL AUTO_INCREMENT,
-  `client_id` int(11) NOT NULL REFERENCES client(id),
+  `account_number` int(8) NOT NULL AUTO_INCREMENT,
+  `client_id` int(8) NOT NULL,
   `balance` double NOT NULL DEFAULT '0',
   `real_time_balance` double NOT NULL DEFAULT '0',
   `created_date` datetime NOT NULL,
   `updated_date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`account_number`)
+  PRIMARY KEY (`account_number`),
+  KEY `account_number` (`account_number`,`client_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -50,10 +51,13 @@ DROP TABLE IF EXISTS `client`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `client` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(8) NOT NULL AUTO_INCREMENT,
   `first_name` varchar(128) NOT NULL,
   `last_name` varchar(128) NOT NULL,
   `email` varchar(64) NOT NULL,
+  `created_date` datetime NOT NULL,
+  `activation_date` datetime NOT NULL,
+  `activated_by` int(8) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -75,12 +79,15 @@ DROP TABLE IF EXISTS `employee`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `employee` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(8) NOT NULL AUTO_INCREMENT,
   `first_name` varchar(128) NOT NULL,
   `last_name` varchar(128) NOT NULL,
   `email` varchar(64) NOT NULL,
+  `created_date` datetime NOT NULL,
+  `activation_date` datetime NOT NULL,
+  `activated_by` int(8) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -89,7 +96,34 @@ CREATE TABLE `employee` (
 
 LOCK TABLES `employee` WRITE;
 /*!40000 ALTER TABLE `employee` DISABLE KEYS */;
+INSERT INTO `employee` VALUES (1,'banksys','admin','admin@banksys.de','2014-10-14 21:15:43','2014-10-14 21:15:43',1);
 /*!40000 ALTER TABLE `employee` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tan_code`
+--
+
+DROP TABLE IF EXISTS `tan_code`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tan_code` (
+  `client_id` int(8) NOT NULL,
+  `code` varchar(15) NOT NULL,
+  `valid` char(1) NOT NULL DEFAULT 'Y',
+  `used_date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`client_id`,`code`),
+  UNIQUE KEY `tan_code_ukey` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tan_code`
+--
+
+LOCK TABLES `tan_code` WRITE;
+/*!40000 ALTER TABLE `tan_code` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tan_code` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -100,11 +134,11 @@ DROP TABLE IF EXISTS `transaction`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `transaction` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `origin_account_id` int(11) NOT NULL REFERENCES client(id),
-  `destination_account_id` int(11) DEFAULT NULL REFERENCES client(id),
+  `id` int(8) NOT NULL AUTO_INCREMENT,
+  `origin_account_id` int(8) NOT NULL,
+  `destination_account_id` int(8) DEFAULT NULL,
   `amount` double NOT NULL,
-  `transaction_type` int(11) NOT NULL REFERENCES transaction_type(id),
+  `transaction_type` int(8) NOT NULL,
   `created_date` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -127,14 +161,14 @@ DROP TABLE IF EXISTS `transaction_history`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `transaction_history` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `origin_account_id` int(11) NOT NULL REFERENCES client(id),
-  `destination_account_id` int(11) NOT NULL REFERENCES client(id),
+  `id` int(8) NOT NULL AUTO_INCREMENT,
+  `origin_account_id` int(8) NOT NULL,
+  `destination_account_id` int(8) NOT NULL,
   `amount` double NOT NULL,
-  `transaction_type` int(11) NOT NULL REFERENCES transaction_type(id),
+  `transaction_type` int(8) NOT NULL,
   `created_date` datetime NOT NULL,
-  `aproved_date` datetime NOT NULL,
-  `approved_by` int(11) NOT NULL REFERENCES employee(id),
+  `approved_date` datetime NOT NULL,
+  `approved_by` int(8) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -156,10 +190,10 @@ DROP TABLE IF EXISTS `transaction_type`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `transaction_type` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(8) NOT NULL AUTO_INCREMENT,
   `description` varchar(128) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -168,6 +202,7 @@ CREATE TABLE `transaction_type` (
 
 LOCK TABLES `transaction_type` WRITE;
 /*!40000 ALTER TABLE `transaction_type` DISABLE KEYS */;
+INSERT INTO `transaction_type` VALUES (1,'Deposit'),(2,'Withdrawal'),(3,'Transfer');
 /*!40000 ALTER TABLE `transaction_type` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -179,13 +214,14 @@ DROP TABLE IF EXISTS `user`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `person_id` int(11) NOT NULL,
+  `id` int(8) NOT NULL AUTO_INCREMENT,
+  `person_id` int(8) NOT NULL,
   `pwd` varchar(64) NOT NULL,
-  `user_type_id` int(11) NOT NULL,
+  `user_type_id` int(8) NOT NULL,
+  `last_login` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_ukey` (`person_id`,`user_type_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -194,6 +230,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
+INSERT INTO `user` VALUES (1,1,'admin',2,'0000-00-00 00:00:00');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -205,7 +242,7 @@ DROP TABLE IF EXISTS `user_type`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user_type` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(8) NOT NULL AUTO_INCREMENT,
   `description` varchar(128) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
@@ -230,4 +267,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-10-13 14:30:21
+-- Dump completed on 2014-10-14 21:22:01
