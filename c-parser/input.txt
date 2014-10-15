@@ -1,5 +1,5 @@
 origin> 458796
 destination> 471258
-amount> 9.999
+amount> A.AAA
 transaction_type> D
 tan_code> ABC4788E44D8D7E
