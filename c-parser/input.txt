@@ -1,4 +1,4 @@
-origin> 458796
+origin> 
 destination> 471258
 amount> A.AAA
 transaction_type> D

@@ -2,7 +2,7 @@ NAME = parser
 CC = gcc
 CFLAGS = -std=gnu99 -fstrict-overflow -Werror -Wall -Wshadow -Wstrict-overflow=5
 
-OBJ_SEQ = $(NAME).o trim.o constants.h
+OBJ_SEQ = $(NAME).o trim.o utils.o constants.h
 
 all: $(NAME)
 

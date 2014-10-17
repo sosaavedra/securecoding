@@ -7,8 +7,6 @@
 #include "trim.h"
 #include "constants.h"
 
-char * getValue (char *line);
-
 int main (int argc, char *argv[]){
     FILE *transactionFile = fopen("input.txt", "r");
 
@@ -22,29 +20,53 @@ int main (int argc, char *argv[]){
     char *value = NULL; 
     char *end;
 
-    int line_number = 0;
+    int lineNumber = 0;
 
+/*
+  * Convert values to upper case
+  * Free memory
+  * Close file
+
+  * Validations (Integers):
+  * Not an integer (Letters, numbers and everything else)
+  * More or less than 6 digits
+  * Empty value
+
+  * Validations (Double)
+  * Not a double (Letters, numbers and everything else but '.'
+  * Empty value
+
+  * Validations Transaction type
+  * Not a character
+  * More than one character
+  * Character other than 'D', 'W', 'T'
+  * Empty value
+
+  * Validations Tan code
+  * Special characters
+  * More or less than 15 letters/numbers
+  * Empty value
+*/
     int origin = -1;
     int destination = -1;
     double amount = -1;
-    char transaction_type = '\0';
-    char *tan_code = calloc(TAN_CODE_SIZE, sizeof(char));
+    char transactionType = '\0';
+    char *tanCode = calloc(TAN_CODE_SIZE, sizeof(char));
 
     while(fgets(line, LINE_SIZE * sizeof(char), transactionFile) != NULL){
-        line_number++;
+        lineNumber++;
 
-        if(line_number > 5){
+        if(lineNumber > 5){
             break;
         }
 
 
-        switch(line_number){
+        switch(lineNumber){
             case 1: value = getValue(line);
                     origin = strtol(value, &end, 10);
 
-                    if(errno == 0){
-                        perror("Origin");
-                        fprintf(stderr, "%s not an integer", value);
+                if(validAccountNumber(value) < 1){
+                        fprintf(stderr, "Origin %s not an integer", value);
                         exit(EXIT_FAILURE);
                     }
                 break;
@@ -68,8 +90,8 @@ int main (int argc, char *argv[]){
                     }
                 break;
             case 4: value = getValue(line);
-                    transaction_type = value[0];
-                    transaction_type = toupper(transaction_type);
+                    transactionType = value[0];
+                    transactionType = toupper(transactionType);
 
                     if(errno){
                         perror("Transaction type)");
@@ -77,7 +99,7 @@ int main (int argc, char *argv[]){
                         exit(NOT_A_CHARACTER);
                     }
                 break;
-            case 5: tan_code = getValue(line);
+            case 5: tanCode = getValue(line);
 
                     if(errno){
                         perror("Tan code");
@@ -97,22 +119,11 @@ int main (int argc, char *argv[]){
     printf("Origin: %d\n", origin);
     printf("Destination: %d\n", destination);
     printf("Amount: %f\n", amount);
-    printf("Transaction type: %c\n", transaction_type);
-    printf("Tan code: %s\n", tan_code);
+    printf("Transaction type: %c\n", transactionType);
+    printf("Tan code: %s\n", tanCode);
 
     free(line);
     fclose(transactionFile);
 
     return EXIT_SUCCESS;
-}
-
-char * getValue(char *line){
-    char *token = NULL;
-
-    token = strtok(line, ">");
-    token = strtok(NULL, ">");
-
-    trim(token);
-
-    return token;
 }
