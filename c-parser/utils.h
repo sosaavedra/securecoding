@@ -1,10 +1,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-char * getValue (char *line);
-int validAccountNumber(char *accountNumber);
-int validAmount(char *amount);
-int validTransactionType(char *transactionType);
-int validTanCode(char *tanCode);
+void rtrim(char *str);
+void ltrim(char *str);
+void trim(char *str);
+
+void strtoupper(char *str);
 
 #endif

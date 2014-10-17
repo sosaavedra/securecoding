@@ -4,7 +4,8 @@
 #include <ctype.h>
 #include <errno.h>
 
-#include "trim.h"
+#include "utils.h"
+#include "validations.h"
 #include "constants.h"
 
 int main (int argc, char *argv[]){
@@ -60,51 +61,69 @@ int main (int argc, char *argv[]){
             break;
         }
 
+        value = getValue(line);
+
+        if (value == NULL){
+            free(line);
+            fclose(transactionFile);
+
+            errno = ENODATA;
+            perror("getValue(char *line)");
+            fprintf(stderr, "Value not found in line: %d", lineNumber);
+            exit(EXIT_FAILURE);
+        }
 
         switch(lineNumber){
-            case 1: value = getValue(line);
-                    origin = strtol(value, &end, 10);
+            case 1: origin = strtol(value, &end, 10);
 
                 if(validAccountNumber(value) < 1){
                         fprintf(stderr, "Origin %s not an integer", value);
                         exit(EXIT_FAILURE);
                     }
                 break;
-            case 2: value = getValue(line);
-                    destination = strtol(value, NULL, 10);
+            case 2: destination = strtol(value, NULL, 10);
 
                     if(errno){
                         perror("Destination");
                         fprintf(stderr, "%s not an integer", value);
-                        exit(NOT_AN_INTEGER);
+                        exit(EXIT_FAILURE);
                     }
                 break;
-            case 3: value = getValue(line);
-                    errno = 0;
+            case 3: errno = 0;
                     amount = strtod(value, NULL);
 
                     if(errno){
                         perror("Amount");
                         fprintf(stderr, "%s not a double", value);
-                        exit(NOT_A_DOUBLE);
+                        exit(EXIT_FAILURE);
                     }
                 break;
-            case 4: value = getValue(line);
-                    transactionType = value[0];
-                    transactionType = toupper(transactionType);
+            case 4: if(strlen(value) > 1){
+                    
+                    }
+
+                    strtoupper(value);
+
+                    if(*value == 'D' || *value == 'W' || *value == 'T'){
+                    
+                    }
+
+                    transactionType = *value;
 
                     if(errno){
                         perror("Transaction type)");
-                        fprintf(stderr, "%s not a character", value);
-                        exit(NOT_A_CHARACTER);
+                        fprintf(stderr, "%c not a character", transactionType);
+                        exit(EXIT_FAILURE);
                     }
                 break;
-            case 5: tanCode = getValue(line);
+            case 5: strtoupper(value);
+
+                    tanCode = value;
 
                     if(errno){
                         perror("Tan code");
                         fprintf(stderr, "%s not alphanumeric", value);
-                        exit(NOT_ALPHANUMERIC);
+                        exit(EXIT_FAILURE);
                     }
                 break;
         }

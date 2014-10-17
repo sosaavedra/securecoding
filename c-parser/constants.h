@@ -4,11 +4,4 @@
 #define TAN_CODE_SIZE 15
 #define LINE_SIZE 64
 
-#define VALUE_NOT_FOUND -2000
-#define NOT_AN_INTEGER -2001
-#define NOT_A_DOUBLE -2002
-#define NOT_A_CHARACTER -2003
-#define NOT_ALPHANUMERIC -2004
-#define INCORRECT_LENGHT -2005
-
 #endif
