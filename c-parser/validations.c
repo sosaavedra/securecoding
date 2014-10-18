@@ -1,13 +1,16 @@
 #include "utils.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "utils.h"
 
-char * getValue(char *line){
-    char *token = NULL;
+char *getValue(char *line){
+    char *token;
+    char *value;
 
+    token = NULL;
     token = strtok(line, ">");
 
     if(token == NULL){
@@ -22,18 +25,18 @@ char * getValue(char *line){
 
     trim(token);
 
-    if(strlen(token) == 0){
+    int length;
+
+    length = strlen(token);
+    if(length == 0){
         return NULL;
     }
 
-    return token;
+    value = malloc(length * sizeof(char));
+    strcpy(value, token);
+
+    return value;
 }
 
-int validAccountNumber(char *accountNumber){ return 1; }
 int validAmount(char *amount){ return 1; }
-int validTransactionType(char *transactionType){ return 1; }
 int validTanCode(char *tanCode){ return 1; }
-
-void exitWithError(int errnoValue, char *perrnoMessage, char *errorMessage){
-
-}
