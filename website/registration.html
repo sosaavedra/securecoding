@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Registration</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="css/reset.css" type="text/css" media="all">
+<link rel="stylesheet" href="css/layout.css" type="text/css" media="all">
+<link rel="stylesheet" href="css/style.css" type="text/css" media="all">
+<script type="text/javascript" src="js/jquery-1.4.2.js" ></script>
+<script type="text/javascript" src="js/cufon-yui.js"></script>
+<script type="text/javascript" src="js/cufon-replace.js"></script>
+<script type="text/javascript" src="js/Myriad_Pro_400.font.js"></script>
+<script type="text/javascript" src="js/Myriad_Pro_700.font.js"></script>
+<script type="text/javascript" src="js/Myriad_Pro_600.font.js"></script>
+<!--[if lt IE 9]>
+	<script type="text/javascript" src="http://info.template-help.com/files/ie6_warning/ie6_script_other.js"></script>
+	<script type="text/javascript" src="js/html5.js"></script>
+<![endif]-->
+</head>
+<body id="page4">
+<div class="main">
+<!-- header -->
+	<header>
+		<div class="wrapper">
+			<h1><a href="index.html" id="logo">Smart Biz</a></h1>
+			<form id="search" action="" method="post">
+				<div class="bg">
+					<input type="submit" class="submit" value="">
+					<input type="text" class="input">
+				</div>
+			</form>
+		</div>
+		<nav>
+			<ul id="menu">
+				<li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
+				<li id="menu_active"><a href="registration.html"><span><span>Registration</span></span></a></li>
+				<li><a href="login.html"><span><span>Login</span></span> </a></li>
+				<li class="omega"><a href="#"><span><span>Something</span></span></a></li>
+			</ul>
+		</nav>
+	</header>
+<!-- / header -->
+<!-- content -->
+	<section id="content">
+		<div class="wrapper">
+			<div class="pad">
+				<div class="wrapper">
+					<article class="col1"><h2>New user registration</h2></article>
+					<article class="col2 pad_left1"><h2>Contact us</h2></article>
+				</div>
+			</div>
+			<div class="box pad_bot1">
+				<div class="pad marg_top">
+					<article class="col1">
+						<form id="registration" class="formstyle" action="register.php" method="post">
+							<div>
+								<div class="wrapper">
+									<div class="bg"><input class="input" type="text" name="title" id="title"></div>Title:
+								</div>
+								<div class="wrapper">
+									<div class="bg"><input class="input" type="text" name="firstname" id="firstname"></div>First name:
+								</div>
+								<div class="wrapper">
+									<div class="bg"><input class="input" type="text" name="lastname" id="lastname"></div>Last name:
+								</div>
+								<div class="wrapper">
+									<div class="bg"><input class="input" type="text" name="email" id="email"></div>Email:
+								</div>
+								<div class="wrapper">
+									<div class="bg"><input class="input" type="password" name="password" id="password"></div>Password:
+								</div>
+								<div class="wrapper">
+									<div class="bg"><input class="input" type="password" name="cpassword" id="cpassword"></div>Retype Password:
+								</div>
+								<a href="#" class="button" onclick="document.getElementById('registration').submit()">Register</a>
+								<a href="#" class="button" onclick="document.getElementById('registration').reset()">clear</a>
+							</div>
+						</form>
+					</article>
+					<article class="col2 pad_left1">
+						<div class="wrapper">
+							<p class="cols pad_bot3">
+								<strong>
+									Country:<br>
+									City:<br>
+									Telephone:<br>
+									Email:
+								</strong>
+							</p>
+							<p class="pad_bot3">
+								Germany<br>
+								Munich<br>
+								+49 1234567890<br>
+								<a href="mailto:">support@mail.com</a>
+							</p>
+						</div>
+					</article>
+				</div>
+			</div>
+		</div>
+	</section>
+<!-- / content -->
+</div>
+<script type="text/javascript"> Cufon.now(); </script>
+</body>
+</html>
