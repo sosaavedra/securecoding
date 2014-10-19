@@ -23,12 +23,6 @@
 	<header>
 		<div class="wrapper">
 			<h1><a href="index.html" id="logo">Smart Biz</a></h1>
-			<form id="search" action="" method="post">
-				<div class="bg">
-					<input type="submit" class="submit" value="">
-					<input type="text" class="input">
-				</div>
-			</form>
 		</div>
 		<nav>
 			<ul id="menu">
@@ -52,13 +46,13 @@
 			<div class="box pad_bot1">
 				<div class="pad marg_top">
 					<article class="col1">
-						<form id="login" class="formstyle" action="">
+						<form id="login" class="formstyle" action="login.php" method="post">
 							<div>
 								<div class="wrapper">
-									<div class="bg"><input class="input" type="text"></div>Username:
+									<div class="bg"><input class="input" type="text" name="username" id="username"></div>Username:
 								</div>
 								<div class="wrapper">
-									<div class="bg"><input class="input" type="text"></div>Password:
+									<div class="bg"><input class="input" type="password" name="password" id="password"></div>Password:
 								</div>
 								<a href="#" class="button" onclick="document.getElementById('login').submit()">Login</a>
 								<a href="#" class="button" onclick="document.getElementById('login').reset()">clear</a>
