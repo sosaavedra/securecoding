@@ -55,6 +55,7 @@ CREATE TABLE `client` (
   `first_name` varchar(128) NOT NULL,
   `last_name` varchar(128) NOT NULL,
   `email` varchar(64) NOT NULL,
+  `title_type_id` int(8) DEFAULT NULL,
   `created_date` datetime NOT NULL,
   `activation_date` datetime NOT NULL,
   `activated_by` int(8) NOT NULL,
@@ -83,6 +84,7 @@ CREATE TABLE `employee` (
   `first_name` varchar(128) NOT NULL,
   `last_name` varchar(128) NOT NULL,
   `email` varchar(64) NOT NULL,
+  `title_type_id` int(8) DEFAULT NULL,
   `created_date` datetime NOT NULL,
   `activation_date` datetime NOT NULL,
   `activated_by` int(8) NOT NULL,
@@ -96,7 +98,7 @@ CREATE TABLE `employee` (
 
 LOCK TABLES `employee` WRITE;
 /*!40000 ALTER TABLE `employee` DISABLE KEYS */;
-INSERT INTO `employee` VALUES (1,'banksys','admin','admin@banksys.de','2014-10-14 21:15:43','2014-10-14 21:15:43',1);
+INSERT INTO `employee` VALUES (1,'banksys','admin','admin@banksys.de',NULL,'2014-10-14 21:15:43','2014-10-14 21:15:43',1);
 /*!40000 ALTER TABLE `employee` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -124,6 +126,30 @@ CREATE TABLE `tan_code` (
 LOCK TABLES `tan_code` WRITE;
 /*!40000 ALTER TABLE `tan_code` DISABLE KEYS */;
 /*!40000 ALTER TABLE `tan_code` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `title_type`
+--
+
+DROP TABLE IF EXISTS `title_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `title_type` (
+  `id` int(8) NOT NULL AUTO_INCREMENT,
+  `description` varchar(128) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `title_type`
+--
+
+LOCK TABLES `title_type` WRITE;
+/*!40000 ALTER TABLE `title_type` DISABLE KEYS */;
+INSERT INTO `title_type` VALUES (1,'Mr.'),(2,'Mrs.'),(3,'Ms.');
+/*!40000 ALTER TABLE `title_type` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -268,4 +294,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-10-14 21:22:01
+-- Dump completed on 2014-10-21  0:54:34
