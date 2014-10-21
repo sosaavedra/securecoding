@@ -16,6 +16,16 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Current Database: `banksys`
+--
+
+/*!40000 DROP DATABASE IF EXISTS `banksys`*/;
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `banksys` /*!40100 DEFAULT CHARACTER SET latin1 */;
+
+USE `banksys`;
+
+--
 -- Table structure for table `account`
 --
 
@@ -30,7 +40,9 @@ CREATE TABLE `account` (
   `created_date` datetime NOT NULL,
   `updated_date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`account_number`),
-  KEY `account_number` (`account_number`,`client_id`)
+  KEY `account_k1` (`account_number`,`client_id`),
+  KEY `account_k2` (`client_id`),
+  CONSTRAINT `account_client_fk` FOREIGN KEY (`client_id`) REFERENCES `client` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -59,7 +71,9 @@ CREATE TABLE `client` (
   `created_date` datetime NOT NULL,
   `activation_date` datetime NOT NULL,
   `activated_by` int(8) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `client_k1` (`title_type_id`),
+  CONSTRAINT `client_title_type_fk` FOREIGN KEY (`title_type_id`) REFERENCES `title_type` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -88,7 +102,9 @@ CREATE TABLE `employee` (
   `created_date` datetime NOT NULL,
   `activation_date` datetime NOT NULL,
   `activated_by` int(8) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `employee_k1` (`title_type_id`),
+  CONSTRAINT `employee_title_type_fk` FOREIGN KEY (`title_type_id`) REFERENCES `title_type` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -164,9 +180,15 @@ CREATE TABLE `transaction` (
   `origin_account_id` int(8) NOT NULL,
   `destination_account_id` int(8) DEFAULT NULL,
   `amount` double NOT NULL,
-  `transaction_type` int(8) NOT NULL,
+  `transaction_type_id` int(8) NOT NULL,
   `created_date` datetime NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `transaction_k1` (`origin_account_id`),
+  KEY `transaction_k2` (`destination_account_id`),
+  KEY `transaction_k3` (`transaction_type_id`),
+  CONSTRAINT `transaction_account_fk1` FOREIGN KEY (`origin_account_id`) REFERENCES `account` (`account_number`),
+  CONSTRAINT `transaction_account_fk2` FOREIGN KEY (`destination_account_id`) REFERENCES `account` (`account_number`),
+  CONSTRAINT `transaction_transaction_type_fk` FOREIGN KEY (`transaction_type_id`) REFERENCES `transaction_type` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -191,11 +213,17 @@ CREATE TABLE `transaction_history` (
   `origin_account_id` int(8) NOT NULL,
   `destination_account_id` int(8) NOT NULL,
   `amount` double NOT NULL,
-  `transaction_type` int(8) NOT NULL,
+  `transaction_type_id` int(8) NOT NULL,
   `created_date` datetime NOT NULL,
   `approved_date` datetime NOT NULL,
   `approved_by` int(8) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `transaction_history_k1` (`origin_account_id`),
+  KEY `transaction_history_k2` (`destination_account_id`),
+  KEY `transaction_history_k3` (`transaction_type_id`),
+  CONSTRAINT `transaction_history_account_fk1` FOREIGN KEY (`origin_account_id`) REFERENCES `account` (`account_number`),
+  CONSTRAINT `transaction_history_account_fk2` FOREIGN KEY (`destination_account_id`) REFERENCES `account` (`account_number`),
+  CONSTRAINT `transaction_history_transaction_type_fk` FOREIGN KEY (`transaction_type_id`) REFERENCES `transaction_type` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -247,7 +275,9 @@ CREATE TABLE `user` (
   `user_type_id` int(8) NOT NULL,
   `last_login` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `user_ukey` (`person_id`,`user_type_id`)
+  UNIQUE KEY `user_ukey` (`person_id`,`user_type_id`),
+  KEY `user_k1` (`user_type_id`),
+  CONSTRAINT `user_user_type` FOREIGN KEY (`user_type_id`) REFERENCES `user_type` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -294,4 +324,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-10-21  0:54:34
+-- Dump completed on 2014-10-21 22:51:10
