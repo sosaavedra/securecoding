@@ -4,7 +4,7 @@
 #include <ctype.h>
 
 void rtrim(char *str){
-    int n;
+    size_t n;
 
     n = strlen(str);
 
@@ -16,7 +16,7 @@ void rtrim(char *str){
 }
 
 void ltrim(char *str){
-    int n;
+    size_t n;
 
     n = 0;
 
@@ -33,11 +33,11 @@ void trim(char *str){
 }
 
 void strtoupper(char *str){
-    int n; 
+    size_t n; 
 
     n = strlen(str);
 
-    for(int i = 0; i < n; i++){
+    for(size_t i = 0; i < n; i++){
         if(str[i] > 96 && str[i] < 123){
             str[i] += 'A' - 'a';
         }
