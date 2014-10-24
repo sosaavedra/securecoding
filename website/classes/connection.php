@@ -50,7 +50,36 @@ class MysqliConn{
             $this->conn->close();
         }
     }
-    
+
+    public function query($query){
+        if(!$this->isConnected){
+            $this->connect();
+        }
+
+
+    }
+
+    private function login($user, $password, $isClient = false){
+        if(!$isClient){
+            $query = "employeeLogin '$user', '$password";
+        } else {
+            $query = "clientLogin '$user', '$password";
+        }
+
+        $result = $this->query($query);
+
+       return ($result == null)? null : $result;
+    }
+
+    public function clientLogin($user, $password){
+        $result = $this->login($user, $password, true);
+        // TODO instance client object
+    }
+
+    public function employeeLogin($user, $password){
+        $result =  $this->login($user, $password);
+        //TODO instance employe object
+    }
 }
 
 ?>
