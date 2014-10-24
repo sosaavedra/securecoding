@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Login</title>
+<title>Make a transaction</title>
 <meta charset="utf-8">
 <link rel="stylesheet" href="css/reset.css" type="text/css" media="all">
 <link rel="stylesheet" href="css/layout.css" type="text/css" media="all">
@@ -12,6 +12,8 @@
 <script type="text/javascript" src="js/Myriad_Pro_400.font.js"></script>
 <script type="text/javascript" src="js/Myriad_Pro_700.font.js"></script>
 <script type="text/javascript" src="js/Myriad_Pro_600.font.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript" src="js/custom.js"></script>
 <!--[if lt IE 9]>
     <script type="text/javascript" src="http://info.template-help.com/files/ie6_warning/ie6_script_other.js"></script>
     <script type="text/javascript" src="js/html5.js"></script>
@@ -26,10 +28,10 @@
         </div>
         <nav>
             <ul id="menu">
-                <li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
-                <li><a href="registration.html"><span><span>Register</span></span></a></li>
-                <li id="menu_active"><a href="#"><span><span>Login</span></span> </a></li>
-                <li class="omega"><a href="#"><span><span>Something</span></span></a></li>
+				<li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
+				<li><a href="customerPage.html"><span><span>My Dashboard</span></span></a></li>
+				<li id="menu_active"><a href="#"><span><span>Transfer Money</span></span></a></li>
+				<li class="omega"><a href="#"><span><span>Logout</span></span></a></li>
             </ul>
         </nav>
     </header>
@@ -39,24 +41,36 @@
         <div class="wrapper">
             <div class="pad">
                 <div class="wrapper">
-                    <article class="col1"><h2>User Login</h2></article>
+                    <article class="col1"><h2>Make a transaction</h2></article>
                     <article class="col2 pad_left1"><h2>Contact us</h2></article>
                 </div>
             </div>
             <div class="box pad_bot1">
                 <div class="pad marg_top">
                     <article class="col1">
-                        <form id="login" class="formstyle" action="login.php" method="post">
+                        <form id="transaction" class="formstyle" action="transaction.php" method="post">
                             <div>
-                                <div class="wrapper">
-                                    <div class="bg"><input class="input" type="text" name="username" id="username"></div>E-Mail:
+							 <div class="wrapper">
+							  <div>
+									<select name="transactionType" id="transactionType" class="bg">
+									  <option value="T">Transfer Money</option>
+									  <option value="D">Deposit Money</option>
+									  <option value="W">Withdraw Money</option>
+									</select>
+								 </div>Select type:
+							 </div>
+							    <div class="wrapper">
+                                    <div class="bg"><input class="input" type="text" name="amount" id="amount"></div>Amount:
                                 </div>
-                                <div class="wrapper">
-                                    <div class="bg"><input class="input" type="password" name="password" id="password"></div>Password:
+                                <div class="wrapper" id="toAccountDiv">
+                                    <div class="bg"><input class="input" type="text" name="toAccount" id="toAccount"></div>To Account:
+                                </div>
+								<div class="wrapper" id="transactionNoDiv">
+                                    <div class="bg"><input class="input" type="text" name="transNo" id="transNo"></div>Transaction no:
                                 </div>
                                 <div class="wrapper">
                                     <div style="margin-right: 100px">
-                                        <a href="#" class="button" onclick="document.getElementById('login').submit()">Login</a>
+                                        <a href="#" class="button" onclick="document.getElementById('transaction').submit()">Go</a>
                                     </div>
                                 </div>
                             </div>
