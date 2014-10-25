@@ -20,7 +20,7 @@ class MysqliConn{
     }
 
     public function __destruct(){
-        $this->close(); 
+        $this->close();
     }
 
     public function __get($property){
@@ -52,6 +52,7 @@ class MysqliConn{
     public function close(){
         if($this->isConnected){
             $this->conn->close();
+            $this->isConnected = false;
         }
     }
 
@@ -89,8 +90,7 @@ class MysqliConn{
     }
 
     public function employeeLogin($user, $password){
-        $result =  $this->login($user, $password, true);
-        //TODO instance employe object
+        return $this->login($user, $password, true);
     }
 }
 

@@ -1,5 +1,12 @@
 <?php
 
+session_start();
+
+// define variables and set to empty values
+$unameErr = "";
+$passErr = "";
+$pageErr = "";
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['username'])) {
 
     require_once "includes/config.php";
@@ -8,9 +15,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['username'])) {
     $mysqli = new MysqliConn();
     $mysqli->connect();
 
-    // define variables and set to empty values
-    $unameErr = "";
-    $passErr = "";
     $formValid = true;
     
     if (empty ( $_POST['username'] )) {
@@ -30,18 +34,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['username'])) {
         
         // check for correct username password
         if(isset($_POST['employee']) && $_POST['employee'] == 1){
-            $mysqli->employeeLogin($username, $password);
+            $employee = $mysqli->employeeLogin($username, $password);
             $mysqli->close();
+            var_dump($employee);
+            if($employee){
+                $_SESSION['user_type'] = "employee";
+                $_SESSION['logged_user'] = $employee;
 
-            header ( 'Location: customerPage.html' );
+                header ( 'Location: customerPage.html' );
+            } else {
+                $pageErr = "Invalid email/password";
+            }
         } else {
             $mysqli->clientLogin($username, $password);
             $mysqli->close();
 
             header ( 'Location: customerPage.html' );
         }
-
-
     } 
 }
 ?>
