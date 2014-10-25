@@ -33,14 +33,15 @@ DROP TABLE IF EXISTS `account`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `account` (
-  `account_number` int(8) NOT NULL AUTO_INCREMENT,
+  `id` int(8) NOT NULL AUTO_INCREMENT,
+  `account_number` varchar(8) NOT NULL,
   `client_id` int(8) NOT NULL,
   `balance` double NOT NULL DEFAULT '0',
-  `real_time_balance` double NOT NULL DEFAULT '0',
   `created_date` datetime NOT NULL,
   `updated_date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`account_number`),
-  KEY `account_k1` (`account_number`,`client_id`),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `account_number_ukey` (`account_number`),
+  KEY `account_k1` (`id`,`client_id`),
   KEY `account_k2` (`client_id`),
   CONSTRAINT `account_client_fk` FOREIGN KEY (`client_id`) REFERENCES `client` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -186,8 +187,8 @@ CREATE TABLE `transaction` (
   KEY `transaction_k1` (`origin_account_id`),
   KEY `transaction_k2` (`destination_account_id`),
   KEY `transaction_k3` (`transaction_type_id`),
-  CONSTRAINT `transaction_account_fk1` FOREIGN KEY (`origin_account_id`) REFERENCES `account` (`account_number`),
-  CONSTRAINT `transaction_account_fk2` FOREIGN KEY (`destination_account_id`) REFERENCES `account` (`account_number`),
+  CONSTRAINT `transaction_account_fk1` FOREIGN KEY (`origin_account_id`) REFERENCES `account` (`id`),
+  CONSTRAINT `transaction_account_fk2` FOREIGN KEY (`destination_account_id`) REFERENCES `account` (`id`),
   CONSTRAINT `transaction_transaction_type_fk` FOREIGN KEY (`transaction_type_id`) REFERENCES `transaction_type` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -221,8 +222,8 @@ CREATE TABLE `transaction_history` (
   KEY `transaction_history_k1` (`origin_account_id`),
   KEY `transaction_history_k2` (`destination_account_id`),
   KEY `transaction_history_k3` (`transaction_type_id`),
-  CONSTRAINT `transaction_history_account_fk1` FOREIGN KEY (`origin_account_id`) REFERENCES `account` (`account_number`),
-  CONSTRAINT `transaction_history_account_fk2` FOREIGN KEY (`destination_account_id`) REFERENCES `account` (`account_number`),
+  CONSTRAINT `transaction_history_account_fk1` FOREIGN KEY (`origin_account_id`) REFERENCES `account` (`id`),
+  CONSTRAINT `transaction_history_account_fk2` FOREIGN KEY (`destination_account_id`) REFERENCES `account` (`id`),
   CONSTRAINT `transaction_history_transaction_type_fk` FOREIGN KEY (`transaction_type_id`) REFERENCES `transaction_type` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -314,6 +315,32 @@ LOCK TABLES `user_type` WRITE;
 INSERT INTO `user_type` VALUES (1,'Client'),(2,'Employee');
 /*!40000 ALTER TABLE `user_type` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Dumping routines for database 'banksys'
+--
+/*!50003 DROP PROCEDURE IF EXISTS `employeeLogin` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `employeeLogin`(IN `in_email` varchar(64), IN `in_pwd` varchar(64))
+SELECT e.id, e.title_type_id, tt.description, e.first_name, e.last_name,
+    e.email, u.user_type_id, ut.description, u.last_login
+FROM employee e left join title_type tt ON e.title_type_id = tt.id,
+    user u, user_type ut
+WHERE e.id = u.person_id AND u.user_type_id = ut.id
+    AND e.email = in_email AND u.pwd = in_pwd ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -324,4 +351,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-10-21 22:51:10
+-- Dump completed on 2014-10-24 20:35:52

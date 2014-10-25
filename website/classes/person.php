@@ -1,5 +1,7 @@
 <?php
 
+require_once "inexistentPropertyException.php";
+
 abstract class Person{
     private $id;
     private $title_type_id;
@@ -7,9 +9,11 @@ abstract class Person{
     private $first_name;
     private $last_name;
     private $email;
+    private $user_type_id;
+    private $user_type;
     private $last_login;
 
-    public __construct($id = NULL, $title_type_id = NULL, $title_type = NULL, $first_name = NULL, $last_name = NULL, $email = NULL, $last_login = NULL){
+    function __construct($id = null, $title_type_id = null, $title_type = null, $first_name = null, $last_name = null, $email = null, $last_login = null){
         $this->id = $id;
         $this->title_type_id = $title_type_id;
         $this->title_type = $title_type;
@@ -19,7 +23,7 @@ abstract class Person{
         $this->last_login = $last_login;
     }
 
-    public function __get($property){
+    function __get($property){
         if(property_exists($this, $property)){
             return $this->$property;
         } else {

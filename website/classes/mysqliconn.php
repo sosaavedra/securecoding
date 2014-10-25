@@ -1,5 +1,8 @@
 <?php
 
+require_once 'inexistentPropertyException.php';
+require_once 'classes/employee.php';
+
 class MysqliConn{
     private $host;
     private $username;
@@ -9,7 +12,7 @@ class MysqliConn{
     private $conn;
     private $isConnected;
 
-    public function __construct($host = NULL, $username = NULL, $pwd = NULL, $db = NULL){
+    public function __construct($host = BANKSYS_HOST, $username = BANKSYS_USER, $pwd = BANKSYS_PWD, $db = BANKSYS_DB){
         $this->host = $host;
         $this->username = $username;
         $this->pwd = $pwd;
@@ -24,6 +27,7 @@ class MysqliConn{
         if(property_exists($this, $property)){
             return $this->$property;
         } else {
+            echo "victor $propery";
             throw new InexistentPropertyException("Inexistent property: $property");
         }
     }
@@ -51,33 +55,41 @@ class MysqliConn{
         }
     }
 
-    public function query($query){
+    public function escape($str){
+        return $this->conn->escape_string($str);
+    }
+
+    private function checkConnection(){
         if(!$this->isConnected){
             $this->connect();
         }
-
-
     }
 
-    private function login($user, $password, $isClient = false){
-        if(!$isClient){
-            $query = "employeeLogin '$user', '$password";
+    private function login($user, $password, $isEmployee = false){
+        $this->checkConnection();
+
+        $stmt = $this->conn->stmt_init();
+
+        if($isEmployee){
+            $stmt->prepare("call employeeLogin (?, ?)");
         } else {
-            $query = "clientLogin '$user', '$password";
+            $stmt->prepare("call clientLogin (?, ?)");
         }
 
-        $result = $this->query($query);
+        $stmt->bind_param('ss', $user, $password);
+        $stmt->execute();
 
-       return ($result == null)? null : $result;
+        $result = $stmt->get_result();
+
+        return $result->fetch_object("Employee");
     }
 
     public function clientLogin($user, $password){
-        $result = $this->login($user, $password, true);
-        // TODO instance client object
+        return $this->login($user, $password);
     }
 
     public function employeeLogin($user, $password){
-        $result =  $this->login($user, $password);
+        $result =  $this->login($user, $password, true);
         //TODO instance employe object
     }
 }
