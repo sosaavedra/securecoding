@@ -86,7 +86,7 @@ include_once "includes/checkLogin.php";
                                 Germany<br>
                                 Munich<br>
                                 +49 1234567890<br>
-                                <a href="mailto:">support@mail.com</a>
+                                <a href="mailto:">scteam17@gmail.com</a>
                             </p>
                         </div>
                     </article>
