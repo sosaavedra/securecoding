@@ -33,7 +33,7 @@ header {}
 #menu a:hover,#menu #menu_active a {color:#fff;background:url(../images/menu_active.gif) top repeat-x}
 #menu a:hover span,#menu #menu_active a span {background:url(../images/menu_left_active.gif) top left no-repeat}
 #menu a:hover span span,#menu #menu_active a span span,#menu .alpha#menu_active a span span,#menu .alpha a:hover span span {background:url(../images/menu_right_active.gif) top right no-repeat}
-.text {background:url(../images/bg_img2.jpg) 1px 0 no-repeat;padding:18px 0 0 515px;width:325px;margin-top:15px;text-align:center;height:265px}
+.text {background:url(../images/bg_img2.jpg) 1px 0 no-repeat;padding:18px 0 0 515px;margin-top:15px;text-align:center;height:265px}
 .text1 {font-size:80px;font-weight:700;line-height:100px;color:#000;letter-spacing:-2px;display:block}
 .text1 span {display:block;font-size:40px;line-height:50px;margin-top:-17px;letter-spacing:-1px;padding-bottom:20px}
 .text .button {display:inline-block;font-size:30px;font-weight:700;color:#fff;line-height:53px;padding:0 37px;background:url(../images/button_bg.gif) top repeat-x #308da2;border-radius:10px;-moz-border-radius:10px;-webkit-border-radius:10px;behavior:url(js/PIE.htc);position:relative;text-decoration:none}
