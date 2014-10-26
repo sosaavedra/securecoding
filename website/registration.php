@@ -183,8 +183,7 @@ mysqli_close ( $con );
 									<div class="bg"><input class="input" type="password" name="cpassword" id="cpassword"></div>Retype Password:
 								</div>
 								<span class="error"><?php echo $cpassErr.$passMatchErr;?></span>
-								<a href="#" class="button" onclick="document.getElementById('registration').submit()">Register</a>
-								<a href="#" class="button" onclick="document.getElementById('registration').reset()">clear</a>
+								<input class='button' type='submit' name='register' value='Register' id='register'>
 							</div>
 						</form>
 					</article>

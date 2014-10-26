@@ -67,7 +67,7 @@ include_once "includes/checkLogin.php";
                                 </div>
                                 <div class="wrapper">
                                     <div style="margin-right: 100px">
-                                        <a href="#" class="button" onclick="document.getElementById('login').submit()">Login</a>
+                                    <input class='button' type='submit' name='login' value='Login' id='login'>
                                     </div>
                                 </div>
                             </div>
