@@ -164,15 +164,15 @@ mysqli_close ( $con );
 								</div>
 								<span class="error"><?php echo $titleErr;?></span>
 								<div class="wrapper">
-									<div class="bg"><input class="input" type="text" name="firstname" id="firstname" value="<?php echo $_POST ['firstname']; ?>"></div>First name:
+									<div class="bg"><input class="input" type="text" name="firstname" id="firstname" value="<?php if(isset($_POST ['firstname']))echo $_POST ['firstname']; ?>"></div>First name:
 								</div>
 								<span class="error"><?php echo $fnameErr;?></span>
 								<div class="wrapper">
-									<div class="bg"><input class="input" type="text" name="lastname" id="lastname" value="<?php echo $_POST ['lastname']; ?>"></div>Last name:
+									<div class="bg"><input class="input" type="text" name="lastname" id="lastname" value="<?php if(isset($_POST ['lastname']))echo $_POST ['lastname']; ?>"></div>Last name:
 								</div>
 								<span class="error"><?php echo $lnameErr;?></span>
 								<div class="wrapper">
-									<div class="bg"><input class="input" type="text" name="email" id="email" value="<?php echo $_POST ['email']; ?>"></div>Email:
+									<div class="bg"><input class="input" type="text" name="email" id="email" value="<?php if(isset($_POST ['email']))echo $_POST ['email']; ?>"></div>Email:
 								</div>
 								<span class="error"><?php echo $emailErr;?></span>
 								<div class="wrapper">
