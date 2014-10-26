@@ -97,7 +97,7 @@
 						
 						$result = $mysqli->getClientsToApprove ();
 						
-						if ($result->num_rows > 0) {
+						if (!empty($result) && $result->num_rows > 0) {
 							
 							echo "<div class='datagrid'><table>";
 							echo "<thead><tr> <td> Name </td> <td> Email </td> <td> ID </td><td> Approve/Reject </td> </tr></thead>";

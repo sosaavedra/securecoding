@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['username'])) {
                 $_SESSION['user_type'] = "employee";
                 $_SESSION['logged_user'] = $employee;
 
-                header ( 'Location: empApproveReg.html' );
+                header ( 'Location: empApproveTrans.php' );
             } else {
                 $pageErr = "Invalid email/password";
             }

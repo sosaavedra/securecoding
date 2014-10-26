@@ -86,13 +86,12 @@
 									$mysqli = new MysqliConn ();
 									$mysqli->connect ();
 									
-									$customerId = $mysqli->escape ( $customerId );
+									$customerId = $mysqli->escape ( $_POST ['customerId'] );
 									
 									// to show customer details
-									
 									$result = $mysqli->getClientDetails ( $customerId );
 									
-									if ($result->num_rows > 0) {
+									if (!empty($result) && $result->num_rows > 0) {
 										
 										echo "<h3> Customer details: </h3><br>";
 										echo "<div class='datagrid'><table>";
@@ -111,7 +110,7 @@
 										// to show customer transactions
 										$result = $mysqli->getClientTransactionHistory ( $customerId );
 										
-										if ($result->num_rows > 0) {
+										if (!empty($result) && $result->num_rows > 0) {
 											
 											echo "<br><div class='datagrid'><table>";
 											echo "<thead><tr> <td> To Account </td> <td> Date </td> <td> Amount </td><td> Type </td> </tr></thead>";

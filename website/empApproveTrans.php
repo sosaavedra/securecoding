@@ -100,7 +100,7 @@
 						
 						$result = $mysqli->getTransactionsToApprove ();
 						
-						if ($result->num_rows > 0) {
+						if (!empty($result) && $result->num_rows > 0) {
 							
 							echo "<div class='datagrid'><table>";
 							echo "<thead><tr> <td> Origin </td> <td> Destination </td> <td> Date </td> <td> Amount </td><td> Type </td> <td> Approve/Reject </td> </tr></thead>";
