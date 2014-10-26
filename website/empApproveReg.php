@@ -56,6 +56,7 @@
 						
 						require_once "includes/config.php";
 						require_once "classes/mysqliconn.php";
+						require_once "includes/checkSession.php";
 						
 						$mysqli = new MysqliConn ();
 						$mysqli->connect ();
@@ -66,6 +67,8 @@
 						
 						// checking if request is a posted
 						if ($_POST) {
+							
+							$employee_id = $_SESSION ['logged_user'];
 							
 							if (empty ( $_POST ['check_list'] )) {
 								$formValid = false;
@@ -79,17 +82,12 @@
 									if (isset ( $_POST ['approve'] )) {
 										// approve-button was clicked
 										if ($mysqli->createAccount ( $employee_id, $clientId )) {
-											$mysqli->close ();
 										} else {
 											die ( "Error: Client already exists!" );
 										}
 									} else if (isset ( $_POST ['reject'] )) {
 										// reject-button was clicked
-										if ($mysqli->deleteRejectedClient ( $clientId )) {
-											$mysqli->close ();
-										} else {
-											die ( "Error: Cannot delete client!" );
-										}
+										$mysqli->deleteRejectedClient ( $clientId );
 									}
 								}
 							}
@@ -97,7 +95,7 @@
 						
 						$result = $mysqli->getClientsToApprove ();
 						
-						if (!empty($result) && $result->num_rows > 0) {
+						if (! empty ( $result ) && $result->num_rows > 0) {
 							
 							echo "<div class='datagrid'><table>";
 							echo "<thead><tr> <td> Name </td> <td> Email </td> <td> ID </td><td> Approve/Reject </td> </tr></thead>";
