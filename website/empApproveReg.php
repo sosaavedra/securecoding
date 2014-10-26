@@ -28,9 +28,9 @@
 			</div>
 			<nav>
 				<ul id="menu">
-					<li class="alpha"><a href="empApproveTrans.php"><span><span>Approve
-									transfers</span></span></a></li>
-					<li id="menu_active"><a href="#"><span><span>Approve registrations</span></span></a></li>
+					<li class="alpha"><a href="empApproveTrans.php"><span><span>Approve transfers</span></span></a></li>
+					<li id="menu_active"><a href="#"><span><span>Approve client</span></span></a></li>
+					<li><a href="empViewCustomer.php"><span><span>View client</span></span></a></li>
 					<li class="omega"><a href="#"><span><span>Logout</span></span></a></li>
 				</ul>
 			</nav>
@@ -50,9 +50,7 @@
 					<div class="pad marg_top">
 						<article class="col1">
 							<p>Please select client(s) you want to approve OR reject</p>
-							<form id="approval" class="formstyle"
-								action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>"
-								method="post">
+							<form id="approval" class="formstyle" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
 											
 						<?php
 						
@@ -111,7 +109,7 @@
 							// output data of each row
 							while ( $row = $result->fetch_assoc () ) {
 								echo "<tr class='alt'>";
-								echo "<td>" .$row ["first_name"] . " " . $row ["last_name"] . "</td><td>" . $row ["email"] . "</td><td>" . $row ["id"] . "</td><td><input type='checkbox' name='check_list[]' value='" . $row ["id"] . "' checked></td>";
+								echo "<td>" . $row ["first_name"] . " " . $row ["last_name"] . "</td><td>" . $row ["email"] . "</td><td>" . $row ["id"] . "</td><td><input type='checkbox' name='check_list[]' value='" . $row ["id"] . "' checked></td>";
 								echo "</tr>";
 							}
 							echo "</tbody>";

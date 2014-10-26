@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="css/reset.css" type="text/css" media="all">
 <link rel="stylesheet" href="css/layout.css" type="text/css" media="all">
 <link rel="stylesheet" href="css/style.css" type="text/css" media="all">
-<script type="text/javascript" src="js/jquery-1.4.2.js" ></script>
+<script type="text/javascript" src="js/jquery-1.4.2.js"></script>
 <script type="text/javascript" src="js/cufon-yui.js"></script>
 <script type="text/javascript" src="js/cufon-replace.js"></script>
 <script type="text/javascript" src="js/Myriad_Pro_400.font.js"></script>
@@ -18,36 +18,39 @@
 <![endif]-->
 </head>
 <body id="page4">
-<div class="main">
-<!-- header -->
-	<header>
-		<div class="wrapper">
-			<h1><a href="index.html" id="logo">Smart Biz</a></h1>
-		</div>
-		<nav>
-			<ul id="menu">
-				<li class="alpha" id="menu_active"><a href="#"><span><span>Approve transfers</span></span></a></li>
-				<li><a href="empApproveReg.php"><span><span>Approve registrations</span></span></a></li>
-				<li class="omega"><a href="#"><span><span>Logout</span></span></a></li>
-			</ul>
-		</nav>
-	</header>
-<!-- / header -->
-<!-- content -->
-	<section id="content">
-		<div class="wrapper">
-			<div class="pad">
-				<div class="wrapper">
-					<article class="col1"><h2>Welcome </h2></article>
-				</div>
+	<div class="main">
+		<!-- header -->
+		<header>
+			<div class="wrapper">
+				<h1>
+					<a href="index.html" id="logo">Smart Biz</a>
+				</h1>
 			</div>
-			<div class="box pad_bot1">
-				<div class="pad marg_top">
-					<article class="col1">
-						<p>Please select transaction(s) you want to approve OR reject</p>
-							<form id="approvalTrans" class="formstyle"
-								action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>"
-								method="post">
+			<nav>
+				<ul id="menu">
+					<li class="alpha" id="menu_active"><a href="#"><span><span>Approve transfers</span></span></a></li>
+					<li><a href="empApproveReg.php"><span><span>Approve client</span></span></a></li>
+					<li><a href="empViewCustomer.php"><span><span>View client</span></span></a></li>
+					<li class="omega"><a href="#"><span><span>Logout</span></span></a></li>
+				</ul>
+			</nav>
+		</header>
+		<!-- / header -->
+		<!-- content -->
+		<section id="content">
+			<div class="wrapper">
+				<div class="pad">
+					<div class="wrapper">
+						<article class="col1">
+							<h2>Welcome</h2>
+						</article>
+					</div>
+				</div>
+				<div class="box pad_bot1">
+					<div class="pad marg_top">
+						<article class="col1">
+							<p>Please select transaction(s) you want to approve OR reject</p>
+							<form id="approvalTrans" class="formstyle" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
 											
 						<?php
 						
@@ -116,7 +119,7 @@
 							// output data of each row
 							while ( $row = $result->fetch_assoc () ) {
 								echo "<tr class='alt'>";
-								echo "<td>" .$row ["origin_account_id"] . "</td><td>" .$row ["destination_account_id"] . "</td><td>" . $row ["created_date"] . "</td><td>" . $row ["amount"] . "</td><td>" . $row ["transaction_type_id"] .  "</td><td><input type='checkbox' name='check_list[]' value='" . $row ["id"] . "' checked></td>";
+								echo "<td>" . $row ["origin_account_id"] . "</td><td>" . $row ["destination_account_id"] . "</td><td>" . $row ["created_date"] . "</td><td>" . $row ["amount"] . "</td><td>" . $row ["transaction_type_id"] . "</td><td><input type='checkbox' name='check_list[]' value='" . $row ["id"] . "' checked></td>";
 								echo "</tr>";
 							}
 							echo "</tbody>";
@@ -124,7 +127,6 @@
 							
 							echo "<input class='button' type='submit' name='approve' value='Approve' id='approve'>";
 							echo "<input class='button' type='submit' name='reject' value='Reject' id='reject'>";
-		
 						} else {
 							echo "No transaction are waiting approval";
 						}
@@ -133,12 +135,12 @@
 						?>
 						</form>
 							<span class="error"><?php echo $chekBoxErr;?></span>
-					</article>
+						</article>
+					</div>
 				</div>
 			</div>
-		</div>
-	</section>
-<!-- / content -->
-</div>
+		</section>
+		<!-- / content -->
+	</div>
 </body>
 </html>
