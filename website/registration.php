@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="css/reset.css" type="text/css" media="all">
 <link rel="stylesheet" href="css/layout.css" type="text/css" media="all">
 <link rel="stylesheet" href="css/style.css" type="text/css" media="all">
-<script type="text/javascript" src="js/jquery-1.4.2.js" ></script>
+<script type="text/javascript" src="js/jquery-1.4.2.js"></script>
 <script type="text/javascript" src="js/cufon-yui.js"></script>
 <script type="text/javascript" src="js/cufon-replace.js"></script>
 <script type="text/javascript" src="js/Myriad_Pro_400.font.js"></script>
@@ -26,23 +26,22 @@
 $fnameErr = $lnameErr = $emailErr = $passErr = $cpassErr = $passMatchErr = $titleErr = "";
 $formValid = true;
 
-		// connect to DB
-		$con = mysqli_connect ( "localhost", "root", "samurai", "banksys" );
-		// Check connection
-		if (mysqli_connect_errno ()) {
-			echo "Failed to connect to MySQL: " . mysqli_connect_error ();
-		}
-		
-		//for displaying titles
-		
-		$sql = "SELECT * FROM `title_type`"; 
-		$titleTypes = mysqli_query ($con, $sql);
-		
+// connect to DB
+$con = mysqli_connect ( "localhost", "root", "samurai", "banksys" );
+// Check connection
+if (mysqli_connect_errno ()) {
+	echo "Failed to connect to MySQL: " . mysqli_connect_error ();
+}
+
+// for displaying titles
+
+$sql = "SELECT * FROM `title_type`";
+$titleTypes = mysqli_query ( $con, $sql );
 
 // checking if request is posted
 if ($_POST) {
-
-	if (empty ( $_POST ['title']) ){
+	
+	if (empty ( $_POST ['title'] )) {
 		$titleErr = "Title not valid";
 		$formValid = false;
 	}
@@ -62,7 +61,7 @@ if ($_POST) {
 		$formValid = false;
 	}
 	
-	if (empty ( $_POST ['password'] ) || strlen($_POST ['password']) < 6 ) {
+	if (empty ( $_POST ['password'] ) || strlen ( $_POST ['password'] ) < 6) {
 		$passErr = "Password must be atleast 6 char";
 		$formValid = false;
 	}
@@ -70,7 +69,7 @@ if ($_POST) {
 	if (empty ( $_POST ['cpassword'] )) {
 		$cpassErr = "Retype password is required";
 		$formValid = false;
-	} else 	if (strcmp ( $_POST ['password'], $_POST ['cpassword'] ) != 0) {
+	} else if (strcmp ( $_POST ['password'], $_POST ['cpassword'] ) != 0) {
 		$passMatchErr = "Passwords do not match";
 		$formValid = false;
 	}
@@ -93,8 +92,8 @@ if ($_POST) {
 			die ( 'Error: ' . mysqli_error ( $con ) );
 		}
 		
-		//get the created client id from database
-
+		// get the created client id from database
+		
 		$sql = "SELECT id FROM `client` WHERE email='$email'";
 		
 		$result = mysqli_query ( $con, $sql );
@@ -103,7 +102,7 @@ if ($_POST) {
 		while ( $row = $result->fetch_assoc () ) {
 			$person_id = $row ["id"];
 		}
-		$hashedPW = hash('sha256', $password);
+		$hashedPW = hash ( 'sha256', $password );
 		
 		// insert into user table, user type = 1 for client
 		
@@ -115,102 +114,119 @@ if ($_POST) {
 		}
 		
 		header ( 'Location: registerSuccess.html' );
-	} 
+	}
 }
 
 mysqli_close ( $con );
 
 ?>
 <div class="main">
-<!-- header -->
-	<header>
-		<div class="wrapper">
-			<h1><a href="index.html" id="logo">Smart Biz</a></h1>
-		</div>
-		<nav>
-			<ul id="menu">
-				<li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
-				<li id="menu_active"><a href="#"><span><span>Register</span></span></a></li>
-				<li><a href="login.php"><span><span>Login</span></span> </a></li>
-				<li class="omega"><a href="#"><span><span>Something</span></span></a></li>
-			</ul>
-		</nav>
-	</header>
-<!-- / header -->
-<!-- content -->
-	<section id="content">
-		<div class="wrapper">
-			<div class="pad">
-				<div class="wrapper">
-					<article class="col1"><h2>New user registration</h2></article>
-					<article class="col2 pad_left1"><h2>Contact us</h2></article>
-				</div>
+		<!-- header -->
+		<header>
+			<div class="wrapper">
+				<h1>
+					<a href="index.html" id="logo">Smart Biz</a>
+				</h1>
 			</div>
-			<div class="box pad_bot1">
-				<div class="pad marg_top">
-					<article class="col1">
-						<form id="registration" class="formstyle" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
-							<div>
-								<div class="wrapper">
-								  <div>
-									<select name="title" id="title" class="bg">
+			<nav>
+				<ul id="menu">
+					<li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
+					<li id="menu_active"><a href="#"><span><span>Register</span></span></a></li>
+					<li><a href="login.php"><span><span>Login</span></span> </a></li>
+					<li class="omega"><a href="#"><span><span>Something</span></span></a></li>
+				</ul>
+			</nav>
+		</header>
+		<!-- / header -->
+		<!-- content -->
+		<section id="content">
+			<div class="wrapper">
+				<div class="pad">
+					<div class="wrapper">
+						<article class="col1">
+							<h2>New user registration</h2>
+						</article>
+						<article class="col2 pad_left1">
+							<h2>Contact us</h2>
+						</article>
+					</div>
+				</div>
+				<div class="box pad_bot1">
+					<div class="pad marg_top">
+						<article class="col1">
+							<form id="registration" class="formstyle" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+								<div>
+									<div class="wrapper">
+										<div>
+											<select name="title" id="title" class="bg">
 									<?php
-									    while ( $row = $titleTypes->fetch_assoc () ) {
-									    echo "<option value='".$row["id"]."'>".$row["description"]."</option>";
-									      }
-									 ?>
+									while ( $row = $titleTypes->fetch_assoc () ) {
+										echo "<option value='" . $row ["id"] . "'>" . $row ["description"] . "</option>";
+									}
+									?>
 									</select>
-								 </div>Select type:
+										</div>
+										Select type:
+									</div>
+									<span class="error"><?php echo $titleErr;?></span>
+									<div class="wrapper">
+										<div class="bg">
+											<input class="input" type="text" name="firstname" id="firstname" value="<?php if(isset($_POST ['firstname']))echo $_POST ['firstname']; ?>">
+										</div>
+										First name:
+									</div>
+									<span class="error"><?php echo $fnameErr;?></span>
+									<div class="wrapper">
+										<div class="bg">
+											<input class="input" type="text" name="lastname" id="lastname" value="<?php if(isset($_POST ['lastname']))echo $_POST ['lastname']; ?>">
+										</div>
+										Last name:
+									</div>
+									<span class="error"><?php echo $lnameErr;?></span>
+									<div class="wrapper">
+										<div class="bg">
+											<input class="input" type="text" name="email" id="email" value="<?php if(isset($_POST ['email']))echo $_POST ['email']; ?>">
+										</div>
+										Email:
+									</div>
+									<span class="error"><?php echo $emailErr;?></span>
+									<div class="wrapper">
+										<div class="bg">
+											<input class="input" type="password" name="password" id="password">
+										</div>
+										Password:
+									</div>
+									<span class="error"><?php echo $passErr;?></span>
+									<div class="wrapper">
+										<div class="bg">
+											<input class="input" type="password" name="cpassword" id="cpassword">
+										</div>
+										Retype Password:
+									</div>
+									<span class="error"><?php echo $cpassErr.$passMatchErr;?></span>
+									<div style="margin-right: 100px">
+										<input class='button' type='submit' name='register' value='Register' id='register'>
+									</div>
 								</div>
-								<span class="error"><?php echo $titleErr;?></span>
-								<div class="wrapper">
-									<div class="bg"><input class="input" type="text" name="firstname" id="firstname" value="<?php if(isset($_POST ['firstname']))echo $_POST ['firstname']; ?>"></div>First name:
-								</div>
-								<span class="error"><?php echo $fnameErr;?></span>
-								<div class="wrapper">
-									<div class="bg"><input class="input" type="text" name="lastname" id="lastname" value="<?php if(isset($_POST ['lastname']))echo $_POST ['lastname']; ?>"></div>Last name:
-								</div>
-								<span class="error"><?php echo $lnameErr;?></span>
-								<div class="wrapper">
-									<div class="bg"><input class="input" type="text" name="email" id="email" value="<?php if(isset($_POST ['email']))echo $_POST ['email']; ?>"></div>Email:
-								</div>
-								<span class="error"><?php echo $emailErr;?></span>
-								<div class="wrapper">
-									<div class="bg"><input class="input" type="password" name="password" id="password" ></div>Password:
-								</div>
-								<span class="error"><?php echo $passErr;?></span>
-								<div class="wrapper">
-									<div class="bg"><input class="input" type="password" name="cpassword" id="cpassword"></div>Retype Password:
-								</div>
-								<span class="error"><?php echo $cpassErr.$passMatchErr;?></span>
-								<input class='button' type='submit' name='register' value='Register' id='register'>
+							</form>
+						</article>
+						<article class="col2 pad_left1">
+							<div class="wrapper">
+								<p class="cols pad_bot3">
+									<strong> Country:<br> City:<br> Telephone:<br> Email:
+									</strong>
+								</p>
+								<p class="pad_bot3">
+									Germany<br> Munich<br> +49 1234567890<br> <a href="mailto:">scteam17@gmail.com</a>
+								</p>
 							</div>
-						</form>
-					</article>
-					<article class="col2 pad_left1">
-						<div class="wrapper">
-							<p class="cols pad_bot3">
-								<strong>
-									Country:<br>
-									City:<br>
-									Telephone:<br>
-									Email:
-								</strong>
-							</p>
-							<p class="pad_bot3">
-								Germany<br>
-								Munich<br>
-								+49 1234567890<br>
-								<a href="mailto:">scteam17@gmail.com</a>
-							</p>
-						</div>
-					</article>
+						</article>
+					</div>
 				</div>
 			</div>
-		</div>
-	</section>
-<!-- / content -->
-</div>
-<script type="text/javascript"> Cufon.now(); </script>
+		</section>
+		<!-- / content -->
+	</div>
+	<script type="text/javascript"> Cufon.now(); </script>
 </body>
 </html>
