@@ -27,7 +27,6 @@ class MysqliConn{
         if(property_exists($this, $property)){
             return $this->$property;
         } else {
-            echo "victor $propery";
             throw new InexistentPropertyException("Inexistent property: $property");
         }
     }
@@ -57,6 +56,8 @@ class MysqliConn{
     }
 
     public function escape($str){
+        $this->checkConnection();
+
         return $this->conn->escape_string($str);
     }
 
@@ -92,6 +93,30 @@ class MysqliConn{
     public function employeeLogin($user, $password){
         return $this->login($user, $password, true);
     }
+
+    public function createClient($title_type_id, $first_name, $last_name, $email, $pwd){
+        $stmt = $this->conn->stmt_init();
+        $stmt->prepare("call createClient (?, ?, ?, ?, ?)");
+        $stmt->bind_param('issss', $title_type_id, $first_name, $last_name, $email, $pwd);
+        $stmt->execute();
+
+        $error_msg;
+        $stmt->bind_result($error_msg);
+
+        return !$stmt->fetch();
+    }
+
+    public function getTitleTypes(){
+        $stmt = $this->conn->stmt_init();
+        $stmt->prepare("call getTitleTypes");
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        return $result;
+    }
+
+
 }
 
 ?>

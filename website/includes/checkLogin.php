@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['username'])) {
         if(isset($_POST['employee']) && $_POST['employee'] == 1){
             $employee = $mysqli->employeeLogin($username, $password);
             $mysqli->close();
-            var_dump($employee);
+
             if($employee){
                 $_SESSION['user_type'] = "employee";
                 $_SESSION['logged_user'] = $employee;
