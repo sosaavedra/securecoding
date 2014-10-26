@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Approve transfers</title>
+<title>View client</title>
 <meta charset="utf-8">
 <link rel="stylesheet" href="css/reset.css" type="text/css" media="all">
 <link rel="stylesheet" href="css/layout.css" type="text/css" media="all">
@@ -30,7 +30,7 @@
 				<ul id="menu">
 					<li class="alpha"><a href="empApproveTrans.php"><span><span>Approve transfers</span></span></a></li>
 					<li><a href="empApproveReg.php"><span><span>Approve client</span></span></a></li>
-					<li  id="menu_active"><a href="#"><span><span>View client</span></span></a></li>
+					<li id="menu_active"><a href="#"><span><span>View client</span></span></a></li>
 					<li class="omega"><a href="#"><span><span>Logout</span></span></a></li>
 				</ul>
 			</nav>
@@ -51,11 +51,101 @@
 						<article class="col1">
 							<p>Please enter customer id you want to view</p>
 							<form id="viewDetails" class="formstyle" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+
+								<div class="wrapper">
+									<div class="wrapper">
+										<div class="bg">
+											<input class="input" type="text" name="customerId" id="customerId" value="<?php if(isset($_POST ['customerId']))echo $_POST ['customerId']; ?>">
+										</div>
+										Customer Id:
+									</div>
+									<div style="margin-right: 100px">
+										<input class='button' type='submit' name='viewCustomer' value='Go' id='viewCustomer'>
+									</div>
+								</div>
+
+							</form>
+							<?php
+							
+							// define variables for form values validation and set to empty values
+							$customerIdErr = "";
+							$formValid = true;
+							
+							if ($_POST) {
+								
+								if (empty ( $_POST ['customerId'] )) {
+									$customerIdErr = "customer id not valid";
+									$formValid = false;
+								}
+								
+								if ($formValid) {
+									
+									// Create connection
+									$conn = mysqli_connect ( "localhost", "root", "samurai", "banksys" );
+									// Check connection
+									if ($conn->connect_error) {
+										die ( "Connection failed: " . $conn->connect_error );
+									}
+									
+									$customerId = mysqli_real_escape_string ( $conn, $_POST ['customerId'] );
+									
+									// to show customer details
+									
+									$sql = "SELECT id,first_name,last_name,email FROM `client` WHERE id='$customerId'";
+									$result = $conn->query ( $sql );
+									
+									if ($result->num_rows > 0) {
+										
+										echo "<h3> Customer details: </h3><br>";
+										
+										echo "<div class='datagrid'><table>";
+										
+										echo "<thead><tr> <td> Name </td> <td> Email </td> <td> ID </td></tr></thead>";
+										
+										echo "<tbody>";
+										
+										// output data of each row
+										while ( $row = $result->fetch_assoc () ) {
+											echo "<tr class='alt'>";
+											echo "<td>" . $row ["first_name"] . " " . $row ["last_name"] . "</td><td>" . $row ["email"] . "</td><td>" . $row ["id"] . "</td>";
+											echo "</tr>";
+										}
+										echo "</tbody>";
+										echo "</table></div>";
+										
+										// to show customer transactions
+										$sql = "SELECT * FROM `transaction_history`";
+										$result = $conn->query ( $sql );
+										
+										if ($result->num_rows > 0) {
 											
-						<?php
-						
-						?>
-						</form>
+											echo "<br><div class='datagrid'><table>";
+											
+											echo "<thead><tr> <td> To Account </td> <td> Date </td> <td> Amount </td><td> Type </td> </tr></thead>";
+											
+											echo "<tbody>";
+											
+											// output data of each row
+											while ( $row = $result->fetch_assoc () ) {
+												echo "<tr class='alt'>";
+												echo "<td>" . $row ["destination_account_id"] . "</td><td>" . $row ["approved_date"] . "</td><td>" . $row ["amount"] . "</td><td>" . $row ["transaction_type_id"] . "</td>";
+												echo "</tr>";
+											}
+											echo "</tbody>";
+											echo "</table></div>";
+										} else {
+											echo "<br><h3>No transaction history found</h3>";
+										}
+									} else {
+										echo "Invalid customer Id.";
+									}
+									
+									$conn->close ();
+								}
+							}
+							
+							?>
+							<span class="error"><?php echo $customerIdErr;?></span>
 						</article>
 					</div>
 				</div>
