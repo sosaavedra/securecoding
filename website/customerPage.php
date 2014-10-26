@@ -46,7 +46,7 @@
 			<div class="box pad_bot1">
 				<div class="pad marg_top">
 					<article class="col1">
-						Transaction history
+						<h3>Transaction history</h3>
 						
 						<?php
 						
