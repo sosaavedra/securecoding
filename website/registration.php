@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="css/reset.css" type="text/css" media="all">
 <link rel="stylesheet" href="css/layout.css" type="text/css" media="all">
 <link rel="stylesheet" href="css/style.css" type="text/css" media="all">
-<script type="text/javascript" src="js/jquery-1.4.2.js" ></script>
+<script type="text/javascript" src="js/jquery-1.4.2.js"></script>
 <script type="text/javascript" src="js/cufon-yui.js"></script>
 <script type="text/javascript" src="js/cufon-replace.js"></script>
 <script type="text/javascript" src="js/Myriad_Pro_400.font.js"></script>
@@ -104,10 +104,18 @@
         </div>
         <nav>
             <ul id="menu">
-                <li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
-                <li id="menu_active"><a href="#"><span><span>Register</span></span></a></li>
-                <li><a href="login.php"><span><span>Login</span></span> </a></li>
-                <li class="omega"><a href="#"><span><span>Something</span></span></a></li>
+                <li class="alpha">
+                    <a href="index.html"><span><span>Home</span></span></a>
+                </li>
+                <li id="menu_active">
+                    <a href="#"><span><span>Register</span></span></a>
+                </li>
+                <li>
+                    <a href="login.php"><span><span>Login</span></span> </a>
+                </li>
+                <li class="omega">
+                    <a href="#"><span><span>Something</span></span></a>
+                </li>
             </ul>
         </nav>
     </header>
@@ -117,8 +125,12 @@
         <div class="wrapper">
             <div class="pad">
                 <div class="wrapper">
-                    <article class="col1"><h2>New user registration</h2></article>
-                    <article class="col2 pad_left1"><h2>Contact us</h2></article>
+                    <article class="col1">
+                        <h2>New user registration</h2>
+                    </article>
+                    <article class="col2 pad_left1">
+                        <h2>Contact us</h2>
+                    </article>
                 </div>
             </div>
             <div class="box pad_bot1">
@@ -135,30 +147,46 @@
                                           }
                                      ?>
                                     </select>
-                                 </div>Select type:
+                                 </div>
+                                Select type:
                                 </div>
                                 <span class="error"><?php echo $titleErr;?></span>
                                 <div class="wrapper">
-                                    <div class="bg"><input class="input" type="text" name="firstname" id="firstname" value="<?php if(isset($_POST ['firstname']))echo $_POST ['firstname']; ?>"></div>First name:
+                                    <div class="bg">
+                                        <input class="input" type="text" name="firstname" id="firstname" value="<?php if(isset($_POST ['firstname'])) echo $_POST ['firstname']; ?>">
+                                    </div>
+                                    First name:
                                 </div>
                                 <span class="error"><?php echo $fnameErr;?></span>
                                 <div class="wrapper">
-                                    <div class="bg"><input class="input" type="text" name="lastname" id="lastname" value="<?php if(isset($_POST ['lastname']))echo $_POST ['lastname']; ?>"></div>Last name:
+                                    <div class="bg">
+                                        <input class="input" type="text" name="lastname" id="lastname" value="<?php if(isset($_POST ['lastname']))echo $_POST ['lastname']; ?>">
+                                    </div>
+                                    Last name:
                                 </div>
                                 <span class="error"><?php echo $lnameErr;?></span>
                                 <div class="wrapper">
-                                    <div class="bg"><input class="input" type="text" name="email" id="email" value="<?php if(isset($_POST ['email']))echo $_POST ['email']; ?>"></div>Email:
+                                    <div class="bg">
+                                        <input class="input" type="text" name="email" id="email" value="<?php if(isset($_POST ['email']))echo $_POST ['email']; ?>">
+                                    </div>
+                                    Email:
                                 </div>
                                 <span class="error"><?php echo $emailErr;?></span>
                                 <div class="wrapper">
-                                    <div class="bg"><input class="input" type="password" name="password" id="password" ></div>Password:
+                                    <div class="bg">
+                                        <input class="input" type="password" name="password" id="password" >
+                                    </div>
+                                    Password:
                                 </div>
                                 <span class="error"><?php echo $passErr;?></span>
                                 <div class="wrapper">
-                                    <div class="bg"><input class="input" type="password" name="cpassword" id="cpassword"></div>Retype Password:
+                                    <div class="bg">
+                                        <input class="input" type="password" name="cpassword" id="cpassword">
+                                    </div>
+                                    Retype Password:
                                 </div>
                                 <span class="error"><?php echo $cpassErr.$passMatchErr;?></span>
-                                <input class='button' type='submit' name='register' value='Register' id='register'>
+                                <input class='button' type='submit' name='register' value='Register' id='register' />
                             </div>
                         </form>
                     </article>
