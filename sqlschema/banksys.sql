@@ -73,6 +73,7 @@ CREATE TABLE `client` (
   `activation_date` datetime NOT NULL,
   `activated_by` int(8) NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `email_ukey` (`email`),
   KEY `client_k1` (`title_type_id`),
   CONSTRAINT `client_title_type_fk` FOREIGN KEY (`title_type_id`) REFERENCES `title_type` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -279,7 +280,7 @@ CREATE TABLE `user` (
   UNIQUE KEY `user_ukey` (`person_id`,`user_type_id`),
   KEY `user_k1` (`user_type_id`),
   CONSTRAINT `user_user_type` FOREIGN KEY (`user_type_id`) REFERENCES `user_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -288,7 +289,6 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,1,'admin',2,'0000-00-00 00:00:00');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -319,6 +319,95 @@ UNLOCK TABLES;
 --
 -- Dumping routines for database 'banksys'
 --
+/*!50003 DROP PROCEDURE IF EXISTS `clientLogin` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `clientLogin`(IN `in_email` varchar(64), IN `in_pwd` varchar(64))
+BEGIN
+    SELECT c.id, c.title_type_id, tt.description, c.first_name, c.last_name,
+    c.email, u.user_type_id, ut.description, u.last_login
+    FROM cient c left join title_type tt ON c.title_type_id = tt.id,
+        user u, user_type ut
+    WHERE c.id = u.person_id AND u.user_type_id = ut.id
+        AND c.email = in_email AND u.pwd = in_pwd;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `createAccount` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `createAccount`(IN `in_employee_id` int(8), IN `in_client_id` int(8))
+BEGIN
+    DECLARE last_account_id int(8);
+    DECLARE new_account_number char(8);
+    DECLARE EXIT HANDLER FOR 1062 SELECT 'Duplicate entry!' AS error_msg;
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION SELECT 'SQLException found!' AS error_msg;
+
+    INSERT INTO account(account_number, client_id, created_date)
+    VALUES('', in_client_id, now());
+
+    SET last_account_id = LAST_INSERT_ID();
+    SET new_account_number = CAST(50000000 + last_account_id AS CHAR(8));
+
+    UPDATE account SET account_number = new_account_number
+    WHERE id = last_account_id;
+
+    UPDATE client SET activation_date = now(), activated_by = in_employee_id
+    WHERE id = in_client_id;
+
+    SELECT last_account_id AS account_id, new_account_number AS account_number;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `createClient` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `createClient`(IN `in_title_type_id` int(8), IN `in_first_name` varchar(128), IN `in_last_name` varchar(128), IN `in_email` varchar(64), IN `in_pwd` varchar(64))
+BEGIN
+    DECLARE EXIT HANDLER FOR 1062 SELECT 'Duplicate entry!' AS error_msg;
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION SELECT 'SQLException found!' AS error_msg;
+
+    INSERT INTO client(first_name, last_name, email, title_type_id)
+    VALUES (in_first_name, in_last_name, in_email, in_title_type_id);
+
+    INSERT INTO user(person_id, pwd, user_type_id)
+    SELECT LAST_INSERT_ID() AS last_client_id,
+        in_pwd AS in_pwd, id
+    FROM user_type
+    WHERE description = 'Client';
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `employeeLogin` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -330,12 +419,31 @@ UNLOCK TABLES;
 /*!50003 SET sql_mode              = '' */ ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `employeeLogin`(IN `in_email` varchar(64), IN `in_pwd` varchar(64))
-SELECT e.id, e.title_type_id, tt.description, e.first_name, e.last_name,
-    e.email, u.user_type_id, ut.description, u.last_login
-FROM employee e left join title_type tt ON e.title_type_id = tt.id,
-    user u, user_type ut
-WHERE e.id = u.person_id AND u.user_type_id = ut.id
-    AND e.email = in_email AND u.pwd = in_pwd ;;
+BEGIN
+    SELECT e.id, e.title_type_id, tt.description title_type, e.first_name, e.last_name,
+        e.email, u.user_type_id, ut.description user_type, u.last_login
+    FROM employee e left join title_type tt ON e.title_type_id = tt.id,
+        user u, user_type ut
+    WHERE e.id = u.person_id AND u.user_type_id = ut.id
+        AND e.email = in_email AND u.pwd = in_pwd;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `getTitleTypes` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getTitleTypes`()
+SELECT id, description FROM title_type ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
@@ -351,4 +459,7 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-10-24 20:35:52
+-- Manually added
+GRANT EXECUTE ON banksys.* TO 'webuser'@'localhost' IDENTIFIED BY 'katanaX';
+
+-- Dump completed on 2014-10-26 18:50:56
