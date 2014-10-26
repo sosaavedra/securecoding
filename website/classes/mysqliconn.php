@@ -2,6 +2,7 @@
 
 require_once 'inexistentPropertyException.php';
 require_once 'classes/employee.php';
+require_once 'classes/client.php';
 
 class MysqliConn{
     private $host;
@@ -71,11 +72,14 @@ class MysqliConn{
         $this->checkConnection();
 
         $stmt = $this->conn->stmt_init();
+        $objectType = "";
 
         if($isEmployee){
             $stmt->prepare("call employeeLogin (?, ?)");
+            $objectType = "Employee";
         } else {
             $stmt->prepare("call clientLogin (?, ?)");
+            $objectType = "Client";
         }
 
         $stmt->bind_param('ss', $user, $password);
@@ -83,7 +87,7 @@ class MysqliConn{
 
         $result = $stmt->get_result();
 
-        return $result->fetch_object("Employee");
+        return $result->fetch_object($objectType);
     }
 
     public function clientLogin($user, $password){
@@ -105,6 +109,18 @@ class MysqliConn{
 
         return !$stmt->fetch();
     }
+
+    public function createAccount($employee_id, $client_id){
+        $stmt = $this->conn->stmt_init();
+        $stmt->prepare("call createAccount (?, ?)");
+        $stmt->bind_param('ii', $employee_id, $client_id);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        return $result;
+    }
+
 
     public function getTitleTypes(){
         $stmt = $this->conn->stmt_init();

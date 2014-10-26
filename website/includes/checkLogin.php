@@ -31,25 +31,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['username'])) {
         // escape variables for security
         $username = $mysqli->escape($_POST['username']);
         $password = $mysqli->escape($_POST['password']);
+        $hashedPW = hash('sha256', $password);
         
         // check for correct username password
         if(isset($_POST['employee']) && $_POST['employee'] == 1){
-            $employee = $mysqli->employeeLogin($username, $password);
+            $employee = $mysqli->employeeLogin($username, $hashedPW);
             $mysqli->close();
 
             if($employee){
                 $_SESSION['user_type'] = "employee";
                 $_SESSION['logged_user'] = $employee;
 
-                header ( 'Location: customerPage.html' );
+                header ( 'Location: empApproveReg.html' );
             } else {
                 $pageErr = "Invalid email/password";
             }
         } else {
-            $mysqli->clientLogin($username, $password);
+            $client = $mysqli->clientLogin($username, $hashedPW);
             $mysqli->close();
 
-            header ( 'Location: customerPage.html' );
+            if($client){
+                $_SESSION['user_type'] = "client";
+                $_SESSION['logged_user'] = $client;
+
+                header ( 'Location: customerPage.php');
+            } else {
+                $pageErr = "Invalid email/password";
+            }
         }
     } 
 }
