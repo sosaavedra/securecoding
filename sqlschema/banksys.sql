@@ -280,7 +280,7 @@ CREATE TABLE `user` (
   UNIQUE KEY `user_ukey` (`person_id`,`user_type_id`),
   KEY `user_k1` (`user_type_id`),
   CONSTRAINT `user_user_type` FOREIGN KEY (`user_type_id`) REFERENCES `user_type` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -289,6 +289,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
+INSERT INTO `user` VALUES (1,1,'5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',2,'0000-00-00 00:00:00');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -331,9 +332,9 @@ UNLOCK TABLES;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `clientLogin`(IN `in_email` varchar(64), IN `in_pwd` varchar(64))
 BEGIN
-    SELECT c.id, c.title_type_id, tt.description, c.first_name, c.last_name,
-    c.email, u.user_type_id, ut.description, u.last_login
-    FROM cient c left join title_type tt ON c.title_type_id = tt.id,
+    SELECT c.id, c.title_type_id, tt.description title_type, c.first_name, c.last_name,
+    c.email, u.user_type_id, ut.description user_type, u.last_login
+    FROM client c left join title_type tt ON c.title_type_id = tt.id,
         user u, user_type ut
     WHERE c.id = u.person_id AND u.user_type_id = ut.id
         AND c.email = in_email AND u.pwd = in_pwd;
@@ -462,4 +463,4 @@ DELIMITER ;
 -- Manually added
 GRANT EXECUTE ON banksys.* TO 'webuser'@'localhost' IDENTIFIED BY 'katanaX';
 
--- Dump completed on 2014-10-26 18:50:56
+-- Dump completed on 2014-10-26 22:13:00
