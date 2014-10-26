@@ -56,9 +56,9 @@ int main (int argc, char *argv[]){
     size_t globalLineNumber = 0;
 
     if(fgets(line, sizeof (line), transactionFile) != NULL){
-        globalLineNumber++;
-
         do{
+            globalLineNumber++;
+
             trim(line);
 
             if(*line == '#'){
@@ -66,18 +66,28 @@ int main (int argc, char *argv[]){
                     case 0: break;
                     case 4:
                         lineNumber = 0;
-                        globalLineNumber++;
 
                         Transaction *transaction = createTransaction(transactionLines);
 
+                        if(transaction == NULL){
+                           fprintf(stderr, "Transaction could not be created. Last line in file: %d\n", globalLineNumber);
+       
+                           freeTransactions(transactions);
+                           free(transactionLines);
+                           free(line);
+                           fclose(transactionFile);
+
+                            return EXIT_FAILURE;
+                        }
+
                         if(transactions == NULL){
-                            transaction = transaction;
+                            transactions = transaction;
                         } else {
                             transactions->next = transaction;
                         }
                     break;
                     default:
-                        fprintf(stderr, "A valid transaction should contain 4 values (one value per line)");
+                        fprintf(stderr, "A valid transaction should only contain 4 values (one value per line)");
     
                         freeTransactions(transactions);
                         free(transactionLines);
@@ -94,8 +104,6 @@ int main (int argc, char *argv[]){
 
                 lineNumber++;
             }
-
-            globalLineNumber++;
         } while(fgets(line, sizeof (line), transactionFile) != NULL);
     }
 

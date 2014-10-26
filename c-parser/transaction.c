@@ -8,14 +8,23 @@
 Transaction *createTransaction(char **transactionLines){
     KeyValue *keyValue = createKeyValue(transactionLines);
 
+    if(keyValue == NULL){
+        return NULL;
+    }
+
     Transaction *transaction = malloc(sizeof (struct Transaction));
+
+    if(transaction == NULL){
+        return NULL;
+    }
+
     transaction->origin = getValue("origin", keyValue);
     transaction->destination = getValue("origin", keyValue);
-    transaction->origin = getValue("amount", keyValue);
-    transaction->origin = getValue("transaction_type", keyValue);
-    transaction->origin = getValue("tan_code", keyValue);
+    transaction->amount = getValue("amount", keyValue);
+    transaction->transactionType = getValue("transaction_type", keyValue);
+    transaction->tanCode = getValue("tan_code", keyValue);
 
-    return NULL;
+    return transaction;
 }
 
 void freeTransactions(Transaction *transactions){}
@@ -29,4 +38,8 @@ void printTransactions (Transaction * transactions){
     printf("Transaction type: %c\n", transactionType);
     printf("Tan code: %s\n", tanCode);
 */
+}
+
+char *saveTransaction(Transaction *transactions){
+    return NULL;
 }

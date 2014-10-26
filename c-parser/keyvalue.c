@@ -4,9 +4,22 @@
 #include <string.h>
 
 #include "utils.h"
+#include "constants.h"
 
 
 KeyValue *createKeyValue(char **transactionLines){
+    KeyValue *keyValue = calloc(LINES_PER_TRANSACTION, sizeof(struct KeyValue));
+
+    if(keyValue == NULL){
+        return NULL;
+    }
+
+    keyValue->key = "destination";
+    (*keyValue + 1)->key = "amount";
+    *(keyValue->key + 2) = "transactionType";
+    *(keyValue->key + 3) = "tanCode";
+
+    //tmpKV = 
 /*
     value = getValue(line);
     
@@ -114,38 +127,34 @@ KeyValue *createKeyValue(char **transactionLines){
 
 }
 
-char *getKeyValue(char *line){
-    char *token;
+KeyValue *getKeyValue(char *line){
+    KeyValue *keyValue = malloc(sizeof (struct KeyValue));
+    char *key;
     char *value;
 
-    token = NULL;
-    token = strtok(line, ">");
+    key = NULL;
+    key = strtok(line, ">");
 
-    if(token == NULL){
+    if(key == NULL){
         return NULL;
     }
 
-    token = strtok(NULL, ">");
+    value = strtok(NULL, ">");
 
-    if(token == NULL){
+    if(value == NULL){
         return NULL;
     }
 
-    trim(token);
+    trim(value);
 
-    size_t length;
-
-    length = strlen(token);
-
-    if(length == 0){
+    if(strlen(value) == 0){
         return NULL;
     }
 
-    value = calloc(length + 1, sizeof(char));
-    strcpy(value, token);
-    value[length] = '\0';
+    keyValue->key = key;
+    keyValue->value = value;
 
-    return value;
+    return keyValue;
 }
 
 

@@ -9,7 +9,7 @@ struct KeyValue{
 };
 
 KeyValue *createKeyValue(char **transactionLines);
-char *getKeyValue(char *line);
+KeyValue *getKeyValue(char *line);
 char *getValue(char *key, KeyValue *keyValue);
 
 #endif
