@@ -47,13 +47,51 @@
 				<div class="pad marg_top">
 					<article class="col1">
 						Transaction history
+						
+						<?php
+						
+						// Create connection
+						$conn = mysqli_connect ( "localhost", "root", "samurai", "banksys" );
+						// Check connection
+						if ($conn->connect_error) {
+							die ( "Connection failed: " . $conn->connect_error );
+						}
+						
+											
+						$sql = "SELECT * FROM `transaction_history`";
+						$result = $conn->query ( $sql );
+						
+						if ($result->num_rows > 0) {
+							
+							echo "<div class='datagrid'><table>";
+							
+							echo "<thead><tr> <td> To Account </td> <td> Date </td> <td> Amount </td><td> Type </td> </tr></thead>";
+							
+							echo "<tbody>";
+							
+							// output data of each row
+							while ( $row = $result->fetch_assoc () ) {
+								echo "<tr class='alt'>";
+								echo "<td>" .$row ["destination_account_id"] . "</td><td>" . $row ["approved_date"] . "</td><td>" . $row ["amount"] . "</td><td>" . $row ["transaction_type_id"] . "</td>";
+								echo "</tr>";
+							}
+							echo "</tbody>";
+							echo "</table></div>";
+		
+						} else {
+							echo "No transaction history found";
+						}
+						$conn->close ();
+						
+						?>
+						
 					</article>
 					<article class="col2 pad_left1">
 						<div class="wrapper">
 							<p class="pad_bot3">
 								Click below to make a new transaction
 								<ul id="menu">
-								<li id="menu_active"><a href="transfer.html"><span><span>Transfer Money</span></span></a></li>
+								<li id="menu_active"><a href="transfer.php"><span><span>Transfer Money</span></span></a></li>
 								</ul>
 							</p>
 						</div>

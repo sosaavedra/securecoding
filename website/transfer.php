@@ -20,6 +20,58 @@
 <![endif]-->
 </head>
 <body id="page4">
+<?php
+
+// define variables for form values validation and set to empty values
+$transNoErr = $amountErr = $toAccountErr = $transTypeErr = "";
+$formValid = true;
+
+		// connect to DB
+		$con = mysqli_connect ( "localhost", "root", "samurai", "banksys" );
+		// Check connection
+		if (mysqli_connect_errno ()) {
+			echo "Failed to connect to MySQL: " . mysqli_connect_error ();
+		}
+		
+		
+
+// checking if request is posted
+if ($_POST) {
+
+	if (empty ( $_POST ['transactionType']) ){
+		$transTypeErr = "Transaction type not valid";
+		$formValid = false;
+	}
+	if (empty ( $_POST ['transNo']) ){
+		$transNoErr = "Transaction number is required";
+		$formValid = false;
+	}
+	if (empty ( $_POST ['amount']) ){
+		$amountErr = "Amount is required";
+		$formValid = false;
+	}
+	if (empty ( $_POST ['toAccount']) ){
+		$toAccountErr = "To account is required";
+		$formValid = false;
+	}
+	
+	if ($formValid) {
+		
+		// escape variables for security
+		$transactionType = mysqli_real_escape_string ( $con, $_POST ['transactionType'] );
+		$transNo = mysqli_real_escape_string ( $con, $_POST ['transNo'] );
+		$amount = mysqli_real_escape_string ( $con, $_POST ['amount'] );
+		$toAccount = mysqli_real_escape_string ( $con, $_POST ['toAccount'] );
+
+		
+		//header ( 'Location: transferSuccess.html' );
+	} 
+}
+
+mysqli_close ( $con );
+
+?>
+
 <div class="main">
 <!-- header -->
     <header>
@@ -48,26 +100,30 @@
             <div class="box pad_bot1">
                 <div class="pad marg_top">
                     <article class="col1">
-                        <form id="transaction" class="formstyle" action="transaction.php" method="post">
+                        <form id="transaction" class="formstyle" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
                             <div>
-							 <div class="wrapper">
-							  <div>
-									<select name="transactionType" id="transactionType" class="bg">
-									  <option value="T">Transfer Money</option>
-									  <option value="D">Deposit Money</option>
-									  <option value="W">Withdraw Money</option>
-									</select>
-								 </div>Select type:
-							 </div>
-							    <div class="wrapper">
+				<div class="wrapper">
+				<div>
+					      <select name="transactionType" id="transactionType" class="bg">
+						<option value="T">Transfer Money</option>
+						<option value="D">Deposit Money</option>
+						<option value="W">Withdraw Money</option>
+					      </select>
+					</div>Select type:
+				</div>
+				<span class="error"><?php echo $transTypeErr;?></span>
+				<div class="wrapper">
                                     <div class="bg"><input class="input" type="text" name="amount" id="amount"></div>Amount:
                                 </div>
+                                <span class="error"><?php echo $amountErr;?></span>
                                 <div class="wrapper" id="toAccountDiv">
                                     <div class="bg"><input class="input" type="text" name="toAccount" id="toAccount"></div>To Account:
                                 </div>
-								<div class="wrapper" id="transactionNoDiv">
+                                <span class="error"><?php echo $toAccountErr;?></span>
+				<div class="wrapper" id="transactionNoDiv">
                                     <div class="bg"><input class="input" type="text" name="transNo" id="transNo"></div>Transaction no:
                                 </div>
+                                <span class="error"><?php echo $transNoErr;?></span>
                                 <div class="wrapper">
                                     <div style="margin-right: 100px">
                                         <a href="#" class="button" onclick="document.getElementById('transaction').submit()">Go</a>

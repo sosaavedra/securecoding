@@ -131,7 +131,7 @@ mysqli_close ( $con );
 			<ul id="menu">
 				<li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
 				<li id="menu_active"><a href="#"><span><span>Register</span></span></a></li>
-				<li><a href="login.html"><span><span>Login</span></span> </a></li>
+				<li><a href="login.php"><span><span>Login</span></span> </a></li>
 				<li class="omega"><a href="#"><span><span>Something</span></span></a></li>
 			</ul>
 		</nav>

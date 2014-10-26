@@ -40,7 +40,8 @@ function sendNewCustEMail($customerId) {
   <title>Your transaction codes</title>
 </head>
 <body>
-  <p>Thank you for registering! Here are your secure transaction codes, Please keep them secret</p>
+  <p>Thank you for registering! We have given you 50.000 euros balance as gift!
+  Below are your secure transaction codes, Please keep them secret</p>
   <table border="1">
     <tr>
       <th>Serial number</th><th>Transaction code</th>
