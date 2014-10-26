@@ -32,7 +32,7 @@ include_once "includes/checkLogin.php";
         <nav>
             <ul id="menu">
                 <li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
-                <li><a href="registration.html"><span><span>Registration</span></span></a></li>
+                <li><a href="registration.php"><span><span>Registration</span></span></a></li>
                 <li id="menu_active"><a href="login.php"><span><span>Login</span></span> </a></li>
                 <li class="omega"><a href="#"><span><span>Something</span></span></a></li>
             </ul>
