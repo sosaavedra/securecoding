@@ -23,49 +23,89 @@
 <?php
 
 // define variables for form values validation and set to empty values
-$transNoErr = $amountErr = $toAccountErr = $transTypeErr = "";
+$transNoErr = $amountErr = $toAccountErr = $transTypeErr = $uploadErr = "";
 $formValid = true;
-
-// connect to DB
-$con = mysqli_connect ( "localhost", "root", "samurai", "banksys" );
-// Check connection
-if (mysqli_connect_errno ()) {
-	echo "Failed to connect to MySQL: " . mysqli_connect_error ();
-}
 
 // checking if request is posted
 if ($_POST) {
 	
-	if (empty ( $_POST ['transactionType'] )) {
-		$transTypeErr = "Transaction type not valid";
-		$formValid = false;
-	}
-	if (empty ( $_POST ['transNo'] )) {
-		$transNoErr = "Transaction number is required";
-		$formValid = false;
-	}
-	if (empty ( $_POST ['amount'] )) {
-		$amountErr = "Amount is required";
-		$formValid = false;
-	}
-	if (empty ( $_POST ['toAccount'] )) {
-		$toAccountErr = "To account is required";
-		$formValid = false;
-	}
-	
-	if ($formValid) {
+	if (isset ( $_POST ['transfer'] )) {
+		// transfer-button was clicked
+		if (empty ( $_POST ['transactionType'] )) {
+			$transTypeErr = "Transaction type not valid";
+			$formValid = false;
+		}
+		if (empty ( $_POST ['transNo'] )) {
+			$transNoErr = "Transaction number is required";
+			$formValid = false;
+		}
+		if (empty ( $_POST ['amount'] )) {
+			$amountErr = "Amount is required";
+			$formValid = false;
+		}
+		if (empty ( $_POST ['toAccount'] )) {
+			$toAccountErr = "To account is required";
+			$formValid = false;
+		}
 		
-		// escape variables for security
-		$transactionType = mysqli_real_escape_string ( $con, $_POST ['transactionType'] );
-		$transNo = mysqli_real_escape_string ( $con, $_POST ['transNo'] );
-		$amount = mysqli_real_escape_string ( $con, $_POST ['amount'] );
-		$toAccount = mysqli_real_escape_string ( $con, $_POST ['toAccount'] );
+		if ($formValid) {
+			
+			// connect to DB
+			$con = mysqli_connect ( "localhost", "root", "samurai", "banksys" );
+			// Check connection
+			if (mysqli_connect_errno ()) {
+				echo "Failed to connect to MySQL: " . mysqli_connect_error ();
+			}
+			
+			// escape variables for security
+			$transactionType = mysqli_real_escape_string ( $con, $_POST ['transactionType'] );
+			$transNo = mysqli_real_escape_string ( $con, $_POST ['transNo'] );
+			$amount = mysqli_real_escape_string ( $con, $_POST ['amount'] );
+			$toAccount = mysqli_real_escape_string ( $con, $_POST ['toAccount'] );
+			
+			// header ( 'Location: transferSuccess.html' );
+			
+			mysqli_close ( $con );
+		}
+	} else if (isset ( $_POST ['upload'] )) {
+		// upload-button was clicked
 		
-		// header ( 'Location: transferSuccess.html' );
+		if (! empty ( $_FILES ['uploadFile'] ['name'] )) {
+			
+			$target_dir = "uploads/";
+			$target_dir = $target_dir . basename ( $_FILES ["uploadFile"] ["name"] );
+			$fileValid = true;
+			
+			// Check if file already exists
+			if (file_exists ( $target_dir . $_FILES ["uploadFile"] ["name"] )) {
+				$uploadErr = "Sorry, file already exists.";
+			}
+			
+			// Check file size 500 KB
+			if (isset ( $uploadFile_size ) && $uploadFile_size > 500000) {
+				$uploadErr = "Sorry, your file is too large.";
+				$fileValid = false;
+			}
+			
+			// Only txt files allowed
+			if (isset ( $uploadFile_type ) && ! ($uploadFile_type == "text/plain")) {
+				$uploadErr = "Sorry, only txt files are allowed.";
+				$fileValid = false;
+			}
+			
+			// Check if $uploadOk is set to 0 by an error
+			if ($fileValid) {
+				if (move_uploaded_file ( $_FILES ["uploadFile"] ["tmp_name"], $target_dir )) {
+					// header ( 'Location: transferSuccess.html' );
+				} else {
+					$uploadErr = "Sorry, there was an error uploading your file.";
+				}
+			}
+		} else {
+			$uploadErr = "Please select the file";
+		}
 	}
 }
-
-mysqli_close ( $con );
 
 ?>
 
@@ -139,11 +179,41 @@ mysqli_close ( $con );
 									<span class="error"><?php echo $transNoErr;?></span>
 									<div class="wrapper">
 										<div style="margin-right: 100px">
-										<input class='button' type='submit' name='transfer' value='Go' id='transfer'>
+											<input class='button' type='submit' name='transfer' value='Go' id='transfer'>
 										</div>
 									</div>
 								</div>
 							</form>
+
+							<form class="formstyle" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post" enctype="multipart/form-data">
+								<div>
+
+									<p>OR you can also make transaction by uploading a file in below format:
+									
+									
+									</h3>
+									</p>
+
+
+
+									<p># Explain format here</p>
+
+									<div class="wrapper">
+										<div class="bg">
+											<input type="file" name="uploadFile" id="uploadFile">
+										</div>
+										Please choose a file:
+									</div>
+									<span class="error"><?php echo $uploadErr;?></span>
+
+									<div class="wrapper">
+										<div style="margin-right: 100px">
+											<input class='button' type='submit' name='upload' value='Go' id='upload'>
+										</div>
+									</div>
+								</div>
+							</form>
+
 						</article>
 						<article class="col2 pad_left1">
 							<div class="wrapper">
