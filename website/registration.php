@@ -26,11 +26,24 @@
 $fnameErr = $lnameErr = $emailErr = $passErr = $cpassErr = $passMatchErr = $titleErr = "";
 $formValid = true;
 
+		// connect to DB
+		$con = mysqli_connect ( "localhost", "root", "samurai", "banksys" );
+		// Check connection
+		if (mysqli_connect_errno ()) {
+			echo "Failed to connect to MySQL: " . mysqli_connect_error ();
+		}
+		
+		//for displaying titles
+		
+		$sql = "SELECT * FROM `title_type`"; 
+		$titleTypes = mysqli_query ($con, $sql);
+		
+
 // checking if request is posted
 if ($_POST) {
 
-	if (empty ( $_POST ['title'] ) || ! preg_match ( "/^[a-zA-Z ]*.$/", $_POST ['title'] )) {
-		$titleErr = "Title can contain only alphabets and .";
+	if (empty ( $_POST ['title']) ){
+		$titleErr = "Title not valid";
 		$formValid = false;
 	}
 	
@@ -63,12 +76,6 @@ if ($_POST) {
 	}
 	
 	if ($formValid) {
-		// connect to DB
-		$con = mysqli_connect ( "localhost", "root", "samurai", "banksys" );
-		// Check connection
-		if (mysqli_connect_errno ()) {
-			echo "Failed to connect to MySQL: " . mysqli_connect_error ();
-		}
 		
 		// escape variables for security
 		$title = mysqli_real_escape_string ( $con, $_POST ['title'] );
@@ -79,7 +86,7 @@ if ($_POST) {
 		$cpassword = mysqli_real_escape_string ( $con, $_POST ['cpassword'] );
 		
 		// insert into client table
-		$sql = "INSERT INTO `client` (`title`, `first_name`, `last_name`, `email`) VALUES
+		$sql = "INSERT INTO `client` (`title_type_id`, `first_name`, `last_name`, `email`) VALUES
 				('$title', '$firstname', '$lastname', '$email')";
 		
 		if (! mysqli_query ( $con, $sql )) {
@@ -107,10 +114,11 @@ if ($_POST) {
 			die ( 'Error: ' . mysqli_error ( $con ) );
 		}
 		
-		mysqli_close ( $con );
 		header ( 'Location: registerSuccess.html' );
 	} 
 }
+
+mysqli_close ( $con );
 
 ?>
 <div class="main">
@@ -144,7 +152,15 @@ if ($_POST) {
 						<form id="registration" class="formstyle" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
 							<div>
 								<div class="wrapper">
-									<div class="bg"><input class="input" type="text" name="title" id="title"></div>Title:
+								  <div>
+									<select name="title" id="title" class="bg">
+									<?php
+									    while ( $row = $titleTypes->fetch_assoc () ) {
+									    echo "<option value='".$row["id"]."'>".$row["description"]."</option>";
+									      }
+									 ?>
+									</select>
+								 </div>Select type:
 								</div>
 								<span class="error"><?php echo $titleErr;?></span>
 								<div class="wrapper">

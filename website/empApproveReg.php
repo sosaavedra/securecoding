@@ -28,7 +28,7 @@
 			</div>
 			<nav>
 				<ul id="menu">
-					<li class="alpha"><a href="empApproveTrans.html"><span><span>Approve
+					<li class="alpha"><a href="empApproveTrans.php"><span><span>Approve
 									transfers</span></span></a></li>
 					<li id="menu_active"><a href="#"><span><span>Approve registrations</span></span></a></li>
 					<li class="omega"><a href="#"><span><span>Logout</span></span></a></li>
@@ -97,21 +97,21 @@
 							}
 						}
 						
-						$sql = "SELECT id,title,first_name,last_name,email FROM `client` WHERE activated_by='0' LIMIT 10";
+						$sql = "SELECT id,first_name,last_name,email FROM `client` WHERE activated_by='0' LIMIT 10";
 						$result = $conn->query ( $sql );
 						
 						if ($result->num_rows > 0) {
 							
 							echo "<div class='datagrid'><table>";
 							
-							echo "<thead><tr><td> Title </td> <td> Name </td> <td> Email </td> <td> ID </td><td> Approve/Reject </td> </tr></thead>";
+							echo "<thead><tr> <td> Name </td> <td> Email </td> <td> ID </td><td> Approve/Reject </td> </tr></thead>";
 							
 							echo "<tbody>";
 							
 							// output data of each row
 							while ( $row = $result->fetch_assoc () ) {
 								echo "<tr class='alt'>";
-								echo "<td>" . $row ["title"] . "</td><td>" . $row ["first_name"] . " " . $row ["last_name"] . "</td><td>" . $row ["email"] . "</td><td>" . $row ["id"] . "</td><td><input type='checkbox' name='check_list[]' value='" . $row ["id"] . "' checked></td>";
+								echo "<td>" .$row ["first_name"] . " " . $row ["last_name"] . "</td><td>" . $row ["email"] . "</td><td>" . $row ["id"] . "</td><td><input type='checkbox' name='check_list[]' value='" . $row ["id"] . "' checked></td>";
 								echo "</tr>";
 							}
 							echo "</tbody>";
