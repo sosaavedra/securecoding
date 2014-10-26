@@ -54,12 +54,11 @@
 											
 						<?php
 						
-						// Create connection
-						$conn = mysqli_connect ( "localhost", "root", "samurai", "banksys" );
-						// Check connection
-						if ($conn->connect_error) {
-							die ( "Connection failed: " . $conn->connect_error );
-						}
+						require_once "includes/config.php";
+						require_once "classes/mysqliconn.php";
+						
+						$mysqli = new MysqliConn ();
+						$mysqli->connect ();
 						
 						// define variables for form values validation and set to empty values
 						$chekBoxErr = "";
@@ -75,35 +74,33 @@
 								
 								foreach ( $_POST ['check_list'] as $clientId ) {
 									
-									$clientId = mysqli_real_escape_string ( $conn, $clientId );
+									$clientId = $mysqli->escape ( $clientId );
 									
 									if (isset ( $_POST ['approve'] )) {
 										// approve-button was clicked
-										$date = date ( "Y-m-d H:i:s" );
-										$sql = "UPDATE client SET activation_date=now(),activated_by=1 WHERE id='$clientId'";
-										if (! mysqli_query ( $conn, $sql )) {
-											die ( 'Error: ' . mysqli_error ( $conn ) );
+										if ($mysqli->createAccount ( $employee_id, $clientId )) {
+											$mysqli->close ();
+										} else {
+											die ( "Error: Client already exists!" );
 										}
 									} else if (isset ( $_POST ['reject'] )) {
 										// reject-button was clicked
-										$sql = "DELETE FROM client WHERE id='$clientId'";
-										if (! mysqli_query ( $conn, $sql )) {
-											die ( 'Error: ' . mysqli_error ( $conn ) );
+										if ($mysqli->deleteRejectedClient ( $clientId )) {
+											$mysqli->close ();
+										} else {
+											die ( "Error: Cannot delete client!" );
 										}
 									}
 								}
 							}
 						}
 						
-						$sql = "SELECT id,first_name,last_name,email FROM `client` WHERE activated_by='0' LIMIT 10";
-						$result = $conn->query ( $sql );
+						$result = $mysqli->getClientsToApprove ();
 						
 						if ($result->num_rows > 0) {
 							
 							echo "<div class='datagrid'><table>";
-							
 							echo "<thead><tr> <td> Name </td> <td> Email </td> <td> ID </td><td> Approve/Reject </td> </tr></thead>";
-							
 							echo "<tbody>";
 							
 							// output data of each row
@@ -120,7 +117,7 @@
 						} else {
 							echo "No clients pending approval.";
 						}
-						$conn->close ();
+						$mysqli->close ();
 						?>
 						</form>
 							<span class="error"><?php echo $chekBoxErr;?></span>

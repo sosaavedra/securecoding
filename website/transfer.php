@@ -29,6 +29,9 @@ $formValid = true;
 // checking if request is posted
 if ($_POST) {
 	
+	require_once "includes/config.php";
+	require_once "classes/mysqliconn.php";
+	
 	if (isset ( $_POST ['transfer'] )) {
 		// transfer-button was clicked
 		if (empty ( $_POST ['transactionType'] )) {
@@ -51,21 +54,23 @@ if ($_POST) {
 		if ($formValid) {
 			
 			// connect to DB
-			$con = mysqli_connect ( "localhost", "root", "samurai", "banksys" );
-			// Check connection
-			if (mysqli_connect_errno ()) {
-				echo "Failed to connect to MySQL: " . mysqli_connect_error ();
-			}
+			$mysqli = new MysqliConn ();
+			$mysqli->connect ();
 			
 			// escape variables for security
-			$transactionType = mysqli_real_escape_string ( $con, $_POST ['transactionType'] );
-			$transNo = mysqli_real_escape_string ( $con, $_POST ['transNo'] );
-			$amount = mysqli_real_escape_string ( $con, $_POST ['amount'] );
-			$toAccount = mysqli_real_escape_string ( $con, $_POST ['toAccount'] );
+			$transactionType = $mysqli->escape ( $transactionType );
+			$transNo = $mysqli->escape ( $transNo );
+			$amount = $mysqli->escape ( $amount );
+			$toAccount = $mysqli->escape ( $toAccount );
 			
-			// header ( 'Location: transferSuccess.html' );
+			if ($mysqli->doTransaction ( $client_id, $transactionType, $toAccount, $amount, $transNo )) {
+				$mysqli->close ();
+				// header ( 'Location: transferSuccess.html' );
+			} else {
+				die ( "Error: Unable to process transaction!" );
+			}
 			
-			mysqli_close ( $con );
+			$mysqli->close ();
 		}
 	} else if (isset ( $_POST ['upload'] )) {
 		// upload-button was clicked

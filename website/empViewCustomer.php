@@ -67,6 +67,9 @@
 							</form>
 							<?php
 							
+							require_once "includes/config.php";
+							require_once "classes/mysqliconn.php";
+							
 							// define variables for form values validation and set to empty values
 							$customerIdErr = "";
 							$formValid = true;
@@ -80,28 +83,20 @@
 								
 								if ($formValid) {
 									
-									// Create connection
-									$conn = mysqli_connect ( "localhost", "root", "samurai", "banksys" );
-									// Check connection
-									if ($conn->connect_error) {
-										die ( "Connection failed: " . $conn->connect_error );
-									}
+									$mysqli = new MysqliConn ();
+									$mysqli->connect ();
 									
-									$customerId = mysqli_real_escape_string ( $conn, $_POST ['customerId'] );
+									$customerId = $mysqli->escape ( $customerId );
 									
 									// to show customer details
 									
-									$sql = "SELECT id,first_name,last_name,email FROM `client` WHERE id='$customerId'";
-									$result = $conn->query ( $sql );
+									$result = $mysqli->getClientDetails ( $customerId );
 									
 									if ($result->num_rows > 0) {
 										
 										echo "<h3> Customer details: </h3><br>";
-										
 										echo "<div class='datagrid'><table>";
-										
 										echo "<thead><tr> <td> Name </td> <td> Email </td> <td> ID </td></tr></thead>";
-										
 										echo "<tbody>";
 										
 										// output data of each row
@@ -114,15 +109,12 @@
 										echo "</table></div>";
 										
 										// to show customer transactions
-										$sql = "SELECT * FROM `transaction_history`";
-										$result = $conn->query ( $sql );
+										$result = $mysqli->getClientTransactionHistory ( $customerId );
 										
 										if ($result->num_rows > 0) {
 											
 											echo "<br><div class='datagrid'><table>";
-											
 											echo "<thead><tr> <td> To Account </td> <td> Date </td> <td> Amount </td><td> Type </td> </tr></thead>";
-											
 											echo "<tbody>";
 											
 											// output data of each row
@@ -140,7 +132,7 @@
 										echo "Invalid customer Id.";
 									}
 									
-									$conn->close ();
+									$mysqli->close ();
 								}
 							}
 							

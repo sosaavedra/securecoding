@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="css/reset.css" type="text/css" media="all">
 <link rel="stylesheet" href="css/layout.css" type="text/css" media="all">
 <link rel="stylesheet" href="css/style.css" type="text/css" media="all">
-<script type="text/javascript" src="js/jquery-1.4.2.js" ></script>
+<script type="text/javascript" src="js/jquery-1.4.2.js"></script>
 <script type="text/javascript" src="js/cufon-yui.js"></script>
 <script type="text/javascript" src="js/cufon-replace.js"></script>
 <script type="text/javascript" src="js/Myriad_Pro_400.font.js"></script>
@@ -18,66 +18,68 @@
 <![endif]-->
 </head>
 <body id="page4">
-<div class="main">
-<!-- header -->
-	<header>
-		<div class="wrapper">
-			<h1><a href="index.html" id="logo">Smart Biz</a></h1>
-		</div>
-		<nav>
-			<ul id="menu">
-				<li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
-				<li id="menu_active"><a href="#"><span><span>My Dashboard</span></span></a></li>
-				<li><a href="transfer.php"><span><span>Transfer Money</span></span></a></li>
-				<li class="omega"><a href="#"><span><span>Logout</span></span></a></li>
-			</ul>
-		</nav>
-	</header>
-<!-- / header -->
-<!-- content -->
-	<section id="content">
-		<div class="wrapper">
-			<div class="pad">
-				<div class="wrapper">
-					<article class="col1"><h2>Welcome </h2></article>
-					<article class="col2 pad_left1"><h2>Make a transaction</h2></article>
-				</div>
+	<div class="main">
+		<!-- header -->
+		<header>
+			<div class="wrapper">
+				<h1>
+					<a href="index.html" id="logo">Smart Biz</a>
+				</h1>
 			</div>
-			<div class="box pad_bot1">
-				<div class="pad marg_top">
-					<article class="col1">
-						<h3>Transaction history</h3>
+			<nav>
+				<ul id="menu">
+					<li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
+					<li id="menu_active"><a href="#"><span><span>My Dashboard</span></span></a></li>
+					<li><a href="transfer.php"><span><span>Transfer Money</span></span></a></li>
+					<li class="omega"><a href="#"><span><span>Logout</span></span></a></li>
+				</ul>
+			</nav>
+		</header>
+		<!-- / header -->
+		<!-- content -->
+		<section id="content">
+			<div class="wrapper">
+				<div class="pad">
+					<div class="wrapper">
+						<article class="col1">
+							<h2>Welcome</h2>
+						</article>
+						<article class="col2 pad_left1">
+							<h2>Make a transaction</h2>
+						</article>
+					</div>
+				</div>
+				<div class="box pad_bot1">
+					<div class="pad marg_top">
+						<article class="col1">
+							<h3>Transaction history</h3>
 						
 						<?php
+						require_once "includes/config.php";
+						require_once "classes/mysqliconn.php";
 						
 						// Create connection
-						$conn = mysqli_connect ( "localhost", "root", "samurai", "banksys" );
-						// Check connection
-						if ($conn->connect_error) {
-							die ( "Connection failed: " . $conn->connect_error );
-						}
+						$mysqli = new MysqliConn ();
+						$mysqli->connect ();
 						
-											
-						$sql = "SELECT * FROM `transaction_history`";
-						$result = $conn->query ( $sql );
+						$customerId = "";
+						
+						$result = $mysqli->getClientTransactionHistory ( $customerId );
 						
 						if ($result->num_rows > 0) {
 							
 							echo "<div class='datagrid'><table>";
-							
 							echo "<thead><tr> <td> To Account </td> <td> Date </td> <td> Amount </td><td> Type </td> </tr></thead>";
-							
 							echo "<tbody>";
 							
 							// output data of each row
 							while ( $row = $result->fetch_assoc () ) {
 								echo "<tr class='alt'>";
-								echo "<td>" .$row ["destination_account_id"] . "</td><td>" . $row ["approved_date"] . "</td><td>" . $row ["amount"] . "</td><td>" . $row ["transaction_type_id"] . "</td>";
+								echo "<td>" . $row ["destination_account_id"] . "</td><td>" . $row ["approved_date"] . "</td><td>" . $row ["amount"] . "</td><td>" . $row ["transaction_type_id"] . "</td>";
 								echo "</tr>";
 							}
 							echo "</tbody>";
 							echo "</table></div>";
-		
 						} else {
 							echo "No transaction history found";
 						}
@@ -86,21 +88,22 @@
 						?>
 						
 					</article>
-					<article class="col2 pad_left1">
-						<div class="wrapper">
-							<p class="pad_bot3">
-								Click below to make a new transaction
+						<article class="col2 pad_left1">
+							<div class="wrapper">
+								<p class="pad_bot3">Click below to make a new transaction
+								
+								
 								<ul id="menu">
-								<li id="menu_active"><a href="transfer.php"><span><span>Transfer Money</span></span></a></li>
+									<li id="menu_active"><a href="transfer.php"><span><span>Transfer Money</span></span></a></li>
 								</ul>
-							</p>
-						</div>
-					</article>
+								</p>
+							</div>
+						</article>
+					</div>
 				</div>
 			</div>
-		</div>
-	</section>
-<!-- / content -->
-</div>
+		</section>
+		<!-- / content -->
+	</div>
 </body>
 </html>

@@ -54,12 +54,11 @@
 											
 						<?php
 						
-						// Create connection
-						$conn = mysqli_connect ( "localhost", "root", "samurai", "banksys" );
-						// Check connection
-						if ($conn->connect_error) {
-							die ( "Connection failed: " . $conn->connect_error );
-						}
+						require_once "includes/config.php";
+						require_once "classes/mysqliconn.php";
+						
+						$mysqli = new MysqliConn ();
+						$mysqli->connect ();
 						
 						// define variables for form values validation and set to empty values
 						$chekBoxErr = "";
@@ -75,45 +74,36 @@
 								
 								foreach ( $_POST ['check_list'] as $id ) {
 									
-									$clientId = mysqli_real_escape_string ( $conn, $id );
+									$clientId = $mysqli->escape ( $clientId );
 									
 									if (isset ( $_POST ['approve'] )) {
+										
 										// approve-button was clicked
-										$date = date ( "Y-m-d H:i:s" );
-										
+										if ($mysqli->approveTransaction ( $id )) {
+											$mysqli->close ();
+										} else {
+											die ( "Error: in approving!" );
+										}
 										// move the data to transaction history table
-										
-										$sql = "DELETE FROM transaction WHERE id='$id'";
-										if (! mysqli_query ( $conn, $sql )) {
-											die ( 'Error: ' . mysqli_error ( $conn ) );
-										}
-										
-										// delete from transaction table
-										$sql = "DELETE FROM transaction WHERE id='$id'";
-										if (! mysqli_query ( $conn, $sql )) {
-											die ( 'Error: ' . mysqli_error ( $conn ) );
-										}
 									} else if (isset ( $_POST ['reject'] )) {
 										// reject-button was clicked
 										// delete from transaction table and refund balance to client
-										$sql = "DELETE FROM transaction WHERE id='$id'";
-										if (! mysqli_query ( $conn, $sql )) {
-											die ( 'Error: ' . mysqli_error ( $conn ) );
+										if ($mysqli->rejectTransaction ( $id )) {
+											$mysqli->close ();
+										} else {
+											die ( "Error:  in rejecting!" );
 										}
 									}
 								}
 							}
 						}
 						
-						$sql = "SELECT * FROM `transaction`";
-						$result = $conn->query ( $sql );
+						$result = $mysqli->getTransactionsToApprove ();
 						
 						if ($result->num_rows > 0) {
 							
 							echo "<div class='datagrid'><table>";
-							
 							echo "<thead><tr> <td> Origin </td> <td> Destination </td> <td> Date </td> <td> Amount </td><td> Type </td> <td> Approve/Reject </td> </tr></thead>";
-							
 							echo "<tbody>";
 							
 							// output data of each row
@@ -131,7 +121,7 @@
 							echo "No transaction are waiting approval";
 						}
 						
-						$conn->close ();
+						$mysqli->close ();
 						?>
 						</form>
 							<span class="error"><?php echo $chekBoxErr;?></span>
