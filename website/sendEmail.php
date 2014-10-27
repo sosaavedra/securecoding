@@ -1,24 +1,25 @@
 <?php
-//sendNewCustEMail ( 1 );
 
 /**
  * This function will send transatcion codes via email to the passed customer id.
- * @param customer id $customerId
+ * 
+ * @param
+ *        	customer id $customerId
  */
 function sendNewCustEMail($customerId) {
 	
-	// code for connecting to DB and fetching transaction codes for a customer
-	$con = mysqli_connect ( "localhost", "root", "samurai", "banksys" );
-	// Check connection
-	if (mysqli_connect_errno ()) {
-		echo "Failed to connect to MySQL: " . mysqli_connect_error ();
-	}
+	require_once "includes/config.php";
+	require_once "includes/emailConfig.php";
+	require_once "classes/mysqliconn.php";
+	require_once "/home/samurai/Praveer/misc/vendor/swiftmailer/swiftmailer/lib/swift_required.php";
 	
-	$checkSql = "SELECT * FROM tan_code WHERE client_id = '{$customerId}'";
-	$result = mysqli_query ( $con, $checkSql );
+	$mysqli = new MysqliConn ();
+	$mysqli->connect ();
+	
+	$result = $mysqli->getClientTransationNumbers ( $customerId );
 	
 	if (! $result) {
-		die ( 'Error: ' . mysqli_error ( $con ) );
+		die ( 'Error:in fetching transation codes' );
 	}
 	
 	// make email body with codes
@@ -29,17 +30,25 @@ function sendNewCustEMail($customerId) {
 		$counter ++;
 	}
 	
-	mysqli_close ( $con );
+	// get customer email address
 	
-	// code to send email
+	$result = $mysqli->getClientDetails ( $customerId );
+	$mysqli->close ();
+	if (! $result) {
+		die ( 'Error:in fetching customer details' );
+	}
 	
-	require_once '/home/samurai/Praveer/misc/vendor/swiftmailer/swiftmailer/lib/swift_required.php';
-	
-	$transport = Swift_SmtpTransport::newInstance ( 'smtp.gmail.com', 465, "ssl" )->setUsername ( 'scteam17@gmail.com' )->setPassword ( 'samurai17' );
-	
-	$mailer = Swift_Mailer::newInstance ( $transport );
-	
-	$emailBody = '
+	if (! empty ( $result ) && $result->num_rows > 0) {
+		
+		while ( $row = $result->fetch_assoc () ) {
+			
+			// code to send email
+			
+			$transport = Swift_SmtpTransport::newInstance (EMAIL_SMTP, EMAIL_PORT, "ssl" )->setUsername (SYSTEM_EMAIL_ID)->setPassword (EMAIL_PASSWORD);
+			
+			$mailer = Swift_Mailer::newInstance ( $transport );
+			
+			$emailBody = '
 <html>
 <head>
   <title>Your transaction codes</title>
@@ -56,16 +65,18 @@ function sendNewCustEMail($customerId) {
 </body>
 </html>
 ';
-	
-	$message = Swift_Message::newInstance ( 'IMP:CONFIDENTIAL: your transation codes' )
-	
-	->setFrom ( array ('scteam17@gmail.com' => 'Secure Banking' ) )
-	->setTo ( array ('raipraveer@gmail.com'	) )
-	->setBody ( $emailBody, 'text/html' );
-	
-	// echo $emailBody;
-	
-	$result = $mailer->send ( $message );
+			
+			$message = Swift_Message::newInstance (EMAIL_HEADER)
+			
+			->setFrom ( array ( SYSTEM_EMAIL_ID => EMAIL_FROM) )
+			->setTo ( array ( $row ["email"] ) )
+			->setBody ( $emailBody, 'text/html' );
+			
+			// echo $emailBody;
+			
+			$result = $mailer->send ( $message );
+		}
+	}
 }
 
 ?>

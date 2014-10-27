@@ -65,10 +65,11 @@
 						$chekBoxErr = "";
 						$formValid = true;
 						
+						
 						// checking if request is a posted
 						if ($_POST) {
 							
-							$employee_id = $_SESSION ['logged_user'];
+							$employee_id = $_SESSION ['logged_user']-> id;
 							
 							if (empty ( $_POST ['check_list'] )) {
 								$formValid = false;
@@ -94,6 +95,7 @@
 						}
 						
 						$result = $mysqli->getClientsToApprove ();
+						$mysqli->close ();
 						
 						if (! empty ( $result ) && $result->num_rows > 0) {
 							
@@ -115,7 +117,6 @@
 						} else {
 							echo "No clients pending approval.";
 						}
-						$mysqli->close ();
 						?>
 						</form>
 							<span class="error"><?php echo $chekBoxErr;?></span>

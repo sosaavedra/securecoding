@@ -126,7 +126,7 @@ class MysqliConn {
 	 */
 	public function doTransaction($client_id, $transactionType, $toAccount, $amount, $transNo) {
 		$stmt = $this->conn->stmt_init ();
-		$stmt->prepare ( "call createClient (?, ?, ?, ?, ?)" );
+		$stmt->prepare ( "call doTransaction (?, ?, ?, ?, ?)" );
 		$stmt->bind_param ( 'isiis', $title_type_id, $first_name, $last_name, $email, $pwd );
 		$stmt->execute ();
 		
@@ -192,6 +192,22 @@ class MysqliConn {
 		$stmt->bind_param ( 'i', $client_id );
 		$stmt->execute ();
 		
+		return $stmt->get_result ();
+	}
+	
+	/**
+	 * returns the transation codes of a particular client
+	 *
+	 * @param
+	 *        	customer id $client_id
+	 * @return mysqli_result
+	 */
+	public function getClientTransationNumbers($client_id) {
+		$stmt = $this->conn->stmt_init ();
+		$stmt->prepare ( "call getClientTransationNumbers (?)" );
+		$stmt->bind_param ( 'i', $client_id );
+		$stmt->execute ();
+	
 		return $stmt->get_result ();
 	}
 	

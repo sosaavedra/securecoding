@@ -57,12 +57,13 @@
 						<?php
 						require_once "includes/config.php";
 						require_once "classes/mysqliconn.php";
+						require_once "includes/checkSession.php";
 						
 						// Create connection
 						$mysqli = new MysqliConn ();
 						$mysqli->connect ();
 						
-						$customerId = "";
+						$customerId = $_SESSION ['logged_user']-> id;
 						
 						$result = $mysqli->getClientTransactionHistory ( $customerId );
 						
