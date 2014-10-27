@@ -36,7 +36,7 @@ CREATE TABLE `account` (
   `id` int(8) NOT NULL AUTO_INCREMENT,
   `account_number` varchar(8) NOT NULL,
   `client_id` int(8) NOT NULL,
-  `balance` double NOT NULL DEFAULT '0',
+  `balance` double unsigned NOT NULL DEFAULT '50000',
   `created_date` datetime NOT NULL,
   `updated_date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -217,8 +217,8 @@ CREATE TABLE `transaction_history` (
   `amount` double NOT NULL,
   `transaction_type_id` int(8) NOT NULL,
   `created_date` datetime NOT NULL,
-  `approved_date` datetime NOT NULL,
-  `approved_by` int(8) NOT NULL,
+  `approved_date` datetime DEFAULT NULL,
+  `approved_by` int(8) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `transaction_history_k1` (`origin_account_id`),
   KEY `transaction_history_k2` (`destination_account_id`),
@@ -280,7 +280,7 @@ CREATE TABLE `user` (
   UNIQUE KEY `user_ukey` (`person_id`,`user_type_id`),
   KEY `user_k1` (`user_type_id`),
   CONSTRAINT `user_user_type` FOREIGN KEY (`user_type_id`) REFERENCES `user_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -337,7 +337,8 @@ BEGIN
     FROM client c left join title_type tt ON c.title_type_id = tt.id,
         user u, user_type ut
     WHERE c.id = u.person_id AND u.user_type_id = ut.id
-        AND c.email = in_email AND u.pwd = in_pwd;
+        AND c.email = in_email AND u.pwd = in_pwd
+        AND c.activation_date IS NOT NULL AND c.activated_by IS NOT NULL;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -409,6 +410,26 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `deleteRejectedClient` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteRejectedClient`(IN `in_client_id` INT(8))
+BEGIN
+    DELETE FROM client WHERE id = in_client_id;
+    DELETE FROM user WHERE person_id = in_client_id;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `employeeLogin` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -433,6 +454,64 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `getClientDetails` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getClientDetails`(IN `in_client_id` INT(8))
+BEGIN
+    SELECT * FROM client WHERE id = in_client_id;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `getClientsToApprove` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getClientsToApprove`()
+BEGIN
+    SELECT id,first_name,last_name,email FROM client WHERE activated_by= '0' LIMIT 10;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `getClientTransactionHistory` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getClientTransactionHistory`(IN `in_client_id` INT(8))
+BEGIN
+    SELECT * FROM transaction_history
+    WHERE origin_account_id = (SELECT account_number FROM account WHERE client_id = in_client_id);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `getTitleTypes` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -445,6 +524,142 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getTitleTypes`()
 SELECT id, description FROM title_type ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `getTransactionsToApprove` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getTransactionsToApprove`()
+BEGIN
+    SELECT * FROM transaction;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `performTransaction` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `performTransaction`(IN `in_client_id` int(8), IN `in_destination_account_number` varchar(8), IN `in_amount` double unsigned, IN `in_tan_code` varchar(15), IN `in_transaction_type_id` int(8))
+BEGIN
+    DECLARE error TINYINT DEFAULT 0;
+    DECLARE origin_account_id int(8);
+    DECLARE origin_account_number VARCHAR(8);
+    
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION, SQLWARNING
+    BEGIN
+    
+        ROLLBACK;
+        
+        IF(error > 0 AND error < 7) THEN
+            SELECT 'Error' AS Level,
+                error AS Code,
+                CASE error
+                WHEN 1 THEN 'Unknown client!'
+                WHEN 2 THEN 'Unknown account number!'
+                WHEN 3 THEN 'Tan code does not exist or has been used before'
+                WHEN 4 THEN 'Account does not have enough money!'
+                WHEN 5 THEN 'Unknown transaction type!'
+                WHEN 6 THEN 'Destination account does not exist!' END AS Message;
+       ELSE
+           SHOW ERRORS;
+       END IF;
+            
+        
+    END;
+    
+    START TRANSACTION;
+
+        IF (EXISTS (SELECT id FROM client WHERE id = in_client_id)) THEN
+            SELECT account_number, id INTO origin_account_number, origin_account_id FROM account WHERE client_id = in_client_id;
+
+            IF origin_account_number IS NOT NULL THEN
+                IF (EXISTS (SELECT code
+                            FROM tan_code
+                            WHERE client_id = in_client_id AND code = in_tan_code
+                                AND valid = 'Y')) THEN
+
+                    UPDATE tan_code SET valid = 'N' WHERE client_id = in_client_id AND code = in_tan_code;
+
+                    IF in_transaction_type_id = 1 THEN
+                        UPDATE account SET balance = balance + in_amount
+                        WHERE client_id = in_client_id AND account_number = origin_account_number;
+                    ELSE
+                        IF (EXISTS (SELECT balance FROM account
+                                        WHERE client_id = in_client_id AND account_number = origin_account_number
+                                            AND balance >= in_amount)) THEN
+
+                            IF in_transaction_type_id = 2 THEN
+                                UPDATE account SET balance = balance - in_amount
+                                WHERE client_id = in_client_id AND account_number = origin_account_number;
+
+                                IF in_amount < 10000 THEN
+                                    INSERT INTO transaction_history(origin_account_id, amount, transaction_type_id, created_date)
+                                    VALUES(origin_account_id, in_amount, in_transaction_type_id, now());
+                                ELSE
+                                    INSERT INTO transaction(origin_account_id, amount, transaction_type_id, created_date)
+                                    VALUES(origin_account_id, in_amount, in_transaction_type_id, now());
+                                END IF;
+                            ELSEIF in_transaction_type_id = 3 THEN
+                                IF (EXISTS (SELECT id FROM account WHERE account_number = in_destination_account_number)) THEN
+                                    UPDATE account SET balance = balance - in_amount
+                                    WHERE client_id = in_client_id AND account_number = origin_account_number;
+                                    
+                                    UPDATE account SET balance = balance + in_amount
+                                    WHERE account_number = in_destination_account_number;
+
+                                    IF in_amount < 10000 THEN
+                                        INSERT INTO transaction_history(origin_account_id, destination_account_id, amount, transaction_type_id, created_date)
+                                        VALUES(origin_account_id, in_destination_account_number, in_amount, in_transaction_type_id, now());
+                                    ELSE
+                                        INSERT INTO transaction(origin_account_id, destination_account_id, amount, transaction_type_id, created_date)
+                                        VALUES(origin_account_id, in_destination_account_number, in_amount, in_transaction_type_id, now());
+                                    END IF;
+                                ELSE
+                                    SET error = 6; -- Destination account does not exist!
+                                    CALL raise_error;
+                                END IF;
+                            ELSE
+                                SET error = 5; -- Unknown transaction type
+                                CALL raise_error;
+                            END IF;
+                        ELSE
+                            SET error = 4; -- Not enough money
+                            CALL raise_error;
+                        END IF;
+                    END IF;
+                ELSE
+                    SET error = 3; -- Tan Code does not exist or has been used before
+                    CALL raise_error;
+                END IF;
+            ELSE
+                SET error = 2; -- Origin Account number does not exist
+                CALL raise_error;
+            END IF;
+        ELSE
+            SET error = 1; -- client does not exist
+            CALL raise_error;
+        END IF;
+    COMMIT;
+END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
@@ -463,4 +678,4 @@ DELIMITER ;
 -- Manually added
 GRANT EXECUTE ON banksys.* TO 'webuser'@'localhost' IDENTIFIED BY 'katanaX';
 
--- Dump completed on 2014-10-26 22:13:00
+-- Dump completed on 2014-10-27 23:37:17
