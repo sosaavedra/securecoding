@@ -283,6 +283,22 @@ class MysqliConn {
 		
 		return ! $stmt->fetch ();
 	}
+	
+	/**
+	 * returns the balance and account number of a particular client
+	 *
+	 * @param
+	 *        	customer id $client_id
+	 * @return mysqli_result
+	 */
+	public function getClientAccountAndBalance($client_id) {
+		$stmt = $this->conn->stmt_init ();
+		$stmt->prepare ( "call getClientAccountAndBalance (?)" );
+		$stmt->bind_param ( 'i', $client_id );
+		$stmt->execute ();
+	
+		return $stmt->get_result ();
+	}
 }
 
 ?>

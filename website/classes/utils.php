@@ -29,7 +29,7 @@ function generateTransactionCodes($customerid) {
 	// generate 100 codes
 	
 	$counter = 0;
-	while ( $counter < 10 ) {
+	while ( $counter < 100 ) {
 		
 		// generate random number
 		$transNo = generateRandomTransactionNumber ();
