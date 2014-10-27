@@ -80,7 +80,6 @@
 										
 										// approve-button was clicked
 										if ($mysqli->approveTransaction ( $id )) {
-											$mysqli->close ();
 										} else {
 											die ( "Error: in approving!" );
 										}
@@ -89,7 +88,6 @@
 										// reject-button was clicked
 										// delete from transaction table and refund balance to client
 										if ($mysqli->rejectTransaction ( $id )) {
-											$mysqli->close ();
 										} else {
 											die ( "Error:  in rejecting!" );
 										}

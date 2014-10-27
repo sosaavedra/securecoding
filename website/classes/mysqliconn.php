@@ -95,7 +95,7 @@ class MysqliConn {
 	
 	/**
 	 * Return the titles configured in database
-	 * 
+	 *
 	 * @return mysqli_result
 	 */
 	public function getTitleTypes() {
@@ -103,9 +103,7 @@ class MysqliConn {
 		$stmt->prepare ( "call getTitleTypes" );
 		$stmt->execute ();
 		
-		$result = $stmt->get_result ();
-		
-		return $result;
+		return $stmt->get_result ();
 	}
 	
 	/**
@@ -140,69 +138,66 @@ class MysqliConn {
 	
 	/**
 	 * Returns all the clients from client table who are not yet approved
-	 * 
+	 *
 	 * @return mysqli_result
 	 */
 	public function getClientsToApprove() {
 		$stmt = $this->conn->stmt_init ();
 		$stmt->prepare ( "call getClientsToApprove" );
 		$stmt->execute ();
-		$result = $stmt->get_result ();
-		return $result;
+		
+		return $stmt->get_result ();
+		;
 	}
 	
 	/**
 	 * return the transactions having more than 10000 euros values, for approval
-	 * 
+	 *
 	 * @return mysqli_result
 	 */
 	public function getTransactionsToApprove() {
 		$stmt = $this->conn->stmt_init ();
 		$stmt->prepare ( "call getTransactionsToApprove" );
 		$stmt->execute ();
-		$result = $stmt->get_result ();
-		return $result;
+		
+		return $stmt->get_result ();
 	}
 	
 	/**
 	 * returns the successful transactions of a particular client
-	 * 
+	 *
 	 * @param
 	 *        	customer id $client_id
 	 * @return mysqli_result
 	 */
 	public function getClientTransactionHistory($client_id) {
 		$stmt = $this->conn->stmt_init ();
-		$stmt->prepare ( "call getClientTransactionHistory" );
+		$stmt->prepare ( "call getClientTransactionHistory (?)" );
 		$stmt->bind_param ( 'i', $client_id );
 		$stmt->execute ();
 		
-		$error_msg;
-		$result = $stmt->get_result ();
-		return $result;
+		return $stmt->get_result ();
 	}
 	
 	/**
 	 * returns the details of a particular client
-	 * 
+	 *
 	 * @param
 	 *        	customer id $client_id
 	 * @return mysqli_result
 	 */
 	public function getClientDetails($client_id) {
 		$stmt = $this->conn->stmt_init ();
-		$stmt->prepare ( "call getClientDetails" );
+		$stmt->prepare ( "call getClientDetails (?)" );
 		$stmt->bind_param ( 'i', $client_id );
 		$stmt->execute ();
 		
-		$error_msg;
-		$result = $stmt->get_result ();
-		return $result;
+		return $stmt->get_result ();
 	}
 	
 	/**
 	 * creates the account for the client after approval so that he can login, also gives him some initial balance
-	 * 
+	 *
 	 * @param
 	 *        	employee id $employee_id
 	 * @param
@@ -222,7 +217,7 @@ class MysqliConn {
 	
 	/**
 	 * delete the client from the table
-	 * 
+	 *
 	 * @param
 	 *        	$client_id
 	 * @return boolean
@@ -239,7 +234,7 @@ class MysqliConn {
 	/**
 	 * Once approved delete from transaction table and move to transaction_history table.
 	 * update the destination account balance.
-	 * 
+	 *
 	 * @param transactionId $id        	
 	 * @return boolean
 	 */
@@ -257,7 +252,7 @@ class MysqliConn {
 	
 	/**
 	 * Delete from transaction table and refund balance to client
-	 * 
+	 *
 	 * @param transactionId $id        	
 	 * @return boolean
 	 */

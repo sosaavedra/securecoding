@@ -66,7 +66,7 @@
 						
 						$result = $mysqli->getClientTransactionHistory ( $customerId );
 						
-						if ($result->num_rows > 0) {
+						if (!empty($result) && $result->num_rows > 0) {
 							
 							echo "<div class='datagrid'><table>";
 							echo "<thead><tr> <td> To Account </td> <td> Date </td> <td> Amount </td><td> Type </td> </tr></thead>";
@@ -83,7 +83,7 @@
 						} else {
 							echo "No transaction history found";
 						}
-						$conn->close ();
+						$mysqli->close ();
 						
 						?>
 						

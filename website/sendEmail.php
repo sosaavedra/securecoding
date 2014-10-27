@@ -1,5 +1,10 @@
 <?php
 //sendNewCustEMail ( 1 );
+
+/**
+ * This function will send transatcion codes via email to the passed customer id.
+ * @param customer id $customerId
+ */
 function sendNewCustEMail($customerId) {
 	
 	// code for connecting to DB and fetching transaction codes for a customer
