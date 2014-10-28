@@ -106,12 +106,10 @@
 										echo "<thead><tr> <td> Name </td> <td> Email </td> <td> ID </td></tr></thead>";
 										echo "<tbody>";
 										
-										// output data of each row
-										while ( $row = $result->fetch_assoc () ) {
-											echo "<tr class='alt'>";
-											echo "<td>" . $row ["first_name"] . " " . $row ["last_name"] . "</td><td>" . $row ["email"] . "</td><td>" . $row ["id"] . "</td>";
-											echo "</tr>";
-										}
+										$row = $result->fetch_assoc ();
+										echo "<tr class='alt'>";
+										echo "<td>" . $row ["first_name"] . " " . $row ["last_name"] . "</td><td>" . $row ["email"] . "</td><td>" . $row ["id"] . "</td>";
+										echo "</tr>";
 										echo "</tbody>";
 										echo "</table></div>";
 										

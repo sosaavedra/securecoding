@@ -11,7 +11,7 @@ function sendNewCustEMail($customerId) {
 	require_once "includes/config.php";
 	require_once "includes/emailConfig.php";
 	require_once "classes/mysqliconn.php";
-	require_once "/home/samurai/Praveer/misc/vendor/swiftmailer/swiftmailer/lib/swift_required.php";
+	require_once "swiftmailer/lib/swift_required.php";
 	
 	$mysqli = new MysqliConn ();
 	$mysqli->connect ();
@@ -40,7 +40,7 @@ function sendNewCustEMail($customerId) {
 	
 	if (! empty ( $result ) && $result->num_rows > 0) {
 		
-		while ( $row = $result->fetch_assoc () ) {
+		$row = $result->fetch_assoc ();
 			
 			// code to send email
 			
@@ -75,7 +75,6 @@ function sendNewCustEMail($customerId) {
 			// echo $emailBody;
 			
 			$result = $mailer->send ( $message );
-		}
 	}
 }
 

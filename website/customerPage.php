@@ -74,10 +74,9 @@
 						
 						$result = $mysqli->getClientAccountAndBalance ( $customerId );
 						if (!empty($result) && $result->num_rows > 0) {
-							while ( $row = $result->fetch_assoc () ) {
+								$row = $result->fetch_assoc ();
 								echo "<h3>Your account number: ".$row ["account_number"]."</h3>";
 								echo "<h3>Your balance: ".$row ["balance"]."</h3>";
-							}
 						}
 						
 						$result = $mysqli->getClientTransactionHistory ( $customerId );
