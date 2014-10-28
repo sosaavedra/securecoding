@@ -81,7 +81,7 @@
 						
 						$result = $mysqli->getClientTransactionHistory ( $customerId );
 						
-						echo "<br><br><h3>Transaction history</h3>";
+						echo "<br><br><h3>Transaction history</h3><br>";
 						
 						if (!empty($result) && $result->num_rows > 0) {
 							

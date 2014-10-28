@@ -72,14 +72,12 @@ if ($_POST) {
 			$amount = $mysqli->escape (  $_POST ['amount'] );
 			$toAccount = $mysqli->escape ( $_POST ['toAccount'] );
 			
-			if ($mysqli->performTransaction( $client_id, $transactionType, $toAccount, $amount, $transNo )) {
+			$mysqli->performTransaction( $client_id, $transactionType, $toAccount, $amount, $transNo );
+			$mysqli->close ();
 				//echo "Transfer Success";
 				header ( 'Location: transferSuccess.html' );
-			} else {
-				die ( "Error: Unable to process transaction!" );
-			}
 			
-			$mysqli->close ();
+			
 		}
 	} else if (isset ( $_POST ['upload'] )) {
 		// upload-button was clicked
@@ -161,9 +159,9 @@ if ($_POST) {
 									<div class="wrapper">
 										<div>
 											<select name="transactionType" id="transactionType" class="bg">
-												<option value="T">Transfer Money</option>
-												<option value="D">Deposit Money</option>
-												<option value="W">Withdraw Money</option>
+												<option value="3">Transfer Money</option>
+												<option value="1">Deposit Money</option>
+												<option value="2">Withdraw Money</option>
 											</select>
 										</div>
 										Select type:

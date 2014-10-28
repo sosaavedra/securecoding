@@ -128,7 +128,7 @@ class MysqliConn {
 	public function performTransaction($client_id, $transactionType, $toAccount, $amount, $transNo) {
 		$stmt = $this->conn->stmt_init ();
 		$stmt->prepare ( "call performTransaction(?, ?, ?, ?, ?)" );
-		$stmt->bind_param ( 'isiis', $title_type_id, $first_name, $last_name, $email, $pwd );
+		$stmt->bind_param ( 'isiis', $client_id, $transactionType, $toAccount, $amount, $transNo );
 		$stmt->execute ();
 		
 		$error_msg;
