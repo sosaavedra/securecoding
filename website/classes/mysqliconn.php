@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?php
 require_once 'inexistentPropertyException.php';
 require_once 'classes/employee.php';
@@ -255,10 +254,10 @@ class MysqliConn {
 	 * @param transactionId $id        	
 	 * @return boolean
 	 */
-	public function approveTransaction($id) {
+	public function approveTransaction($id, $employee_id) {
 		$stmt = $this->conn->stmt_init ();
-		$stmt->prepare ( "call approveTransaction (?)" );
-		$stmt->bind_param ( 'i', $id );
+		$stmt->prepare ( "call approveTransaction (?, ?)" );
+		$stmt->bind_param ( 'ii', $id, $employee_id );
 		$stmt->execute ();
 		
 		$error_msg;
