@@ -1,6 +1,8 @@
 		  
 <?php
 
+require_once "includes/config.php";
+
 /** 
  * Returns a random 15 character transaction number
  * 
@@ -20,7 +22,7 @@ function generateRandomTransactionNumber() {
 function generateTransactionCodes($customerid) {
 	
 	// connect to DB
-	$con = mysqli_connect ( "localhost", "root", "samurai", "banksys" );
+	$con = mysqli_connect ( "BANKSYS_HOST", "BANKSYS_USER", "BANKSYS_PWD", "BANKSYS_DB" );
 	// Check connection
 	if (mysqli_connect_errno ()) {
 		echo "Failed to connect to MySQL: " . mysqli_connect_error ();

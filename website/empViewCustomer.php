@@ -1,6 +1,8 @@
 <?php
 
     require_once 'includes/checkSession.php';
+    require_once 'includes/employeeAccessOnly.php';
+    $empName = $_SESSION ['logged_user']-> first_name." ".$_SESSION ['logged_user']-> last_name;
 
 ?>
 
@@ -37,7 +39,7 @@
 					<li class="alpha"><a href="empApproveTrans.php"><span><span>Approve transfers</span></span></a></li>
 					<li><a href="empApproveReg.php"><span><span>Approve client</span></span></a></li>
 					<li id="menu_active"><a href="#"><span><span>View client</span></span></a></li>
-					<li class="omega"><a href="#"><span><span>Logout</span></span></a></li>
+					<li class="omega"><a href="logout.php"><span><span>Logout</span></span></a></li>
 				</ul>
 			</nav>
 		</header>
@@ -48,7 +50,7 @@
 				<div class="pad">
 					<div class="wrapper">
 						<article class="col1">
-							<h2>Welcome</h2>
+							<h2>Welcome <?php echo $empName; ?></h2>
 						</article>
 					</div>
 				</div>

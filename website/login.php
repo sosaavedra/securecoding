@@ -62,9 +62,9 @@ include_once "includes/checkLogin.php";
                                 </div>
                                     <div class="bg" style="background: none; border:none; box-shadow: none;">
                                         <input class="input" type="checkbox" name="employee" id="employee" value="1" />I work here!
-                                        <strong><?php echo $pageErr; ?></strong>
                                     </div>
-                                </div>
+                                   
+                                </div> <span class="error"><?php echo $pageErr;?></span>
                                 <div class="wrapper">
                                     <div style="margin-right: 100px">
                                     <input class='button' type='submit' name='login' value='Login' id='login'>

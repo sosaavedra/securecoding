@@ -1,6 +1,12 @@
 <?php
 
     require_once 'includes/checkSession.php';
+    
+    require_once 'includes/customerAccessOnly.php';
+    
+    $customerId = $_SESSION ['logged_user']-> id;
+    $customerName = $_SESSION ['logged_user']-> first_name." ".$_SESSION ['logged_user']-> last_name;
+    
 
 ?>
 
@@ -34,10 +40,9 @@
 			</div>
 			<nav>
 				<ul id="menu">
-					<li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
-					<li id="menu_active"><a href="#"><span><span>My Dashboard</span></span></a></li>
+					<li class="alpha" id="menu_active"><a href="customerPage.php"><span><span>My Dashboard</span></span></a></li>
 					<li><a href="transfer.php"><span><span>Transfer Money</span></span></a></li>
-					<li class="omega"><a href="#"><span><span>Logout</span></span></a></li>
+					<li class="omega"><a href="logout.php"><span><span>Logout</span></span></a></li>
 				</ul>
 			</nav>
 		</header>
@@ -48,7 +53,7 @@
 				<div class="pad">
 					<div class="wrapper">
 						<article class="col1">
-							<h2>Welcome</h2>
+							<h2>Welcome <?php echo $customerName; ?></h2>
 						</article>
 						<article class="col2 pad_left1">
 							<h2>Make a transaction</h2>
@@ -58,7 +63,6 @@
 				<div class="box pad_bot1">
 					<div class="pad marg_top">
 						<article class="col1">
-							<h3>Transaction history</h3>
 						
 						<?php
 						require_once "includes/config.php";
@@ -68,9 +72,17 @@
 						$mysqli = new MysqliConn ();
 						$mysqli->connect ();
 						
-						$customerId = $_SESSION ['logged_user']-> id;
+						$result = $mysqli->getClientAccountAndBalance ( $customerId );
+						if (!empty($result) && $result->num_rows > 0) {
+							while ( $row = $result->fetch_assoc () ) {
+								echo "<h3>Your account number: ".$row ["account_number"]."</h3>";
+								echo "<h3>Your balance: ".$row ["balance"]."</h3>";
+							}
+						}
 						
 						$result = $mysqli->getClientTransactionHistory ( $customerId );
+						
+						echo "<br><br><h3>Transaction history</h3>";
 						
 						if (!empty($result) && $result->num_rows > 0) {
 							

@@ -2,6 +2,7 @@
 
     require_once 'includes/checkSession.php';
 
+    require_once 'includes/customerAccessOnly.php';
 ?>
 
 <!DOCTYPE html>
@@ -131,10 +132,9 @@ if ($_POST) {
 			</div>
 			<nav>
 				<ul id="menu">
-					<li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
-					<li><a href="customerPage.php"><span><span>My Dashboard</span></span></a></li>
-					<li id="menu_active"><a href="#"><span><span>Transfer Money</span></span></a></li>
-					<li class="omega"><a href="#"><span><span>Logout</span></span></a></li>
+					<li class="alpha"><a href="customerPage.php"><span><span>My Dashboard</span></span></a></li>
+					<li id="menu_active"><a href="transfer.php"><span><span>Transfer Money</span></span></a></li>
+					<li class="omega"><a href="logout.php"><span><span>Logout</span></span></a></li>
 				</ul>
 			</nav>
 		</header>
