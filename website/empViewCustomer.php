@@ -38,7 +38,7 @@
 				<ul id="menu">
 					<li class="alpha"><a href="empApproveTrans.php"><span><span>Approve transfers</span></span></a></li>
 					<li><a href="empApproveReg.php"><span><span>Approve client</span></span></a></li>
-					<li id="menu_active"><a href="#"><span><span>View client</span></span></a></li>
+					<li id="menu_active"><a href="empViewCustomer.php"><span><span>View client</span></span></a></li>
 					<li class="omega"><a href="logout.php"><span><span>Logout</span></span></a></li>
 				</ul>
 			</nav>
