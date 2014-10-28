@@ -538,7 +538,7 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getClientsToApprove`()
 BEGIN
-    SELECT id,first_name,last_name,email FROM client WHERE activated_by= '0' LIMIT 10;
+    SELECT id,first_name,last_name,email FROM client WHERE activated_by IS NULL LIMIT 10;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
