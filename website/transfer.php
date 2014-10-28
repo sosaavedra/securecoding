@@ -1,3 +1,9 @@
+<?php
+
+    require_once 'includes/checkSession.php';
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,7 +37,6 @@ if ($_POST) {
 	
 	require_once "includes/config.php";
 	require_once "classes/mysqliconn.php";
-	require_once "includes/checkSession.php";
 	
 	$client_id = $_SESSION ['logged_user']-> id;
 	

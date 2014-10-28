@@ -1,3 +1,9 @@
+<?php
+
+    require_once 'includes/checkSession.php';
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

@@ -1,3 +1,9 @@
+<?php
+
+    require_once 'includes/checkSession.php';
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -57,7 +63,6 @@
 						<?php
 						require_once "includes/config.php";
 						require_once "classes/mysqliconn.php";
-						require_once "includes/checkSession.php";
 						
 						// Create connection
 						$mysqli = new MysqliConn ();

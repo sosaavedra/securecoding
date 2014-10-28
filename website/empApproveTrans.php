@@ -1,3 +1,9 @@
+<?php
+
+    require_once 'includes/checkSession.php';
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,9 +83,10 @@
 									$clientId = $mysqli->escape ( $clientId );
 									
 									if (isset ( $_POST ['approve'] )) {
-										
+							                        $employee_id = $_SESSION ['logged_user']-> id;
+
 										// approve-button was clicked
-										if ($mysqli->approveTransaction ( $id )) {
+										if ($mysqli->approveTransaction ( $id, $employee_id )) {
 										} else {
 											die ( "Error: in approving!" );
 										}
