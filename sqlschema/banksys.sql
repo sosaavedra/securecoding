@@ -143,6 +143,7 @@ CREATE TABLE `tan_code` (
 
 LOCK TABLES `tan_code` WRITE;
 /*!40000 ALTER TABLE `tan_code` DISABLE KEYS */;
+INSERT INTO `tan_code` VALUES (1,'ABC','N','2014-10-27 22:24:05');
 /*!40000 ALTER TABLE `tan_code` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -320,6 +321,39 @@ UNLOCK TABLES;
 --
 -- Dumping routines for database 'banksys'
 --
+/*!50003 DROP PROCEDURE IF EXISTS `approveTransaction` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `approveTransaction`(IN `in_id` int(8), IN `in_employee_id` int(8))
+BEGIN
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION, SQLWARNING
+    BEGIN
+
+        ROLLBACK;
+
+        SHOW ERRORS;
+    END;
+
+    START TRANSACTION;
+
+    INSERT INTO transaction_history(origin_account_id, destination_account_id, amount, transaction_type_id, created_date, approved_date, approved_by)
+    SELECT origin_account_id, destination_account_id, amount, transaction_type_id, created_date, NOW(), in_employee_id FROM transaction WHERE id = in_id;
+
+    COMMIT;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `clientLogin` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -448,6 +482,25 @@ BEGIN
         user u, user_type ut
     WHERE e.id = u.person_id AND u.user_type_id = ut.id
         AND e.email = in_email AND u.pwd = in_pwd;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `getClientAccountAndBalance` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getClientAccountAndBalance`(IN `in_client_id` INT(8))
+BEGIN
+    SELECT account_number,balance from account where client_id=in_client_id;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -678,4 +731,4 @@ DELIMITER ;
 -- Manually added
 GRANT EXECUTE ON banksys.* TO 'webuser'@'localhost' IDENTIFIED BY 'katanaX';
 
--- Dump completed on 2014-10-27 23:37:17
+-- Dump completed on 2014-10-28  1:49:38
