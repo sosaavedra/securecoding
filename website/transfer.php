@@ -73,7 +73,8 @@ if ($_POST) {
 			$toAccount = $mysqli->escape ( $_POST ['toAccount'] );
 			
 			if ($mysqli->performTransaction( $client_id, $transactionType, $toAccount, $amount, $transNo )) {
-				// header ( 'Location: transferSuccess.html' );
+				//echo "Transfer Success";
+				header ( 'Location: transferSuccess.html' );
 			} else {
 				die ( "Error: Unable to process transaction!" );
 			}
