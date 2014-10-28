@@ -4,21 +4,19 @@
 typedef struct Transaction Transaction;
 
 struct Transaction{
-    char *origin;
     char *destination;
     char *amount;
-    char *transactionType;
     char *tanCode;
     Transaction *next;
     Transaction *prev;
 };
 
-Transaction *createTransaction(char **transactionLines);
+Transaction *createTransaction(char *line);
 
 void freeTransactions(Transaction *transactions);
 
 void printTransactions (Transaction * transactions);
 
-char *saveTransaction(Transaction *transactions);
+char *saveTransactions(Transaction *transactions, char *client_id);
 
 #endif

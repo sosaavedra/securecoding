@@ -1,14 +1,4 @@
-dest > 123456
-amount> 3.334
-tran_type > t
-tan_code > abc4788e44d8d7e
-#
-dest > 123457
-amount> 3.334
-tran_type > t
-tan_code > abc4788e44d8d7e
-#
-dest > 123458
-amount> 3.334
-tran_type > t
-tan_code > abc4788e44d8d7e
+123456@3.334@abc4788e44d8d7e
+654321@3.334@abc4788e44d8d7e
+147852@3.334@abc4788e44d8d7e
+258741@3.334@abc4788e44d8d7e
