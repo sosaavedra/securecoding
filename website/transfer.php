@@ -201,14 +201,25 @@ if ($_POST) {
 								<div>
 
 									<p>OR you can also make transaction by uploading a file in below format:
-									
-									
+                                                                            dest:12345678@amount:5000@tan_code:123456789ABCDEF
 									</h3>
 									</p>
-
-
-
-									<p># Explain format here</p>
+									<p>
+                                                                            <ul>
+                                                                                <li>
+                                                                                    One transaction per line. Use '@' as separator between fields.
+                                                                                </li>
+                                                                                <li>
+                                                                                    dest: Account number that will receive the transaction
+                                                                                </li>
+                                                                                <li>
+                                                                                amount: The amount of money to be transferred
+                                                                                </li>
+                                                                                <li>
+                                                                                dest: Security code. One of the codes received by email. The code shouldn't have been used before.
+                                                                                </li>
+                                                                            </ul>
+                                                                        </p>
 
 									<div class="wrapper">
 										<div class="bg">

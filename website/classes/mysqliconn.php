@@ -2,6 +2,7 @@
 require_once 'inexistentPropertyException.php';
 require_once 'classes/employee.php';
 require_once 'classes/client.php';
+
 class MysqliConn {
 	private $host;
 	private $username;
