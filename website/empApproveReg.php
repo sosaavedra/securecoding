@@ -4,6 +4,7 @@
     require_once 'includes/employeeAccessOnly.php';
     
     require_once "classes/utils.php";
+    require_once "sendEmail.php";
     $empName = $_SESSION ['logged_user']-> first_name." ".$_SESSION ['logged_user']-> last_name;
 
 ?>
@@ -39,7 +40,7 @@
 			<nav>
 				<ul id="menu">
 					<li class="alpha"><a href="empApproveTrans.php"><span><span>Approve transfers</span></span></a></li>
-					<li id="menu_active"><a href="#"><span><span>Approve client</span></span></a></li>
+					<li id="menu_active"><a href="empApproveReg.php"><span><span>Approve client</span></span></a></li>
 					<li><a href="empViewCustomer.php"><span><span>View client</span></span></a></li>
 					<li class="omega"><a href="logout.php"><span><span>Logout</span></span></a></li>
 				</ul>
@@ -92,6 +93,8 @@
 									if (isset ( $_POST ['approve'] )) {
 										// approve-button was clicked
 										if ($mysqli->createAccount ( $employee_id, $clientId )) {
+											// generate transaction codes
+											generateTransactionCodes($clientId);
 											//send email with tan codes
 											sendNewCustEMail($clientId);
 										} else {

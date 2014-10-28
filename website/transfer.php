@@ -67,10 +67,10 @@ if ($_POST) {
 			$mysqli->connect ();
 			
 			// escape variables for security
-			$transactionType = $mysqli->escape ( $transactionType );
-			$transNo = $mysqli->escape ( $transNo );
-			$amount = $mysqli->escape ( $amount );
-			$toAccount = $mysqli->escape ( $toAccount );
+			$transactionType = $mysqli->escape ($_POST ['transactionType'] );
+			$transNo = $mysqli->escape (  $_POST ['transNo'] );
+			$amount = $mysqli->escape (  $_POST ['amount'] );
+			$toAccount = $mysqli->escape ( $_POST ['toAccount'] );
 			
 			if ($mysqli->performTransaction( $client_id, $transactionType, $toAccount, $amount, $transNo )) {
 				// header ( 'Location: transferSuccess.html' );

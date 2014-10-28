@@ -22,7 +22,7 @@ function generateRandomTransactionNumber() {
 function generateTransactionCodes($customerid) {
 	
 	// connect to DB
-	$con = mysqli_connect ( "BANKSYS_HOST", "BANKSYS_USER", "BANKSYS_PWD", "BANKSYS_DB" );
+	$con = mysqli_connect ( BANKSYS_HOST, "root", "mysql17", BANKSYS_DB );
 	// Check connection
 	if (mysqli_connect_errno ()) {
 		echo "Failed to connect to MySQL: " . mysqli_connect_error ();
@@ -55,7 +55,6 @@ function generateTransactionCodes($customerid) {
 				die ( 'Error: ' . mysqli_error ( $con ) );
 			}
 			
-			echo $transNo;
 			
 			// increment counter
 			$counter ++;
