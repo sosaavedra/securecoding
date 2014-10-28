@@ -2,12 +2,10 @@
 $(document).ready(function(){ 
 	$('#transactionType').on('change',function() { 
 
-		if ( this.value == 'W' || this.value == 'D'){ 
+		if ( this.value == '1' || this.value == '2'){ 
 			 $("#toAccountDiv").hide();
-			 $("#transactionNoDiv").hide(); 
 		}else{ 
 			 $("#toAccountDiv").show();
-			 $("#transactionNoDiv").show(); 
 		 }
 		 }); 
 	});
