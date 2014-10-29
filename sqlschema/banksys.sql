@@ -70,8 +70,8 @@ CREATE TABLE `client` (
   `email` varchar(64) NOT NULL,
   `title_type_id` int(8) DEFAULT NULL,
   `created_date` datetime NOT NULL,
-  `activation_date` datetime DEFAULT NULL,
-  `activated_by` int(8) DEFAULT NULL,
+  `activation_date` datetime NOT NULL,
+  `activated_by` int(8) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email_ukey` (`email`),
   KEY `client_k1` (`title_type_id`),
@@ -143,7 +143,6 @@ CREATE TABLE `tan_code` (
 
 LOCK TABLES `tan_code` WRITE;
 /*!40000 ALTER TABLE `tan_code` DISABLE KEYS */;
-INSERT INTO `tan_code` VALUES (1,'ABC','N','2014-10-27 22:24:05');
 /*!40000 ALTER TABLE `tan_code` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -538,7 +537,7 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getClientsToApprove`()
 BEGIN
-    SELECT id,first_name,last_name,email FROM client WHERE activated_by IS NULL LIMIT 10;
+    SELECT id,first_name,last_name,email FROM client WHERE activated_by= '0' LIMIT 10;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -559,6 +558,25 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `getClientTransactionHistory`(IN `in
 BEGIN
     SELECT * FROM transaction_history
     WHERE origin_account_id = (SELECT account_number FROM account WHERE client_id = in_client_id);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `getClientTransationNumbers` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getClientTransationNumbers`(IN `in_client_id` INT(8))
+BEGIN
+    SELECT code from tan_code where client_id=in_client_id;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -616,6 +634,7 @@ BEGIN
     DECLARE error TINYINT DEFAULT 0;
     DECLARE origin_account_id int(8);
     DECLARE origin_account_number VARCHAR(8);
+    DECLARE destination_account_id int(8);
     
     DECLARE EXIT HANDLER FOR SQLEXCEPTION, SQLWARNING
     BEGIN
@@ -673,6 +692,9 @@ BEGIN
                                 END IF;
                             ELSEIF in_transaction_type_id = 3 THEN
                                 IF (EXISTS (SELECT id FROM account WHERE account_number = in_destination_account_number)) THEN
+
+                                    SELECT id INTO destination_account_id FROM account WHERE account_number = in_destination_account_number;
+
                                     UPDATE account SET balance = balance - in_amount
                                     WHERE client_id = in_client_id AND account_number = origin_account_number;
                                     
@@ -681,10 +703,10 @@ BEGIN
 
                                     IF in_amount < 10000 THEN
                                         INSERT INTO transaction_history(origin_account_id, destination_account_id, amount, transaction_type_id, created_date)
-                                        VALUES(origin_account_id, in_destination_account_number, in_amount, in_transaction_type_id, now());
+                                        VALUES(origin_account_id, destination_account_id, in_amount, in_transaction_type_id, now());
                                     ELSE
                                         INSERT INTO transaction(origin_account_id, destination_account_id, amount, transaction_type_id, created_date)
-                                        VALUES(origin_account_id, in_destination_account_number, in_amount, in_transaction_type_id, now());
+                                        VALUES(origin_account_id, destination_account_id, in_amount, in_transaction_type_id, now());
                                     END IF;
                                 ELSE
                                     SET error = 6; -- Destination account does not exist!
@@ -731,4 +753,4 @@ DELIMITER ;
 -- Manually added
 GRANT EXECUTE ON banksys.* TO 'webuser'@'localhost' IDENTIFIED BY 'katanaX';
 
--- Dump completed on 2014-10-28  1:49:38
+-- Dump completed on 2014-10-29 20:41:40
