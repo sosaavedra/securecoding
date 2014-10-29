@@ -125,10 +125,10 @@ class MysqliConn {
 	 *        	unique transaction number $transNo
 	 * @return boolean
 	 */
-	public function performTransaction($client_id, $transactionType, $toAccount, $amount, $transNo) {
+	public function performTransaction( $client_id, $toAccount, $amount,$transNo, $transactionType  ) {
 		$stmt = $this->conn->stmt_init ();
 		$stmt->prepare ( "call performTransaction(?, ?, ?, ?, ?)" );
-		$stmt->bind_param ( 'isiis', $title_type_id, $first_name, $last_name, $email, $pwd );
+		$stmt->bind_param ( 'isdsi', $client_id, $toAccount, $amount, $transNo, $transactionType );
 		$stmt->execute ();
 		
 		$error_msg;

@@ -1,8 +1,7 @@
 <?php
+require_once 'includes/checkSession.php';
 
-    require_once 'includes/checkSession.php';
-
-    require_once 'includes/customerAccessOnly.php';
+require_once 'includes/customerAccessOnly.php';
 ?>
 
 <!DOCTYPE html>
@@ -39,7 +38,7 @@ if ($_POST) {
 	require_once "includes/config.php";
 	require_once "classes/mysqliconn.php";
 	
-	$client_id = $_SESSION ['logged_user']-> id;
+	$client_id = $_SESSION ['logged_user']->id;
 	
 	if (isset ( $_POST ['transfer'] )) {
 		// transfer-button was clicked
@@ -47,15 +46,18 @@ if ($_POST) {
 			$transTypeErr = "Transaction type not valid";
 			$formValid = false;
 		}
-		if (empty ( $_POST ['transNo'] )) {
-			$transNoErr = "Transaction number is required";
-			$formValid = false;
-		}
+		
 		if (empty ( $_POST ['amount'] )) {
 			$amountErr = "Amount is required";
 			$formValid = false;
 		}
-		if (empty ( $_POST ['toAccount'] )) {
+		
+		if (empty ( $_POST ['transNo'] )) {
+			$transNoErr = "Transaction number is required";
+			$formValid = false;
+		}
+		
+		if (strcmp ( $_POST ['transactionType'], "3" ) == 0 && empty ( $_POST ['toAccount'] )) {
 			$toAccountErr = "To account is required";
 			$formValid = false;
 		}
@@ -67,19 +69,15 @@ if ($_POST) {
 			$mysqli->connect ();
 			
 			// escape variables for security
-			$transactionType = $mysqli->escape ($_POST ['transactionType'] );
-			$transNo = $mysqli->escape (  $_POST ['transNo'] );
-			$amount = $mysqli->escape (  $_POST ['amount'] );
+			$transactionType = $mysqli->escape ( $_POST ['transactionType'] );
+			$transNo = $mysqli->escape ( $_POST ['transNo'] );
+			$amount = $mysqli->escape ( $_POST ['amount'] );
 			$toAccount = $mysqli->escape ( $_POST ['toAccount'] );
 			
-			if ($mysqli->performTransaction( $client_id, $transactionType, $toAccount, $amount, $transNo )) {
-				//echo "Transfer Success";
-				header ( 'Location: transferSuccess.html' );
-			} else {
-				die ( "Error: Unable to process transaction!" );
-			}
-			
+			$mysqli->performTransaction ( $client_id, $toAccount, $amount, $transNo, $transactionType );
 			$mysqli->close ();
+			// echo "Transfer Success";
+			header ( 'Location: transferSuccess.html' );
 		}
 	} else if (isset ( $_POST ['upload'] )) {
 		// upload-button was clicked
@@ -161,9 +159,9 @@ if ($_POST) {
 									<div class="wrapper">
 										<div>
 											<select name="transactionType" id="transactionType" class="bg">
-												<option value="T">Transfer Money</option>
-												<option value="D">Deposit Money</option>
-												<option value="W">Withdraw Money</option>
+												<option value="3">Transfer Money</option>
+												<option value="1">Deposit Money</option>
+												<option value="2">Withdraw Money</option>
 											</select>
 										</div>
 										Select type:
@@ -201,26 +199,21 @@ if ($_POST) {
 							<form class="formstyle" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post" enctype="multipart/form-data">
 								<div>
 
-									<p>OR you can also make transaction by uploading a file in below format:
-                                                                            dest:12345678@amount:5000@tan_code:123456789ABCDEF
+									<p>OR you can also make transaction by uploading a file in below format: dest:12345678@amount:5000@tan_code:123456789ABCDEF
+									
+									
 									</h3>
 									</p>
 									<p>
-                                                                            <ul>
-                                                                                <li>
-                                                                                    One transaction per line. Use '@' as separator between fields.
-                                                                                </li>
-                                                                                <li>
-                                                                                    dest: Account number that will receive the transaction
-                                                                                </li>
-                                                                                <li>
-                                                                                amount: The amount of money to be transferred
-                                                                                </li>
-                                                                                <li>
-                                                                                dest: Security code. One of the codes received by email. The code shouldn't have been used before.
-                                                                                </li>
-                                                                            </ul>
-                                                                        </p>
+									
+									
+									<ul>
+										<li>One transaction per line. Use '@' as separator between fields.</li>
+										<li>dest: Account number that will receive the transaction</li>
+										<li>amount: The amount of money to be transferred</li>
+										<li>dest: Security code. One of the codes received by email. The code shouldn't have been used before.</li>
+									</ul>
+									</p>
 
 									<div class="wrapper">
 										<div class="bg">
