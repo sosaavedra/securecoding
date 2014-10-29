@@ -1,4 +1,5 @@
 #include "transaction.h"
+#include "utils.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -17,16 +18,37 @@ Transaction *createTransaction(char *line){
     }
 
     value = strtok(line, "@");
+    if(!value || strlen(value) != 8){
+        fprintf(stderr, "There's a problem with the destination account number: \"%s\"\n", value);
+
+        return NULL;
+    }
+
     transaction->destination = malloc(sizeof(char) * (strlen(value) + 1));
     strcpy(transaction->destination, value);
     transaction->destination[strlen(value)] = '\0';
 
+    char *end;
+
     value = strtok(NULL, "@");
+    strtod(value, &end);
+    if(end != NULL && strlen(end) > 0){
+        fprintf(stderr, "Invalid amount %s\n", value);
+
+        return NULL;
+    }
+
     transaction->amount = malloc(sizeof(char) * (strlen(value) + 1));
     strcpy(transaction->amount, value);
     transaction->amount[strlen(value)] = '\0';
 
     value = strtok(NULL, "@");
+    if(!value || strlen(value) != 15){
+        fprintf(stderr, "There's a problem with the tan code: \"%s\"\n", value);
+
+        return NULL;
+    }
+
     transaction->tanCode = malloc(sizeof(char) * (strlen(value) + 1));
     strcpy(transaction->tanCode, value);
     transaction->tanCode[strlen(value)] = '\0';
@@ -41,14 +63,14 @@ void printTransactions (Transaction * transactions){
 
     Transaction *next = transactions;
 
-    if(next != NULL){
+    if(next){
         do{
             printf("Destination: %s\n", next->destination);
             printf("Amount: %s\n", next->amount);
             printf("Tan code: %s\n", next->tanCode);
 
             next = next->next;
-        } while(next != NULL);
+        } while(next);
     }
 }
 
@@ -56,39 +78,66 @@ char *saveTransactions(Transaction *transactions, char *client_id){
     printf("MySQL client version: %s\n", mysql_get_client_info());
 
     MYSQL mysql;
-    MYSQL_RES *res;
-    MYSQL_ROW row; 
+    MYSQL_STMT *stmt;
+    MYSQL_BIND sp_params[4];
+
+    int status;
 
     if(mysql_init(&mysql)==NULL){
-        printf("\nFailed to initate MySQL connection");
-        exit(EXIT_FAILURE);
+        printf("Failed to initate MySQL connection\n");
+
+        return NULL;
     } 
 
     if (!mysql_real_connect(&mysql,"localhost","webuser","katanaX","banksys",0,NULL,0)){
         printf( "Failed to connect to MySQL: Error: %s\n",
         mysql_error(&mysql)); 
 
-         exit(EXIT_FAILURE);
+        return NULL;
     }
 
-    printf("Logged on to database sucessfully");
+    printf("Logged on to database sucessfully\n");
 
-    char *query = "call performTransaction %s, %s, %s, %s, 3";
+    stmt = mysql_stmt_init(&mysql);
 
-    if (mysql_query(&mysql, query)) {
-        fprintf(stderr, "%s\n", mysql_error(&mysql));
-        exit(EXIT_FAILURE);
+    if(!stmt){
+        fprintf(stderr, "Could not initialize statement\n");
+
+        return NULL;
     }
 
-    res = mysql_use_result(&mysql);
+    status = mysql_stmt_prepare(stmt, "call performTransaction(?, ?, ?, ?, 3)", 38); 
+    test_stmt_error(stmt, status);
 
-    /* output table name */
-    printf("MySQL Tables in mysql database:\n");
+    memset(sp_params, 0, sizeof(MYSQL_BIND));
 
-    while ((row = mysql_fetch_row(res)) != NULL)
-        printf("%s \n", row[0]);
+    sp_params[0].buffer_type = MYSQL_TYPE_LONG;
+    sp_params[0].buffer = client_id ;
+    sp_params[0].length = 0;
+    sp_params[0].is_null = 0;
 
-    mysql_free_result(res);
+    sp_params[1].buffer_type = MYSQL_TYPE_STRING;
+    sp_params[1].buffer = transactions->destination;
+    sp_params[1].length = 0;
+    sp_params[1].is_null = 0;
+
+    sp_params[2].buffer_type = MYSQL_TYPE_DOUBLE;
+    sp_params[2].buffer = transactions->amount;
+    sp_params[2].length = 0;
+    sp_params[2].is_null = 0;
+
+    sp_params[3].buffer_type = MYSQL_TYPE_STRING;
+    sp_params[3].buffer = transactions->tanCode ;
+    sp_params[3].length = 0;
+    sp_params[3].is_null = 0;
+
+    status = mysql_stmt_bind_param(stmt, sp_params);
+    test_stmt_error(stmt, status);
+
+    status = mysql_stmt_execute(stmt);
+    test_stmt_error(stmt, status);
+
+    mysql_stmt_close(stmt);
 
     mysql_close(&mysql);
 

@@ -14,13 +14,21 @@ int main (int argc, char **argv){
     char *client_id;
 
     if(argc != 3){
-        fprintf(stderr, "Wrong number of parameters. Expected 2, found %d", argc);
+        fprintf(stderr, "Wrong number of parameters. Expected 3, found %d\n", argc);
 
         return EXIT_FAILURE;
     }
 
     fileName = argv[1];
     client_id = argv[2];
+
+    for(int i = 0; i < strlen(client_id); i++){
+        if(!isdigit(*(client_id + i))){
+            fprintf(stderr, "Account number %s must be integer\n", client_id);
+    
+            return EXIT_FAILURE;
+        }
+    }
 
     FILE *transactionFile = fopen(fileName, "r");
 
@@ -61,7 +69,7 @@ int main (int argc, char **argv){
         Transaction *transaction = createTransaction(line);
 
         if(transaction == NULL){
-           fprintf(stderr, "Transaction in line %d could not be created.", lineNumber);
+           fprintf(stderr, "Transaction in line %d could not be created\n", lineNumber);
    
            freeTransactions(transactions);
            free(line);
