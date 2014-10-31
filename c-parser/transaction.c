@@ -82,6 +82,10 @@ char *saveTransactions(Transaction *transactions, char *client_id){
     MYSQL_BIND sp_params[4];
 
     int status;
+    unsigned long client_id_length;
+    unsigned long destination_length;
+    unsigned long amount_length;
+    unsigned long tancode_length;
 
     if(mysql_init(&mysql)==NULL){
         printf("Failed to initate MySQL connection\n");
@@ -111,24 +115,32 @@ char *saveTransactions(Transaction *transactions, char *client_id){
 
     memset(sp_params, 0, sizeof(MYSQL_BIND));
 
+    client_id_length = sizeof(client_id);
     sp_params[0].buffer_type = MYSQL_TYPE_LONG;
-    sp_params[0].buffer = client_id ;
-    sp_params[0].length = 0;
+    sp_params[0].buffer = &client_id ;
+    sp_params[0].buffer_length = client_id_length;
+    sp_params[0].length = &client_id_length;
     sp_params[0].is_null = 0;
 
+    destination_length = strlen(transactions->destination);
     sp_params[1].buffer_type = MYSQL_TYPE_STRING;
-    sp_params[1].buffer = transactions->destination;
-    sp_params[1].length = 0;
+    sp_params[1].buffer = &transactions->destination;
+    sp_params[1].buffer_length = destination_length; 
+    sp_params[1].length = &destination_length;
     sp_params[1].is_null = 0;
 
+    amount_length = strlen(transactions->amount);
     sp_params[2].buffer_type = MYSQL_TYPE_DOUBLE;
-    sp_params[2].buffer = transactions->amount;
-    sp_params[2].length = 0;
+    sp_params[2].buffer = &transactions->amount;
+    sp_params[2].buffer_length = amount_length;
+    sp_params[2].length = &amount_length;
     sp_params[2].is_null = 0;
-
+    
+    tancode_length = strlen(transactions->tanCode);
     sp_params[3].buffer_type = MYSQL_TYPE_STRING;
-    sp_params[3].buffer = transactions->tanCode ;
-    sp_params[3].length = 0;
+    sp_params[3].buffer = &transactions->tanCode;
+    sp_params[3].buffer_length = tancode_length;
+    sp_params[3].length = &tancode_length;
     sp_params[3].is_null = 0;
 
     status = mysql_stmt_bind_param(stmt, sp_params);
