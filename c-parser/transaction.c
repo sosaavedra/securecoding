@@ -1,10 +1,13 @@
 #include "transaction.h"
 #include "utils.h"
+#include "constants.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <mysql.h>
+
+
 
 Transaction *createTransaction(char *line){
     char *value;
@@ -75,17 +78,26 @@ void printTransactions (Transaction * transactions){
 }
 
 char *saveTransactions(Transaction *transactions, char *client_id){
-    printf("MySQL client version: %s\n", mysql_get_client_info());
+    char *performTransaction =  "call performTransaction(?, ?, ?, ?, 3)";
 
     MYSQL mysql;
     MYSQL_STMT *stmt;
     MYSQL_BIND sp_params[4];
+    MYSQL_BIND sp_result[3];
 
     int status;
     unsigned long client_id_length;
     unsigned long destination_length;
     unsigned long amount_length;
     unsigned long tancode_length;
+
+    char level[RESPONSE_LENGTH];
+    int code;
+    char message[RESPONSE_LENGTH];
+
+    unsigned long length[3];
+    my_bool is_null[3];
+    my_bool error[3];
 
     if(mysql_init(&mysql)==NULL){
         printf("Failed to initate MySQL connection\n");
@@ -94,13 +106,10 @@ char *saveTransactions(Transaction *transactions, char *client_id){
     } 
 
     if (!mysql_real_connect(&mysql,"localhost","webuser","katanaX","banksys",0,NULL,0)){
-        printf( "Failed to connect to MySQL: Error: %s\n",
-        mysql_error(&mysql)); 
+        printf( "Failed to connect to MySQL: Error: %s\n", mysql_error(&mysql)); 
 
         return NULL;
     }
-
-    printf("Logged on to database sucessfully\n");
 
     stmt = mysql_stmt_init(&mysql);
 
@@ -110,44 +119,74 @@ char *saveTransactions(Transaction *transactions, char *client_id){
         return NULL;
     }
 
-    status = mysql_stmt_prepare(stmt, "call performTransaction(?, ?, ?, ?, 3)", 38); 
+    status = mysql_stmt_prepare(stmt, performTransaction, strlen(performTransaction));
     test_stmt_error(stmt, status);
 
-    memset(sp_params, 0, sizeof(MYSQL_BIND));
+    printf("call performTransaction(%s, %s, %s, %s, 3)\n", client_id, transactions->destination, transactions->amount, transactions->tanCode);
 
-    client_id_length = sizeof(client_id);
-    sp_params[0].buffer_type = MYSQL_TYPE_LONG;
-    sp_params[0].buffer = &client_id ;
+    memset(sp_params, 0, sizeof(sp_params));
+
+    client_id_length = strlen(client_id);
+    sp_params[0].buffer_type = MYSQL_TYPE_STRING;
+    sp_params[0].buffer = (char *)client_id;
     sp_params[0].buffer_length = client_id_length;
-    sp_params[0].length = &client_id_length;
-    sp_params[0].is_null = 0;
 
     destination_length = strlen(transactions->destination);
     sp_params[1].buffer_type = MYSQL_TYPE_STRING;
-    sp_params[1].buffer = &transactions->destination;
+    sp_params[1].buffer = (char *)transactions->destination;
     sp_params[1].buffer_length = destination_length; 
-    sp_params[1].length = &destination_length;
-    sp_params[1].is_null = 0;
 
     amount_length = strlen(transactions->amount);
-    sp_params[2].buffer_type = MYSQL_TYPE_DOUBLE;
-    sp_params[2].buffer = &transactions->amount;
+    sp_params[2].buffer_type = MYSQL_TYPE_STRING;
+    sp_params[2].buffer = (char *)transactions->amount;
     sp_params[2].buffer_length = amount_length;
-    sp_params[2].length = &amount_length;
-    sp_params[2].is_null = 0;
     
     tancode_length = strlen(transactions->tanCode);
     sp_params[3].buffer_type = MYSQL_TYPE_STRING;
-    sp_params[3].buffer = &transactions->tanCode;
+    sp_params[3].buffer = (char *)transactions->tanCode;
     sp_params[3].buffer_length = tancode_length;
-    sp_params[3].length = &tancode_length;
-    sp_params[3].is_null = 0;
 
     status = mysql_stmt_bind_param(stmt, sp_params);
     test_stmt_error(stmt, status);
 
     status = mysql_stmt_execute(stmt);
     test_stmt_error(stmt, status);
+
+    memset(sp_result, 0, sizeof(sp_result));
+
+    sp_result[0].buffer_type = MYSQL_TYPE_STRING;
+    sp_result[0].buffer = &level;
+    sp_result[0].buffer_length = RESPONSE_LENGTH;
+    sp_result[0].length = &length[0];
+    sp_result[0].is_null = &is_null[0];
+    sp_result[0].error = &error[0];
+
+    sp_result[1].buffer_type = MYSQL_TYPE_LONG;
+    sp_result[1].buffer = &code;
+    sp_result[1].length = &length[1];
+    sp_result[1].is_null = &is_null[1];
+    sp_result[1].error = &error[1];
+
+    sp_result[2].buffer_type = MYSQL_TYPE_STRING;
+    sp_result[2].buffer = &message;
+    sp_result[2].buffer_length = RESPONSE_LENGTH;
+    sp_result[2].length = &length[2];
+    sp_result[2].is_null = &is_null[2];
+    sp_result[2].error = &error[2];
+
+
+    status = mysql_stmt_bind_result(stmt, sp_result);
+    test_stmt_error(stmt, status);
+
+    status = mysql_stmt_store_result(stmt);
+    test_stmt_error(stmt, status);
+
+    status = mysql_stmt_fetch(stmt);
+    test_stmt_error(stmt, status);
+
+    printf("Level: %s\n", level);
+    printf("Code: %d\n", code);
+    printf("Message: %s\n", message);
 
     mysql_stmt_close(stmt);
 
