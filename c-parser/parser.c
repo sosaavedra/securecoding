@@ -103,7 +103,10 @@ int main (int argc, char **argv){
     }
 
     printTransactions(transactions); 
-    saveTransactions(transactions, client_id);
+
+    if(saveTransactions(transactions, client_id)){
+        return EXIT_FAILURE;
+    }
 
     freeTransactions(transactions);
     free(line);
