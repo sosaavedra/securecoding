@@ -1,5 +1,6 @@
 #include "transaction.h"
 #include "utils.h"
+#include "mysqllib.h"
 #include "constants.h"
 
 #include <stdlib.h>
@@ -82,7 +83,6 @@ char *saveTransactions(Transaction *transactions, char *client_id){
     MYSQL_STMT *stmt;
     MYSQL_BIND sp_params[4];
     MYSQL_BIND sp_result[3];
-    MYSQL_RES *meta_result;
 
     int status;
     unsigned long client_id_length;
@@ -98,40 +98,41 @@ char *saveTransactions(Transaction *transactions, char *client_id){
     my_bool is_null[3];
     my_bool error[3];
 
-    if(mysql_init(&mysql)==NULL){
+    if(mysql_init(&mysql) == NULL){
         printf("Failed to initate MySQL connection\n");
 
         return NULL;
     } 
 
-    if (!mysql_real_connect(&mysql,"localhost","webuser","katanaX","banksys",0,NULL,0)){
+    if (!mysql_real_connect(&mysql,"localhost","webuser","katanaX","banksys",0,NULL,CLIENT_MULTI_STATEMENTS)){
         printf( "Failed to connect to MySQL: Error: %s\n", mysql_error(&mysql)); 
 
         return NULL;
     }
 
+    printf("init stmt\n");
+    stmt = mysql_stmt_init(&mysql);
+ 
+    if(!stmt){
+        fprintf(stderr, "Could not initialize statement\n");
+    
+        return NULL;
+    }
+
+    printf("prepare stmt\n");
+    status = mysql_stmt_prepare(stmt, performTransaction, strlen(performTransaction));
+
+    if(test_stmt_error(stmt, status)){
+        return NULL;
+    }
+    
+    client_id_length = strlen(client_id);
+
     Transaction *next = transactions;
 
     if(next){
-
-        client_id_length = strlen(client_id);
-
         do{
-            stmt = mysql_stmt_init(&mysql);
-        
-            if(!stmt){
-                fprintf(stderr, "Could not initialize statement\n");
-        
-                return NULL;
-            }
-
-            status = mysql_stmt_prepare(stmt, performTransaction, strlen(performTransaction));
-            test_stmt_error(stmt, status);
-    
             printf("call performTransaction(%s, %s, %s, %s, 3)\n", client_id, next->destination, next->amount, next->tanCode);
-    
-            meta_result = mysql_stmt_result_metadata(stmt);
-printf("metadata");
 
             memset(sp_params, 0, sizeof(sp_params));
     
@@ -153,21 +154,26 @@ printf("metadata");
             sp_params[3].buffer_type = MYSQL_TYPE_STRING;
             sp_params[3].buffer = (char *)next->tanCode;
             sp_params[3].buffer_length = tancode_length;
-    
+ 
+            printf("bind_param\n");
             status = mysql_stmt_bind_param(stmt, sp_params);
-    
-printf("param");
+
             if(test_stmt_error(stmt, status)){
                 return NULL;
             }
-    
+           
+            printf("execute\n");
             status = mysql_stmt_execute(stmt);
     
-printf("execute");
             if(test_stmt_error(stmt, status)){
                 return NULL;
             }
-            if(meta_result){
+
+            int num_fields;
+
+            num_fields = mysql_stmt_field_count(stmt);
+
+            if(num_fields > 0){
 
                 memset(sp_result, 0, sizeof(sp_result));
  
@@ -191,17 +197,15 @@ printf("execute");
                 sp_result[2].is_null = &is_null[2];
                 sp_result[2].error = &error[2];
 
+                printf("bind_result\n");
                 status = mysql_stmt_bind_result(stmt, sp_result);
-
-printf("result");
-                status = mysql_stmt_store_result(stmt);
 
                 if(test_stmt_error(stmt, status)){
                     return NULL;
                 }
 
+                printf("fetch\n");
                 status = mysql_stmt_fetch(stmt);
-printf("fetch");
 
                 if(test_stmt_error(stmt, status)){
                     return NULL;
@@ -212,15 +216,17 @@ printf("fetch");
                 printf("Message: %s\n", message);
             }
 
+            while(mysql_stmt_next_result(stmt) == 0);
+
             next = next->next;
-
-            mysql_free_result(meta_result);
-
-            mysql_stmt_close(stmt);
 
         } while(next);
     }
 
+    printf("close stmt\n");
+    mysql_stmt_close(stmt);
+
+    printf("close mysql\n");
     mysql_close(&mysql);
 
     return NULL;

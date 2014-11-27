@@ -3,7 +3,7 @@ CC = gcc
 CFLAGS = -g -std=gnu99 -fstrict-overflow -Werror -Wall -Wshadow -Wstrict-overflow=5
 MYSQLFLAGS = -I/usr/include/mysql -L/usr/lib/mysql -lmysqlclient
 
-OBJ_SEQ = constants.h utils.o transaction.o $(NAME).o
+OBJ_SEQ = constants.h utils.o mysqllib.o transaction.o $(NAME).o
 
 all: $(NAME)
 
@@ -14,6 +14,9 @@ transaction.o: transaction.c transaction.h
 	$(CC) $(CFLAGS) $(MYSQLFLAGS) -c -o $@ $<
 
 utils.o: utils.c utils.h
+	$(CC) $(CFLAGS) $(MYSQLFLAGS) -c -o $@ $<
+
+mysqllib.o: mysqllib.c mysqllib.h
 	$(CC) $(CFLAGS) $(MYSQLFLAGS) -c -o $@ $<
 
 $(NAME): $(OBJ_SEQ)

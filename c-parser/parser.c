@@ -14,7 +14,7 @@ int main (int argc, char **argv){
     char *client_id;
 
     if(argc != 3){
-        fprintf(stderr, "Wrong number of parameters. Expected 3, found %d\n", argc);
+        fprintf(stderr, "Wrong number of parameters. Expected 2, found %d\n", (argc - 1));
 
         return EXIT_FAILURE;
     }
