@@ -69,7 +69,7 @@ int main (int argc, char **argv){
         Transaction *transaction = createTransaction(line);
 
         if(transaction == NULL){
-           fprintf(stderr, "Transaction in line %d could not be created\n", lineNumber);
+           fprintf(stderr, "Transaction in line %zu could not be created\n", lineNumber);
    
            freeTransactions(transactions);
            free(line);
