@@ -280,7 +280,7 @@ CREATE TABLE `user` (
   UNIQUE KEY `user_ukey` (`person_id`,`user_type_id`),
   KEY `user_k1` (`user_type_id`),
   CONSTRAINT `user_user_type` FOREIGN KEY (`user_type_id`) REFERENCES `user_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -751,6 +751,7 @@ DELIMITER ;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Manually added
-GRANT EXECUTE ON banksys.* TO 'webuser'@'localhost' IDENTIFIED BY 'katanaX';
+GRANT EXECUTE ON banksys.* TO 'webuser'@'localhost' IDENTIFIED BY 'kubruf#eGa4e';
+GRANT EXECUTE ON banksys.* TO 'parser'@'localhost' IDENTIFIED BY 'vEq7saf@&eVU';
 
--- Dump completed on 2014-10-29 20:41:40
+-- Dump completed on 2014-11-28  1:27:22
