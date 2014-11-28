@@ -1,5 +1,4 @@
 #include "transaction.h"
-#include "utils.h"
 #include "mysqllib.h"
 #include "constants.h"
 
@@ -79,7 +78,7 @@ void printTransactions (Transaction * transactions){
 char *saveTransactions(Transaction *transactions, char *client_id){
     char *performTransaction =  "call performTransaction(?, ?, ?, ?, 3)";
 
-    MYSQL mysql;
+    MYSQL *mysql;
     MYSQL_STMT *stmt;
     MYSQL_BIND sp_params[4];
     MYSQL_BIND sp_result[3];
@@ -98,20 +97,15 @@ char *saveTransactions(Transaction *transactions, char *client_id){
     my_bool is_null[3];
     my_bool error[3];
 
-    if(mysql_init(&mysql) == NULL){
-        printf("Failed to initate MySQL connection\n");
+    mysql = openDB();
+
+    if(mysql == NULL){
 
         return NULL;
     } 
 
-    if (!mysql_real_connect(&mysql,"localhost","webuser","katanaX","banksys",0,NULL,CLIENT_MULTI_STATEMENTS)){
-        printf( "Failed to connect to MySQL: Error: %s\n", mysql_error(&mysql)); 
-
-        return NULL;
-    }
-
     printf("init stmt\n");
-    stmt = mysql_stmt_init(&mysql);
+    stmt = mysql_stmt_init(mysql);
  
     if(!stmt){
         fprintf(stderr, "Could not initialize statement\n");
@@ -227,7 +221,7 @@ char *saveTransactions(Transaction *transactions, char *client_id){
     mysql_stmt_close(stmt);
 
     printf("close mysql\n");
-    mysql_close(&mysql);
+    mysql_close(mysql);
 
     return NULL;
 }

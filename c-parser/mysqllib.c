@@ -3,8 +3,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int connect(MYSQL *mysql){
-return 0;
+MYSQL *openDB(){
+    MYSQL *mysql;
+
+    mysql = mysql_init(NULL);
+
+    if(mysql == NULL){
+        printf("Failed to initate MySQL connection\n");
+
+        return NULL;
+    } 
+
+    if (!mysql_real_connect(mysql,"localhost","parser","vEq7saf@&eVU","banksys",0,NULL,CLIENT_MULTI_RESULTS)){
+        printf( "Failed to connect to MySQL: Error: %s\n", mysql_error(mysql)); 
+
+        return NULL;
+    }
+
+    return mysql;
 }
 
 int test_error(MYSQL *mysql, int status){

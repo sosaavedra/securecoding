@@ -3,7 +3,7 @@
 
 #include <mysql.h>
 
-int connect(MYSQL *mysql);
+MYSQL *openDB();
 
 int test_error(MYSQL *mysql, int status);
 int test_stmt_error(MYSQL_STMT *stmt, int status);
