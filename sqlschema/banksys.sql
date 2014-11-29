@@ -280,7 +280,7 @@ CREATE TABLE `user` (
   UNIQUE KEY `user_ukey` (`person_id`,`user_type_id`),
   KEY `user_k1` (`user_type_id`),
   CONSTRAINT `user_user_type` FOREIGN KEY (`user_type_id`) REFERENCES `user_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -481,6 +481,39 @@ BEGIN
         user u, user_type ut
     WHERE e.id = u.person_id AND u.user_type_id = ut.id
         AND e.email = in_email AND u.pwd = in_pwd;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `generateClientTransactionCodes` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `generateClientTransactionCodes`(IN `in_client_id` int(8))
+BEGIN
+    DECLARE i INT DEFAULT 0;
+    DECLARE new_code VARCHAR(15);
+
+    WHILE i < 100 DO
+        SELECT UPPER(SUBSTR(MD5(UUID()), 1, 15)) INTO new_code;
+
+        IF(NOT EXISTS(SELECT code FROM tan_code WHERE code = new_code)) THEN
+            INSERT INTO tan_code(client_id, code) VALUES (in_client_id, new_code);
+            SET i = i + 1;
+        END IF;
+
+    END WHILE;
+
+    SELECT code FROM tan_code WHERE client_id = in_client_id;
+
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -709,28 +742,28 @@ BEGIN
                                         VALUES(origin_account_id, destination_account_id, in_amount, in_transaction_type_id, now());
                                     END IF;
                                 ELSE
-                                    SET error = 6; -- Destination account does not exist!
+                                    SET error = 6; 
                                     CALL raise_error;
                                 END IF;
                             ELSE
-                                SET error = 5; -- Unknown transaction type
+                                SET error = 5; 
                                 CALL raise_error;
                             END IF;
                         ELSE
-                            SET error = 4; -- Not enough money
+                            SET error = 4; 
                             CALL raise_error;
                         END IF;
                     END IF;
                 ELSE
-                    SET error = 3; -- Tan Code does not exist or has been used before
+                    SET error = 3; 
                     CALL raise_error;
                 END IF;
             ELSE
-                SET error = 2; -- Origin Account number does not exist
+                SET error = 2; 
                 CALL raise_error;
             END IF;
         ELSE
-            SET error = 1; -- client does not exist
+            SET error = 1; 
             CALL raise_error;
         END IF;
     COMMIT;
@@ -754,4 +787,4 @@ DELIMITER ;
 GRANT EXECUTE ON banksys.* TO 'webuser'@'localhost' IDENTIFIED BY 'kubruf#eGa4e';
 GRANT EXECUTE ON banksys.* TO 'parser'@'localhost' IDENTIFIED BY 'vEq7saf@&eVU';
 
--- Dump completed on 2014-11-28  1:27:22
+-- Dump completed on 2014-11-29  3:20:42
