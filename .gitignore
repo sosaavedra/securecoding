@@ -2,3 +2,5 @@
 **/*.o
 **/parser
 **/*.swp
+sites/
+**/info.php
