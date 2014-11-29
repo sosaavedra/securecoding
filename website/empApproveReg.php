@@ -3,7 +3,7 @@
     require_once 'includes/checkSession.php';
     require_once 'includes/employeeAccessOnly.php';
     
-    require_once "classes/utils.php";
+    require_once "classes/mysqliconn.php";
     require_once "sendEmail.php";
     $empName = $_SESSION ['logged_user']-> first_name." ".$_SESSION ['logged_user']-> last_name;
 
@@ -94,7 +94,7 @@
 										// approve-button was clicked
 										if ($mysqli->createAccount ( $employee_id, $clientId )) {
 											// generate transaction codes
-											generateTransactionCodes($clientId);
+											$mysqli->generateClientTransactionCodes($clientId);
 											//send email with tan codes
 											sendNewCustEMail($clientId);
 										} else {
