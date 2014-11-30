@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-MYSQL *openDB(){
+MYSQL *openConnection(){
     MYSQL *mysql;
 
     mysql = mysql_init(NULL);
@@ -21,6 +21,10 @@ MYSQL *openDB(){
     }
 
     return mysql;
+}
+
+void closeConnection(MYSQL *mysql){
+    mysql_close(mysql);
 }
 
 int test_error(MYSQL *mysql, int status){

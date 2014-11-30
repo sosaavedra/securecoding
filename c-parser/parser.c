@@ -48,48 +48,44 @@ int main (int argc, char **argv){
         return EXIT_FAILURE;
     }
 
-    Transaction *transactions = malloc(sizeof (struct Transaction));
-
-    if(transactions == NULL){
-        fprintf(stderr, "Insufficient memory at line #%d\n", __LINE__);
-
-        free(line);
-        fclose(transactionFile);
-
-        return EXIT_FAILURE;
-    }
-
     size_t lineNumber = 0;
 
-    while(fgets(line, (LINE_SIZE + 1), transactionFile) != NULL){
+    Transaction *transactions;
+
+    if(fgets(line, (LINE_SIZE + 1), transactionFile) != NULL){
         lineNumber++;
 
         trim(line);
 
-        Transaction *transaction = createTransaction(line);
+        transactions = createTransaction(line);
 
-        if(transaction == NULL){
-           fprintf(stderr, "Transaction in line %zu could not be created\n", lineNumber);
-   
-           freeTransactions(transactions);
-           free(line);
-           fclose(transactionFile);
-
+        if(transactions == NULL){
+            fprintf(stderr, "Transaction in line %zu could not be created\n", lineNumber);
+       
+            free(line);
+            fclose(transactionFile);
+    
             return EXIT_FAILURE;
         }
 
-        if(transactions->destination == NULL){
-            transactions = transaction;
-        } else {
-            if(transactions->prev == NULL){
-                transactions->prev = transaction;
-                transactions->next = transaction;
-                transaction->prev = transactions;
-            } else {
-                transaction->prev = transactions->prev;
-                transactions->prev->next = transaction;
-                transactions->prev = transaction;
+        while(fgets(line, (LINE_SIZE + 1), transactionFile) != NULL){
+            lineNumber++;
+    
+            trim(line);
+    
+            Transaction *transaction = createTransaction(line);
+    
+            if(transaction == NULL){
+               fprintf(stderr, "Transaction in line %zu could not be created\n", lineNumber);
+       
+               freeTransactions(transactions);
+               free(line);
+               fclose(transactionFile);
+    
+                return EXIT_FAILURE;
             }
+
+            addTransaction(transactions, transaction);
         }
     }
 
