@@ -366,12 +366,14 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `clientLogin`(IN `in_email` varchar(64), IN `in_pwd` varchar(64))
 BEGIN
     SELECT c.id, c.title_type_id, tt.description title_type, c.first_name, c.last_name,
-    c.email, u.user_type_id, ut.description user_type, u.last_login
-    FROM client c left join title_type tt ON c.title_type_id = tt.id,
-        user u, user_type ut
+    c.email, a.account_number, a.balance, u.user_type_id, ut.description user_type, u.last_login
+    FROM client c, title_type tt,
+        user u, user_type ut, account a
     WHERE c.id = u.person_id AND u.user_type_id = ut.id
         AND c.email = in_email AND u.pwd = in_pwd
-        AND c.activation_date IS NOT NULL AND c.activated_by IS NOT NULL;
+        AND c.activation_date IS NOT NULL AND c.activated_by IS NOT NULL
+        AND c.id = a.client_id
+        AND c.title_type_id = tt.id;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -520,6 +522,53 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `getAccountDetails` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getAccountDetails`(IN `in_account_number` varchar(8))
+BEGIN
+    SELECT tt.description, c.first_name, c.last_name, c.email, a.account_number, a.balance
+    FROM account a, client c, title_type tt
+    WHERE a.account_number = in_account_number AND a.client_id = c.id
+        AND c.title_type_id = tt.id;    SELECT * FROM client WHERE id = in_client_id;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `getAccountTransactionHistory` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getAccountTransactionHistory`(IN `in_account_number` varchar(8))
+BEGIN
+    SELECT a1.account_number AS origin, a2.account_number AS destination,
+        th.created_date, th.amount, th.approved_date, tt.description
+    FROM transaction_history th, account a1, account a2, transaction_type tt
+    WHERE a1.account_number = in_account_number
+        AND a1.id = th.origin_account_id
+        AND th.destination_account_id = a2.id
+        AND th.transaction_type_id = tt.id;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `getClientAccountAndBalance` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -539,25 +588,6 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `getClientDetails` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8 */ ;
-/*!50003 SET character_set_results = utf8 */ ;
-/*!50003 SET collation_connection  = utf8_general_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = '' */ ;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `getClientDetails`(IN `in_client_id` INT(8))
-BEGIN
-    SELECT * FROM client WHERE id = in_client_id;
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `getClientsToApprove` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -571,26 +601,6 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getClientsToApprove`()
 BEGIN
     SELECT id,first_name,last_name,email FROM client WHERE activated_by= '0' LIMIT 10;
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `getClientTransactionHistory` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8 */ ;
-/*!50003 SET character_set_results = utf8 */ ;
-/*!50003 SET collation_connection  = utf8_general_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = '' */ ;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `getClientTransactionHistory`(IN `in_client_id` INT(8))
-BEGIN
-    SELECT * FROM transaction_history
-    WHERE origin_account_id = (SELECT account_number FROM account WHERE client_id = in_client_id);
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -787,4 +797,4 @@ DELIMITER ;
 GRANT EXECUTE ON banksys.* TO 'webuser'@'localhost' IDENTIFIED BY 'kubruf#eGa4e';
 GRANT EXECUTE ON banksys.* TO 'parser'@'localhost' IDENTIFIED BY 'vEq7saf@&eVU';
 
--- Dump completed on 2014-11-29  3:20:42
+-- Dump completed on 2014-11-30 23:02:17
