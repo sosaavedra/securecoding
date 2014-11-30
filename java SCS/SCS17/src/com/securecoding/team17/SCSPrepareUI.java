@@ -47,12 +47,12 @@ public class SCSPrepareUI {
 
 		// Create the frame for the SCS
 		scsFrame = new JFrame("Banksys - TAN code generator");
-		scsFrame.setSize(400, 300);
+		scsFrame.setSize(500, 400);
 		scsContainer = scsFrame.getContentPane();
 		insets = scsContainer.getInsets();
 		scsContainer.setLayout(null);
 
-		// Create the controls whic are required
+		// Create the controls which are required
 		btnGenerateTAN = new JButton("GenerateTAN");
 		lblPIN = new JLabel("PIN:");
 		lblAccountNumber = new JLabel("Destination account:");
@@ -83,15 +83,15 @@ public class SCSPrepareUI {
 
 		// put all components on GUI
 		lblPIN.setBounds(insets.left + 20, insets.top + 20, lblPIN.getPreferredSize().width, lblPIN.getPreferredSize().height);
-		txtPIN.setBounds(insets.left + 130, insets.top + 20, txtPIN.getPreferredSize().width, txtPIN.getPreferredSize().height);
+		txtPIN.setBounds(insets.left + 180, insets.top + 20, txtPIN.getPreferredSize().width, txtPIN.getPreferredSize().height);
 		txtPIN.setToolTipText("Enter your 6 digit pin");
 
 		lblAccountNumber.setBounds(insets.left + 20, txtPIN.getY() + txtPIN.getHeight() + 10, lblAccountNumber.getPreferredSize().width, lblAccountNumber.getPreferredSize().height);
-		txtAccountNumber.setBounds(insets.left + 130, lblAccountNumber.getY(), txtAccountNumber.getPreferredSize().width, txtAccountNumber.getPreferredSize().height);
+		txtAccountNumber.setBounds(insets.left + 180, lblAccountNumber.getY(), txtAccountNumber.getPreferredSize().width, txtAccountNumber.getPreferredSize().height);
 		txtAccountNumber.setToolTipText("Enter destination account number");
 
 		lblAmount.setBounds(insets.left + 20, txtAccountNumber.getY() + txtAccountNumber.getHeight() + 10, lblAmount.getPreferredSize().width, lblAmount.getPreferredSize().height);
-		txtAmount.setBounds(insets.left + 130, lblAmount.getY(), txtAmount.getPreferredSize().width, txtAmount.getPreferredSize().height);
+		txtAmount.setBounds(insets.left + 180, lblAmount.getY(), txtAmount.getPreferredSize().width, txtAmount.getPreferredSize().height);
 		txtAmount.setToolTipText("Enter amount to transfer");
 
 		lblDetailsInfo.setBounds(insets.left + 20, txtAmount.getY() + txtAmount.getHeight() + 20, lblDetailsInfo.getPreferredSize().width, lblDetailsInfo.getPreferredSize().height);
@@ -99,7 +99,7 @@ public class SCSPrepareUI {
 		btnGenerateTAN.setBounds(insets.left + 20, lblDetailsInfo.getY() + lblDetailsInfo.getHeight() + 20, btnGenerateTAN.getPreferredSize().width, btnGenerateTAN.getPreferredSize().height);
 
 		lblTANCode.setBounds(insets.left + 20, btnGenerateTAN.getY() + btnGenerateTAN.getHeight() + 20, lblTANCode.getPreferredSize().width, lblTANCode.getPreferredSize().height);
-		txtTANCode.setBounds(insets.left + 130, lblTANCode.getY(), txtTANCode.getPreferredSize().width, txtTANCode.getPreferredSize().height);
+		txtTANCode.setBounds(insets.left + 180, lblTANCode.getY(), txtTANCode.getPreferredSize().width, txtTANCode.getPreferredSize().height);
 		txtTANCode.setToolTipText("Copy this code into bank website");
 
 		lblTANCode.setVisible(false);
@@ -110,6 +110,8 @@ public class SCSPrepareUI {
 
 		// Set frame visible
 		scsFrame.setVisible(true);
+		
+		scsFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 	}
 
