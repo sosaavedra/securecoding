@@ -75,6 +75,12 @@ if ($_POST) {
         $formValid = false;
     }
     
+    if (empty ( $_POST ['tanOption'] )) {
+    	$tanOptionErr = "Please select a TAN option";
+    	$formValid = false;
+    }
+    
+    
     if ($formValid) {
         // escape variables for security
         $title = $mysqli->escape ( $_POST ['title'] );
@@ -83,6 +89,7 @@ if ($_POST) {
         $email = $mysqli->escape ( $_POST ['email'] );
         $password = $mysqli->escape ( $_POST ['password'] );
         $cpassword = $mysqli->escape ( $_POST ['cpassword'] );
+        $tanOption = $mysqli->escape ( $_POST ['tanOption'] );
         
         $hashedPW = hash ( 'sha256', $password );
         
@@ -179,6 +186,28 @@ if ($_POST) {
                                         Retype Password:
                                     </div>
                                     <span class="error"><?php echo $cpassErr.$passMatchErr;?></span>
+                                    
+                                    <div class="wrapper">
+										<div class="bg">
+											<input type="radio" name="tanOption"
+											<?php if (isset($_POST ['tanOption']) && $_POST ['tanOption']=="email") echo "checked";?>
+											value="email">Send me TAN via email 
+										
+										</div>
+										TAN option:
+									</div>
+									
+									<div class="wrapper">
+										<div class="bg">
+											<input type="radio"	name="tanOption"
+											<?php if (isset($_POST ['tanOption']) && $_POST ['tanOption']=="scs") echo "checked";?>
+											value="scs">Download SCS(smart card simulator)
+										
+										</div>
+									
+									</div>
+									<span class="error"><?php echo $tanOptionErr;?></span>
+									
                                     <div style="margin-right: 100px">
                                         <input class='button' style="width:120px;height:40px;" type='submit' name='register' value='Register' id='register' />
                                     </div>
