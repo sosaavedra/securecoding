@@ -128,9 +128,7 @@ if ($_POST) {
         <!-- header -->
         <header>
             <div class="wrapper">
-                <h1>
-                    <a href="index.html" id="logo">Smart Biz</a>
-                </h1>
+                <a href="index.html" id="logo">BankSys</a>
             </div>
             <nav>
                 <ul id="menu">
@@ -162,9 +160,9 @@ if ($_POST) {
                                     <div class="wrapper">
                                         <div>
                                             <select name="transactionType" id="transactionType" class="bg">
-                                                <option value="3">Transfer Money</option>
-                                                <option value="1">Deposit Money</option>
-                                                <option value="2">Withdraw Money</option>
+                                                <option value="3">Transfer</option>
+                                                <option value="1">Deposit</option>
+                                                <option value="2">Withdraw</option>
                                             </select>
                                         </div>
                                         Select type:

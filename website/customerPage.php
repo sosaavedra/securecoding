@@ -78,19 +78,35 @@
                         }
                         
                         $result = $mysqli->getAccountTransactionHistory ( $accountNumber );
-                        
-                        echo "<br><br><h3>Transaction history</h3><br>";
-                        
+                        ?>
+
+                        <br/><br/>
+                        <h3>Transaction history</h3>
+                        <br/>
+
+                        <?php
                         if (!empty($result) && $result->num_rows > 0) {
-                            
-                            echo "<div class='datagrid'><table>";
-                            echo "<thead><tr> <td> To Account </td> <td> Date </td> <td> Amount </td><td> Type </td> </tr></thead>";
-                            echo "<tbody>";
-                            
+                        ?>
+                         <div class='datagrid'>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <td>To Account</td>
+                                        <td>Date</td>
+                                        <td>Amount</td>
+                                        <td>Type</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        <?php 
                             // output data of each row
                             while ( $row = $result->fetch_assoc () ) {
                                 echo "<tr class='alt'>";
-                                echo "<td>" . $row ["destination_account_id"] . "</td><td>" . $row ["approved_date"] . "</td><td>" . $row ["amount"] . "</td><td>" . $row ["transaction_type_id"] . "</td>";
+                                printf("<td>%s</td><td>%s</td><td>%s</td><td>%s</td>",
+                                    $row ["destination"],
+                                    $row ["approved_date"] ? $row ["approved_date"] : $row ["created_date"],
+                                    $row ["amount"],
+                                    $row ["description"]);
                                 echo "</tr>";
                             }
                             echo "</tbody>";
