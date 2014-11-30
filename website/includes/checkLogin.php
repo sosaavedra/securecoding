@@ -39,6 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['username'])) {
             $mysqli->close();
 
             if($employee){
+            	$sess_name = session_name();
+            	setcookie($sess_name, session_id(), null, '/', null, null, true);
                 $_SESSION['user_type'] = "employee";
                 $_SESSION['logged_user'] = $employee;
 
@@ -51,6 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['username'])) {
             $mysqli->close();
 
             if($client){
+            	$sess_name = session_name();
+            	setcookie($sess_name, session_id(), null, '/', null, null, true);
                 $_SESSION['user_type'] = "client";
                 $_SESSION['logged_user'] = $client;
 
