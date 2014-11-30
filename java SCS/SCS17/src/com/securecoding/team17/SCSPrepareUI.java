@@ -47,7 +47,7 @@ public class SCSPrepareUI {
 
 		// Create the frame for the SCS
 		scsFrame = new JFrame("Banksys - TAN code generator");
-		scsFrame.setSize(600, 300);
+		scsFrame.setSize(600, 350);
 		scsContainer = scsFrame.getContentPane();
 		insets = scsContainer.getInsets();
 		scsContainer.setLayout(null);
