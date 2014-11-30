@@ -37,6 +37,7 @@ CREATE TABLE `account` (
   `account_number` varchar(8) NOT NULL,
   `client_id` int(8) NOT NULL,
   `balance` double unsigned NOT NULL DEFAULT '50000',
+  `use_scs` char(1) NOT NULL DEFAULT 'N',
   `created_date` datetime NOT NULL,
   `updated_date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -118,6 +119,34 @@ LOCK TABLES `employee` WRITE;
 /*!40000 ALTER TABLE `employee` DISABLE KEYS */;
 INSERT INTO `employee` VALUES (1,'banksys','admin','admin@banksys.de',NULL,'2014-10-14 21:15:43','2014-10-14 21:15:43',1);
 /*!40000 ALTER TABLE `employee` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `scs`
+--
+
+DROP TABLE IF EXISTS `scs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `scs` (
+  `id` int(8) NOT NULL AUTO_INCREMENT,
+  `client_id` int(8) NOT NULL,
+  `pin_code` int(8) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `scs_ukey` (`pin_code`),
+  KEY `account_k1` (`id`,`client_id`),
+  KEY `scs_fk` (`client_id`),
+  CONSTRAINT `scs_fk` FOREIGN KEY (`client_id`) REFERENCES `client` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `scs`
+--
+
+LOCK TABLES `scs` WRITE;
+/*!40000 ALTER TABLE `scs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `scs` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -797,4 +826,4 @@ DELIMITER ;
 GRANT EXECUTE ON banksys.* TO 'webuser'@'localhost' IDENTIFIED BY 'kubruf#eGa4e';
 GRANT EXECUTE ON banksys.* TO 'parser'@'localhost' IDENTIFIED BY 'vEq7saf@&eVU';
 
--- Dump completed on 2014-11-30 23:02:17
+-- Dump completed on 2014-11-30 23:15:03
