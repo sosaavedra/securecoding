@@ -183,10 +183,10 @@ class MysqliConn {
      *            customer id $client_id
      * @return mysqli_result
      */
-    public function getClientTransactionHistory($client_id) {
+    public function getAccountTransactionHistory($accountNumber) {
         $stmt = $this->conn->stmt_init ();
-        $stmt->prepare ( "call getClientTransactionHistory (?)" );
-        $stmt->bind_param ( 'i', $client_id );
+        $stmt->prepare ( "call getAccountTransactionHistory (?)" );
+        $stmt->bind_param ( 's', $accountNumber );
         $stmt->execute ();
         
         return $stmt->get_result ();
@@ -199,10 +199,10 @@ class MysqliConn {
      *            customer id $client_id
      * @return mysqli_result
      */
-    public function getClientDetails($client_id) {
+    public function getAccountDetails($accountNumber) {
         $stmt = $this->conn->stmt_init ();
-        $stmt->prepare ( "call getClientDetails (?)" );
-        $stmt->bind_param ( 'i', $client_id );
+        $stmt->prepare ( "call getAccountDetails (?)" );
+        $stmt->bind_param ( 's', $accountNumber );
         $stmt->execute ();
         
         return $stmt->get_result ();
