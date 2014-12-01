@@ -218,7 +218,6 @@ CREATE TABLE `transaction` (
   KEY `transaction_k2` (`destination_account_id`),
   KEY `transaction_k3` (`transaction_type_id`),
   CONSTRAINT `transaction_account_fk1` FOREIGN KEY (`origin_account_id`) REFERENCES `account` (`id`),
-  CONSTRAINT `transaction_account_fk2` FOREIGN KEY (`destination_account_id`) REFERENCES `account` (`id`),
   CONSTRAINT `transaction_transaction_type_fk` FOREIGN KEY (`transaction_type_id`) REFERENCES `transaction_type` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -248,12 +247,13 @@ CREATE TABLE `transaction_history` (
   `created_date` datetime NOT NULL,
   `approved_date` datetime DEFAULT NULL,
   `approved_by` int(8) DEFAULT NULL,
+  `rejected_date` datetime DEFAULT NULL,
+  `rejected_by` int(8) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `transaction_history_k1` (`origin_account_id`),
   KEY `transaction_history_k2` (`destination_account_id`),
   KEY `transaction_history_k3` (`transaction_type_id`),
   CONSTRAINT `transaction_history_account_fk1` FOREIGN KEY (`origin_account_id`) REFERENCES `account` (`id`),
-  CONSTRAINT `transaction_history_account_fk2` FOREIGN KEY (`destination_account_id`) REFERENCES `account` (`id`),
   CONSTRAINT `transaction_history_transaction_type_fk` FOREIGN KEY (`transaction_type_id`) REFERENCES `transaction_type` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -309,7 +309,7 @@ CREATE TABLE `user` (
   UNIQUE KEY `user_ukey` (`person_id`,`user_type_id`),
   KEY `user_k1` (`user_type_id`),
   CONSTRAINT `user_user_type` FOREIGN KEY (`user_type_id`) REFERENCES `user_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -362,6 +362,12 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `approveTransaction`(IN `in_id` int(8), IN `in_employee_id` int(8))
 BEGIN
 
+    DECLARE last_id INT(8);
+    DECLARE tran_type_desc CHAR(1);
+    DECLARE tran_amount DOUBLE UNSIGNED;
+    DECLARE o_account_id INT(8);
+    DECLARE d_account_id INT(8);
+
     DECLARE EXIT HANDLER FOR SQLEXCEPTION, SQLWARNING
     BEGIN
 
@@ -374,6 +380,24 @@ BEGIN
 
     INSERT INTO transaction_history(origin_account_id, destination_account_id, amount, transaction_type_id, created_date, approved_date, approved_by)
     SELECT origin_account_id, destination_account_id, amount, transaction_type_id, created_date, NOW(), in_employee_id FROM transaction WHERE id = in_id;
+
+    SELECT LAST_INSERT_ID() INTO last_id;
+
+    SELECT th.origin_account_id, th.destination_account_id, tt.short_description, th.amount INTO o_account_id, d_account_id, tran_type_desc, tran_amount
+    FROM transaction_history th, transaction_type tt
+    WHERE th.id = last_id AND th.transaction_type_id = tt.id;
+
+    UPDATE account SET balance = CASE tran_type_desc
+        WHEN 'D' THEN balance + tran_amount
+        ELSE balance - tran_amount END
+    WHERE id = o_account_id;
+
+    IF d_account_id IS NOT NULL THEN
+        UPDATE account SET balance = balance + tran_amount
+        WHERE id = d_account_id;
+    END IF;
+
+    DELETE FROM transaction WHERE id = in_id;
 
     COMMIT;
 END ;;
@@ -629,7 +653,10 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getClientsToApprove`()
 BEGIN
-    SELECT id,first_name,last_name,email FROM client WHERE activated_by= '0' LIMIT 10;
+    SELECT c.id, tt.description, c.first_name, c.last_name, c.email
+    FROM client c, title_type tt
+    WHERE tt.id = c.title_type_id AND activated_by= '0'
+    LIMIT 10;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -684,7 +711,11 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getTransactionsToApprove`()
 BEGIN
-    SELECT * FROM transaction;
+    SELECT t.id, a1.account_number AS origin, a2.account_number AS destination,
+        t.amount, t.created_date, tt.description
+    FROM transaction t LEFT OUTER JOIN account a2 ON t.destination_account_id = a2.id,
+        account a1, transaction_type tt
+    WHERE t.origin_account_id = a1.id AND t.transaction_type_id = tt.id;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -744,18 +775,24 @@ BEGIN
                     UPDATE tan_code SET valid = 'N' WHERE client_id = in_client_id AND code = in_tan_code;
 
                     IF in_transaction_type_id = 1 THEN
-                        UPDATE account SET balance = balance + in_amount
-                        WHERE client_id = in_client_id AND account_number = origin_account_number;
+                        IF in_amount < 10000 THEN
+                            UPDATE account SET balance = balance + in_amount
+                            WHERE client_id = in_client_id AND account_number = origin_account_number;
+
+                            INSERT INTO transaction_history(origin_account_id, amount, transaction_type_id, created_date)                     VALUES(origin_account_id, in_amount, in_transaction_type_id, now());
+                        ELSE
+                                INSERT INTO transaction(origin_account_id, amount, transaction_type_id, created_date)                             VALUES(origin_account_id, in_amount, in_transaction_type_id, now());
+                        END IF;
                     ELSE
                         IF (EXISTS (SELECT balance FROM account
                                         WHERE client_id = in_client_id AND account_number = origin_account_number
                                             AND balance >= in_amount)) THEN
 
                             IF in_transaction_type_id = 2 THEN
-                                UPDATE account SET balance = balance - in_amount
-                                WHERE client_id = in_client_id AND account_number = origin_account_number;
-
                                 IF in_amount < 10000 THEN
+                                    UPDATE account SET balance = balance - in_amount
+                                    WHERE client_id = in_client_id AND account_number = origin_account_number;
+
                                     INSERT INTO transaction_history(origin_account_id, amount, transaction_type_id, created_date)
                                     VALUES(origin_account_id, in_amount, in_transaction_type_id, now());
                                 ELSE
@@ -767,13 +804,13 @@ BEGIN
 
                                     SELECT id INTO destination_account_id FROM account WHERE account_number = in_destination_account_number;
 
-                                    UPDATE account SET balance = balance - in_amount
-                                    WHERE client_id = in_client_id AND account_number = origin_account_number;
-                                    
-                                    UPDATE account SET balance = balance + in_amount
-                                    WHERE account_number = in_destination_account_number;
-
                                     IF in_amount < 10000 THEN
+                                        UPDATE account SET balance = balance - in_amount
+                                        WHERE client_id = in_client_id AND account_number = origin_account_number;
+
+                                        UPDATE account SET balance = balance + in_amount
+                                        WHERE account_number = in_destination_account_number;
+
                                         INSERT INTO transaction_history(origin_account_id, destination_account_id, amount, transaction_type_id, created_date)
                                         VALUES(origin_account_id, destination_account_id, in_amount, in_transaction_type_id, now());
                                     ELSE
@@ -812,6 +849,52 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `rejectTransaction` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `rejectTransaction`(IN `in_id` int(8), IN `in_employee_id` int(8))
+BEGIN
+
+    DECLARE last_id INT(8);
+    DECLARE tran_type_desc CHAR(1);
+    DECLARE tran_amount DOUBLE UNSIGNED;
+    DECLARE account_id INT(8);
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION, SQLWARNING
+    BEGIN
+
+        ROLLBACK;
+
+        SHOW ERRORS;
+    END;
+
+    START TRANSACTION;
+
+    INSERT INTO transaction_history(origin_account_id, destination_account_id, amount, transaction_type_id, created_date, rejected_date, rejected_by)
+    SELECT origin_account_id, destination_account_id, amount, transaction_type_id, created_date, NOW(), in_employee_id FROM transaction WHERE id = in_id;
+
+    SELECT LAST_INSERT_ID() INTO last_id;
+
+    SELECT th.origin_account_id, tt.short_description, th.amount INTO account_id, tran_type_desc, tran_amount
+    FROM transaction_history th, transaction_type tt
+    WHERE th.id = last_id AND th.transaction_type_id = tt.id;
+
+    DELETE FROM transaction WHERE id = in_id;
+
+    COMMIT;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -826,4 +909,4 @@ DELIMITER ;
 GRANT EXECUTE ON banksys.* TO 'webuser'@'localhost' IDENTIFIED BY 'kubruf#eGa4e';
 GRANT EXECUTE ON banksys.* TO 'parser'@'localhost' IDENTIFIED BY 'vEq7saf@&eVU';
 
--- Dump completed on 2014-11-30 23:15:03
+-- Dump completed on 2014-12-01  4:20:40

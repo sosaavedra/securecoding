@@ -54,12 +54,13 @@
                 </div>
                 <div class="box pad_bot1">
                     <div class="pad marg_top">
-                        <article class="col1">
+                        <article>
                             <p>Please select transaction(s) you want to approve OR reject</p>
                             <form id="approvalTrans" class="formstyle" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
                                             
                         <?php
                         
+                        require_once "includes/utils.php";
                         require_once "includes/config.php";
                         require_once "classes/mysqliconn.php";
                         
@@ -77,25 +78,20 @@
                                 $formValid = false;
                                 $chekBoxErr = "No transactions selected";
                             } else {
-                                
+                                $employee_id = $_SESSION ['logged_user']-> id;
+
                                 foreach ( $_POST ['check_list'] as $id ) {
-                                    
-                                    $clientId = $mysqli->escape ( $clientId );
-                                    
                                     if (isset ( $_POST ['approve'] )) {
-                                                    $employee_id = $_SESSION ['logged_user']-> id;
 
                                         // approve-button was clicked
-                                        if ($mysqli->approveTransaction ( $id, $employee_id )) {
-                                        } else {
+                                        if (!$mysqli->approveTransaction ( $id, $employee_id )) {
                                             die ( "Error: in approving!" );
                                         }
                                         // move the data to transaction history table
                                     } else if (isset ( $_POST ['reject'] )) {
                                         // reject-button was clicked
                                         // delete from transaction table and refund balance to client
-                                        if ($mysqli->rejectTransaction ( $id )) {
-                                        } else {
+                                        if (!$mysqli->rejectTransaction ( $id, $employee_id )) {
                                             die ( "Error:  in rejecting!" );
                                         }
                                     }
@@ -106,15 +102,32 @@
                         $result = $mysqli->getTransactionsToApprove ();
                         
                         if (!empty($result) && $result->num_rows > 0) {
-                            
-                            echo "<div class='datagrid'><table>";
-                            echo "<thead><tr> <td> Origin </td> <td> Destination </td> <td> Date </td> <td> Amount </td><td> Type </td> <td> Approve/Reject </td> </tr></thead>";
-                            echo "<tbody>";
-                            
+                        ?>
+
+                        <div class='datagrid'>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <td>Origin</td>
+                                        <td>Destination</td>
+                                        <td>Date</td>
+                                        <td>Amount</td>
+                                        <td>Type</td>
+                                        <td>Approve/Reject</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        <?php
                             // output data of each row
                             while ( $row = $result->fetch_assoc () ) {
                                 echo "<tr class='alt'>";
-                                echo "<td>" . $row ["origin_account_id"] . "</td><td>" . $row ["destination_account_id"] . "</td><td>" . $row ["created_date"] . "</td><td>" . $row ["amount"] . "</td><td>" . $row ["transaction_type_id"] . "</td><td><input type='checkbox' name='check_list[]' value='" . $row ["id"] . "' checked></td>";
+                                printf("<td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td><input type='checkbox' name='check_list[]' value='%s' checked></td>",
+                                    $row ["origin"],
+                                    $row ["destination"],
+                                    $row ["created_date"],
+                                    moneyFormat($row ["amount"]),
+                                    $row ["description"],
+                                    $row ["id"]);
                                 echo "</tr>";
                             }
                             echo "</tbody>";

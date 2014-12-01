@@ -285,10 +285,11 @@ class MysqliConn {
      * @param transactionId $id            
      * @return boolean
      */
-    public function rejectTransaction($id) {
+    public function rejectTransaction($id, $employee_id) {
         $stmt = $this->conn->stmt_init ();
-        $stmt->prepare ( "call rejectTransaction (?)" );
-        $stmt->bind_param ( 'i', $id );
+        $stmt->prepare ( "call rejectTransaction (?, ?)" );
+        echo "call rejectTransaction ($id, $employee_id)";
+        $stmt->bind_param ( 'ii', $id, $employee_id );
         $stmt->execute ();
         
         $error_msg;

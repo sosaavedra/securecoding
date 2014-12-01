@@ -57,7 +57,7 @@
                 </div>
                 <div class="box pad_bot1">
                     <div class="pad marg_top">
-                        <article class="col1">
+                        <article>
                             <p>Please select client(s) you want to approve OR reject</p>
                             <form id="approval" class="formstyle" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
                                             
@@ -110,15 +110,25 @@
                         $mysqli->close ();
                         
                         if (! empty ( $result ) && $result->num_rows > 0) {
-                            
-                            echo "<div class='datagrid'><table>";
-                            echo "<thead><tr> <td> Name </td> <td> Email </td> <td> ID </td><td> Approve/Reject </td> </tr></thead>";
-                            echo "<tbody>";
-                            
+                        ?>                            
+                        <div class='datagrid'>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <td>Name</td>
+                                        <td>Email</td>
+                                        <td>Approve/Reject</td>
+                                    </tr>
+                                </thead>
+                        <tbody>
+                        <?php    
                             // output data of each row
                             while ( $row = $result->fetch_assoc () ) {
                                 echo "<tr class='alt'>";
-                                echo "<td>" . $row ["first_name"] . " " . $row ["last_name"] . "</td><td>" . $row ["email"] . "</td><td>" . $row ["id"] . "</td><td><input type='checkbox' name='check_list[]' value='" . $row ["id"] . "' checked></td>";
+                                printf("<td>%s</td><td>%s</td><td><input type='checkbox' name='check_list[]' value='%s' checked></td>",
+                                    $row['description'] . " " . $row ['first_name'] . " " . $row ['last_name'],
+                                    $row ['email'],
+                                    $row ['id']);
                                 echo "</tr>";
                             }
                             echo "</tbody>";

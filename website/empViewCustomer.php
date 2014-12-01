@@ -54,7 +54,7 @@
                 </div>
                 <div class="box pad_bot1">
                     <div class="pad marg_top">
-                        <article class="col1">
+                        <article style="width:500px">
                             <p>Please enter account number you want to view</p>
                             <form id="viewDetails" class="formstyle" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
 
@@ -71,6 +71,8 @@
                                 </div>
 
                             </form>
+                        </article>
+                        <article>
                             <?php
                             
                             require_once "includes/utils.php";

@@ -75,7 +75,7 @@
                         if (!empty($result) && $result->num_rows > 0) {
                                 $row = $result->fetch_assoc ();
                                 echo "<h3>Your account number: $accountNumber</h3>";
-                                echo "<h3>Your balance: ".$row ["balance"]."</h3>";
+                                echo "<h3>Your balance: ". moneyFormat($row ["balance"])."</h3>";
                         }
                         
                         $result = $mysqli->getAccountTransactionHistory ( $accountNumber );
