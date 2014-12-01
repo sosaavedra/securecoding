@@ -91,7 +91,7 @@ public class SCSPrepareUI {
 		txtPIN.setToolTipText("Enter your 6 digit pin");
 
 		lblBankSysLogo.setFont(new Font("Serif", Font.PLAIN, 36));
-		lblBankSysLogo.setBounds(insets.left + 360, insets.top + 20, lblBankSysLogo.getPreferredSize().width, lblBankSysLogo.getPreferredSize().height);
+		lblBankSysLogo.setBounds(insets.left + 380, insets.top + 20, lblBankSysLogo.getPreferredSize().width, lblBankSysLogo.getPreferredSize().height);
 
 		lblAccountNumber.setBounds(insets.left + 20, txtPIN.getY() + txtPIN.getHeight() + 10, lblAccountNumber.getPreferredSize().width, lblAccountNumber.getPreferredSize().height);
 		txtAccountNumber.setBounds(insets.left + 180, lblAccountNumber.getY(), txtAccountNumber.getPreferredSize().width, txtAccountNumber.getPreferredSize().height);
