@@ -583,19 +583,34 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `generateClientTransactionCodes`(IN 
 BEGIN
     DECLARE i INT DEFAULT 0;
     DECLARE new_code VARCHAR(15);
+    DECLARE is_scs_used CHAR(1);
+    DECLARE new_pin_code INT(8);
 
-    WHILE i < 100 DO
-        SELECT UPPER(SUBSTR(MD5(UUID()), 1, 15)) INTO new_code;
+    SELECT use_scs INTO is_scs_used FROM client WHERE id = in_client_id;
 
-        IF(NOT EXISTS(SELECT code FROM tan_code WHERE code = new_code)) THEN
-            INSERT INTO tan_code(client_id, code) VALUES (in_client_id, new_code);
-            SET i = i + 1;
-        END IF;
+    IF is_scs_used = 'N' THEN
 
-    END WHILE;
+        WHILE i < 100 DO
+            SELECT UPPER(SUBSTR(MD5(UUID()), 1, 15)) INTO new_code;
 
-    SELECT code FROM tan_code WHERE client_id = in_client_id;
+            IF(NOT EXISTS(SELECT code FROM tan_code WHERE code = new_code)) THEN
+                INSERT INTO tan_code(client_id, code) VALUES (in_client_id, new_code);
+                SET i = i + 1;
+            END IF;
 
+        END WHILE;
+
+        SELECT code
+        FROM tan_code
+        WHERE client_id = in_client_id
+        LIMIT 100;
+    ELSE
+        SELECT FLOOR(RAND() * 900000) + 100000 INTO new_pin_code;
+
+        INSERT scs (client_id, pin_code) VALUES (in_client_id, new_pin_code);
+
+        SELECT new_pin_code AS pin_code;
+    END IF;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -991,4 +1006,4 @@ DELIMITER ;
 GRANT EXECUTE ON banksys.* TO 'webuser'@'localhost' IDENTIFIED BY 'kubruf#eGa4e';
 GRANT EXECUTE ON banksys.* TO 'parser'@'localhost' IDENTIFIED BY 'vEq7saf@&eVU';
 
--- Dump completed on 2014-12-01 23:27:38
+-- Dump completed on 2014-12-02  0:47:39
