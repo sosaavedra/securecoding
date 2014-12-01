@@ -2,6 +2,20 @@
 
 include_once "includes/checkLogin.php";
 
+/*Delete this*/
+
+require_once "includes/utils.php";
+require_once "includes/config.php";
+require_once "classes/mysqliconn.php";
+
+$mysqli = new MysqliConn ();
+$mysqli->connect ();
+        
+$resultset = $mysqli->getClientTransationNumbers ( 3 );
+
+createPDF("Mr. Victor Sosa", "500004", $resultset);
+
+/*Detete this*/
 ?>
 <!DOCTYPE html>
 <html lang="en">
