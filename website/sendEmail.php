@@ -56,7 +56,7 @@ function sendNewCustEMail($accountNumber) {
                 
                 $result = $mysqli->getClientTransationNumbers ( $row['id'] );
         
-                $filename = createPDF($clientName, $accountNumber, $result);
+                $filename = createPDF($clientName, $accountNumber, $row['email'], $result);
        
     
                 $message->attach(Swift_Attachment::fromPath($filename));
