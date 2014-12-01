@@ -118,7 +118,8 @@ if ($_POST) {
                 <ul id="menu">
                     <li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
                     <li id="menu_active"><a href="registration.php"><span><span>Register</span></span></a></li>
-                    <li class="omega"><a href="login.php"><span><span>Login</span></span> </a></li>
+                    <li><a href="login.php"><span><span>Login</span></span> </a></li>
+                    <li class="omega"><a href="forgetPass.php"><span><span>Forget password</span></span> </a></li>
                 </ul>
             </nav>
         </header>
