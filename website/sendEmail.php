@@ -42,6 +42,7 @@ function sendNewCustEMail($accountNumber) {
   <p>Thank you for registering! We have given you 50.000 euros balance as gift!
 </body>
 </html>
+<<<<<<< HEAD
 ';
             
             $message = Swift_Message::newInstance (EMAIL_HEADER)
@@ -125,6 +126,62 @@ function sendTokenEMail($email) {
             
         $result = $mailer->send ( $message );
     }
+}
+
+/**
+ * This function will send temporary password reset token to customer
+ *
+ * @param
+ *        	email id $email
+ */
+function sendTokenEMail($email) {
+
+	require_once "includes/config.php";
+	require_once "includes/emailConfig.php";
+	require_once "classes/mysqliconn.php";
+	require_once "swiftmailer/lib/swift_required.php";
+
+	$mysqli = new MysqliConn ();
+	$mysqli->connect ();
+
+	$result = $mysqli->getClientPaswordToken ( $email );
+
+	if (! $result) {
+		die ( 'Error:in fetching token' );
+	}
+
+	if (! empty ( $result ) && $result->num_rows > 0) {
+
+		$row = $result->fetch_assoc ();
+			
+		// code to send email
+			
+		$transport = Swift_SmtpTransport::newInstance (EMAIL_SMTP, EMAIL_PORT, "ssl" )->setUsername (SYSTEM_EMAIL_ID)->setPassword (EMAIL_PASSWORD);
+			
+		$mailer = Swift_Mailer::newInstance ( $transport );
+			
+		$emailBody = '
+<html>
+<head>
+  <title>Your temporary password reset token</title>
+</head>
+	<body>
+	    <p>Someone is trying to reset your password.</p>
+		<p>If it was you the token generated for you is <b>'.$row ["token"].'</b></p>
+		<p>If it was not you, ignore this email.</p>
+	</body>
+</html>';
+		
+		$message = Swift_Message::newInstance (EMAIL_HEADER)
+			
+		->setFrom ( array ( SYSTEM_EMAIL_ID => EMAIL_FROM) )
+		->setTo ( array ( $email ) )
+		->setBody ( $emailBody, 'text/html' );
+			
+		// echo $emailBody;
+			
+		$result = $mailer->send ( $message );
+	}
 }
 
 ?>

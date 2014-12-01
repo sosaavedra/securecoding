@@ -71,13 +71,8 @@ if ($_POST) {
         $cpassword = $mysqli->escape ( $_POST ['cpassword'] );
         
         $hashedPW = hash ( 'sha256', $password );
-        
-        
-        if ($mysqli->resetPassword ($email, $token, $hashedPW)) {
-            header ( 'Location: passwordSuccess.html' );
-        } else {
-            $genError = "Some error occured!";
-        }
+        $mysqli->resetPassword ($email, $token, $hashedPW);
+        header ( 'Location: passwordSuccess.html' );
         $mysqli->close ();
     }
 }
@@ -105,6 +100,7 @@ if ($_POST) {
                     <article class="col1">
                         <form id="login" class="formstyle" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"].'?email='.$_GET ['email']);?>" method="post">
                             <div>
+                             <p> We sent you an email with token, Please enter the token below </p>
                                 <div class="wrapper">
                                  <div class="wrapper">
                                     <div class="bg"><input class="input" autocomplete="off" type="text" name="token" id="token"></div>Token:
