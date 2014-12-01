@@ -99,12 +99,11 @@ if ($_POST) {
         $hashedPW = hash ( 'sha256', $password );
         
         if ($mysqli->createClient ( $title, $firstname, $lastname, $email, $hashedPW, $scsOpt )) {
-            $mysqli->close ();
-            
             header ( 'Location: registerSuccess.html' );
         } else {
             $alreadyRegisteredErr = "Email id already registered!";
         }
+        $mysqli->close ();
     }
 }
 

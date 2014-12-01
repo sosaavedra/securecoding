@@ -322,6 +322,33 @@ class MysqliConn {
 
         return $stmt->get_result ();
     }
+    
+    public function forgetPassword($email) {
+    	$stmt = $this->conn->stmt_init ();
+    	$stmt->prepare ( "call forgetPassword(?)" );
+    	$stmt->bind_param ( 's', $email);
+    	$stmt->execute ();
+    
+    	return $stmt->get_result ();
+    }  
+    
+    public function resetPassword($email, $token, $hashedPW) {
+    	$stmt = $this->conn->stmt_init ();
+    	$stmt->prepare ( "call resetPassword(?,?,?)" );
+    	$stmt->bind_param ( 'sss', $email, $token, $hashedPW);
+    	$stmt->execute ();
+    
+    	return $stmt->get_result ();
+    }
+    
+    public function getClientPaswordToken($email) {
+    	$stmt = $this->conn->stmt_init ();
+    	$stmt->prepare ( "call getClientPaswordToken(?)" );
+    	$stmt->bind_param ( 's', $email);
+    	$stmt->execute ();
+    
+    	return $stmt->get_result ();
+    }
 }
 
 ?>

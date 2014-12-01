@@ -1,12 +1,8 @@
-<?php
 
-include_once "includes/checkLogin.php";
-
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Login</title>
+<title>Reset Password</title>
 <meta charset="utf-8">
 <link rel="stylesheet" href="css/reset.css" type="text/css" media="all">
 <link rel="stylesheet" href="css/layout.css" type="text/css" media="all">
@@ -23,20 +19,76 @@ include_once "includes/checkLogin.php";
 <![endif]-->
 </head>
 <body id="page4">
+
+
+<?php
+
+// define variables for form values validation and set to empty values
+$passErr = $cpassErr = $passMatchErr = $tokenErr = $genError = "";
+$formValid = true;
+
+
+require_once "includes/config.php";
+require_once "classes/mysqliconn.php";
+
+// checking if request is posted
+if ($_POST) {
+	
+    
+    if (empty ( $_POST ['token'] )) {
+        $tokenErr = "Token cannot be empty";
+        $formValid = false;
+    }
+   
+    if (empty ( $_POST ['password'] ) || strlen ( $_POST ['password'] ) < 6) {
+        $passErr = "Password must be atleast 6 char";
+        $formValid = false;
+    }
+    
+    if (empty ( $_POST ['email'] ) || ! filter_var ( $_POST ['email'], FILTER_VALIDATE_EMAIL )) {
+    	$genError = "Some error occured!";
+    	$formValid = false;
+    }
+    
+    if (empty ( $_POST ['cpassword'] )) {
+        $cpassErr = "Retype password is required";
+        $formValid = false;
+    } else if (!($_POST ['password'] === $_POST ['cpassword'])) {
+        $passMatchErr = "Passwords do not match";
+        $formValid = false;
+    }
+    
+    
+    if ($formValid) {
+    	
+    	$mysqli = new MysqliConn ();
+    	$mysqli->connect ();
+    	
+        // escape variables for security
+        $email = $mysqli->escape ( $_POST ['email'] );
+        $token = $mysqli->escape ( $_POST ['token'] );
+        $password = $mysqli->escape ( $_POST ['password'] );
+        $cpassword = $mysqli->escape ( $_POST ['cpassword'] );
+        
+        $hashedPW = hash ( 'sha256', $password );
+        
+        
+        if ($mysqli->resetPassword ($email, $token, $hashedPW)) {
+            header ( 'Location: passwordSuccess.html' );
+        } else {
+            $genError = "Some error occured!";
+        }
+        $mysqli->close ();
+    }
+}
+
+?>
 <div class="main">
 <!-- header -->
     <header>
         <div class="wrapper">
             <a href="index.html" id="logo">BankSys</a>
         </div>
-        <nav>
-            <ul id="menu">
-                <li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
-                <li><a href="registration.php"><span><span>Register</span></span></a></li>
-                <li id="menu_active"><a href="login.php"><span><span>Login</span></span> </a></li>
-                <li class="omega"><a href="forgetPass.php"><span><span>Forget password</span></span> </a></li>
-            </ul>
-        </nav>
     </header>
 <!-- / header -->
 <!-- content -->
@@ -44,30 +96,33 @@ include_once "includes/checkLogin.php";
         <div class="wrapper">
             <div class="pad">
                 <div class="wrapper">
-                    <article class="col1"><h2>User Login</h2></article>
+                    <article class="col1"><h2>Reset Password</h2></article>
                     <article class="col2 pad_left1"><h2>Contact us</h2></article>
                 </div>
             </div>
             <div class="box pad_bot1">
                 <div class="pad marg_top">
                     <article class="col1">
-                        <form id="login" class="formstyle" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+                        <form id="login" class="formstyle" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"].'?email='.$_GET ['email']);?>" method="post">
                             <div>
                                 <div class="wrapper">
-                                <div class="wrapper">
-                                    <div class="bg"><input class="input" type="text" name="username" id="username"></div>E-Mail:
+                                 <div class="wrapper">
+                                    <div class="bg"><input class="input" autocomplete="off" type="text" name="token" id="token"></div>Token:
                                 </div>
+                                <span class="error"><?php echo $tokenErr;?></span>
                                 <div class="wrapper">
                                     <div class="bg"><input class="input" autocomplete="off" type="password" name="password" id="password"></div>Password:
                                 </div>
-                                    <div class="bg" style="background: none; border:none; box-shadow: none;">
-                                        <input class="input" type="checkbox" name="employee" id="employee" value="1" />I work here!
-                                    </div>
-                                   
-                                </div> <span class="error"><?php echo $pageErr;?></span>
+                                <span class="error"><?php echo $passErr;?></span>
+                                <div class="wrapper">
+                                    <div class="bg"><input class="input" autocomplete="off" type="password" name="cpassword" id="cpassword"></div>Re-Password:
+                                </div>
+                                <span class="error"><?php echo $cpassErr.$passMatchErr;?></span>
+                                </div> <span class="error"> <?php echo $genError;?> </span>
                                 <div class="wrapper">
                                     <div style="margin-right: 100px">
-                                    <input class='button' type='submit' name='login' value='Login' id='login'>
+                                    <input class='button' type='submit' name='reset' value='Reset' id='reset'>
+                                    <input type='hidden' name='email' value='<?php if (isset($_GET ['email'])) echo htmlspecialchars($_GET ['email']);?>' id='email'>
                                     </div>
                                 </div>
                             </div>

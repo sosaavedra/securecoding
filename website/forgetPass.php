@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Success</title>
+<title>Forget password</title>
 <meta charset="utf-8">
 <link rel="stylesheet" href="css/reset.css" type="text/css" media="all">
 <link rel="stylesheet" href="css/layout.css" type="text/css" media="all">
@@ -18,19 +18,57 @@
 <![endif]-->
 </head>
 <body id="page4">
+
+<?php
+
+require_once "includes/config.php";
+require_once "classes/mysqliconn.php";
+require_once "sendEmail.php";
+
+// define variables for form values validation and set to empty values
+$emailErr = "";
+$formValid = true;
+
+// checking if request is posted
+if ($_POST) {
+    
+   
+    if (empty ( $_POST ['username'] ) || ! filter_var ( $_POST ['username'], FILTER_VALIDATE_EMAIL )) {
+        $emailErr = "Email is not valid";
+        $formValid = false;
+    }
+    
+    
+    if ($formValid) {
+    	
+    	$mysqli = new MysqliConn ();
+    	$mysqli->connect ();
+    	
+       		// escape variables for security
+        	$email = $mysqli->escape ( $_POST ['username'] );
+        	
+        	
+        	
+        	if($mysqli->forgetPassword ($email))
+        	{
+        		//send email
+        		sendTokenEMail($email);
+        		header ( 'Location: resetPass.php?email='.$email);
+        	}else{
+        		$emailErr = "Email does not exist.";
+        	}
+            $mysqli->close ();
+        }
+    }
+
+?>
+
 <div class="main">
 <!-- header -->
     <header>
         <div class="wrapper">
             <a href="index.html" id="logo">BankSys</a>
         </div>
-        <nav>
-            <ul id="menu">
-                <li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
-                <li><a href="registration.php"><span><span>Register</span></span></a></li>
-                <li class="omega"><a href="login.php"><span><span>Login</span></span> </a></li>
-            </ul>
-        </nav>
     </header>
 <!-- / header -->
 <!-- content -->
@@ -38,15 +76,29 @@
         <div class="wrapper">
             <div class="pad">
                 <div class="wrapper">
-                    <article class="col1"><h2>Registration Success.</h2></article>
+                    <article class="col1"><h2>Forget password</h2></article>
                     <article class="col2 pad_left1"><h2>Contact us</h2></article>
                 </div>
             </div>
             <div class="box pad_bot1">
                 <div class="pad marg_top">
                     <article class="col1">
-                        Thanks you for registering.<br>
-                        We are verifying your details. You will be able to login after you receive a confirmation email with transaction codes.
+                        <form id="login" class="formstyle" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+                         <p>Please type your email, we will send a temporary code to you, which you can use on next page to reset your password.
+                            </p>
+                            <div>
+                               <div class="wrapper">
+                                <div class="wrapper">
+                                    <div class="bg"><input class="input" type="text" name="username" id="username"></div>E-Mail:
+                                </div>
+                                </div> <span class="error"><?php echo $emailErr;?></span>
+                                <div class="wrapper">
+                                    <div style="margin-right: 100px">
+                                    <input class='button' type='submit' name='submit' value='Submit' id='submit'>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </article>
                     <article class="col2 pad_left1">
                         <div class="wrapper">
