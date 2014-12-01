@@ -90,11 +90,13 @@
                                     
                                     if (isset ( $_POST ['approve'] )) {
                                         // approve-button was clicked
-                                        if ($mysqli->createAccount ( $employee_id, $clientId )) {
+                                        if ($newClient = $mysqli->createAccount ( $employee_id, $clientId )) {
+                                            $row = $newClient->fetch_assoc ();
+                                            $newAccountNumber = $row['account_number'];
                                             // generate transaction codes
                                             $mysqli->generateClientTransactionCodes($clientId);
                                             //send email with tan codes
-                                            sendNewCustEMail($clientId);
+                                            sendNewCustEMail($newAccountNumber);
                                         } else {
                                             die ( "Error: Client already exists!" );
                                         }

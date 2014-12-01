@@ -98,12 +98,10 @@ class MysqliConn {
         $stmt = $this->conn->stmt_init ();
         $stmt->prepare ( "call createClient (?, ?, ?, ?, ?, ?)" );
         $stmt->bind_param ( 'isssss', $title_type_id, $first_name, $last_name, $email, $pwd, $scsOpt);
-        $stmt->execute ();
-        
-        $error_msg;
-        $stmt->bind_result ( $error_msg );
-        
-        return ! $stmt->fetch ();
+        $success = $stmt->execute ();
+       echo "call createClient ($title_type_id, $first_name, $last_name, $email, $pwd, $scsOpt)"; 
+echo $success;
+        return $success;
     }
     
     /**
