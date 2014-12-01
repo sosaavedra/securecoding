@@ -57,7 +57,7 @@ include_once "includes/checkLogin.php";
                                     <div class="bg"><input class="input" type="text" name="username" id="username"></div>E-Mail:
                                 </div>
                                 <div class="wrapper">
-                                    <div class="bg"><input class="input" type="password" name="password" id="password"></div>Password:
+                                    <div class="bg"><input class="input" autocomplete="off" type="password" name="password" id="password"></div>Password:
                                 </div>
                                     <div class="bg" style="background: none; border:none; box-shadow: none;">
                                         <input class="input" type="checkbox" name="employee" id="employee" value="1" />I work here!
