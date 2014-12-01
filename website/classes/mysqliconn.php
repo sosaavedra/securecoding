@@ -94,10 +94,10 @@ class MysqliConn {
         return $this->login ( $user, $password, true );
     }
 
-    public function createClient($title_type_id, $first_name, $last_name, $email, $pwd) {
+    public function createClient($title_type_id, $first_name, $last_name, $email, $pwd, $scsOpt) {
         $stmt = $this->conn->stmt_init ();
-        $stmt->prepare ( "call createClient (?, ?, ?, ?, ?)" );
-        $stmt->bind_param ( 'issss', $title_type_id, $first_name, $last_name, $email, $pwd );
+        $stmt->prepare ( "call createClient (?, ?, ?, ?, ?, ?)" );
+        $stmt->bind_param ( 'isssss', $title_type_id, $first_name, $last_name, $email, $pwd, $scsOpt);
         $stmt->execute ();
         
         $error_msg;
