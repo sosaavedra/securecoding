@@ -118,15 +118,15 @@ function sendTokenEMail($email) {
 </head>
 	<body>
 	    <p>Someone is trying to reset your password.</p>
-		<p>If it was you the token generated for you is'.$row ["token"].'</p>
-		<p>IF it was not you, ignore this email.</p>
+		<p>If it was you the token generated for you is <b>'.$row ["token"].'</b></p>
+		<p>If it was not you, ignore this email.</p>
 	</body>
 </html>';
 		
 		$message = Swift_Message::newInstance (EMAIL_HEADER)
 			
 		->setFrom ( array ( SYSTEM_EMAIL_ID => EMAIL_FROM) )
-		->setTo ( array ( $row ["email"] ) )
+		->setTo ( array ( $email ) )
 		->setBody ( $emailBody, 'text/html' );
 			
 		// echo $emailBody;

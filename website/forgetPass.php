@@ -46,17 +46,11 @@ if ($_POST) {
     	
        		// escape variables for security
         	$email = $mysqli->escape ( $_POST ['username'] );
-        	
-        	
-        	
-        	if($mysqli->forgetPassword ($email))
-        	{
-        		//send email
-        		sendTokenEMail($email);
-        		header ( 'Location: resetPass.php?email='.$email);
-        	}else{
-        		$emailErr = "Email does not exist.";
-        	}
+        	//generate token and store in DB
+        	$mysqli->forgetPassword ($email);
+        	//send email
+        	sendTokenEMail($email);
+        	header ( 'Location: resetPass.php?email='.$email);
             $mysqli->close ();
         }
     }
