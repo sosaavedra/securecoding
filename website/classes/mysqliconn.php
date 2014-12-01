@@ -94,10 +94,10 @@ class MysqliConn {
         return $this->login ( $user, $password, true );
     }
 
-    public function createClient($title_type_id, $first_name, $last_name, $email, $pwd) {
+    public function createClient($title_type_id, $first_name, $last_name, $email, $pwd, $scsOpt) {
         $stmt = $this->conn->stmt_init ();
-        $stmt->prepare ( "call createClient (?, ?, ?, ?, ?)" );
-        $stmt->bind_param ( 'issss', $title_type_id, $first_name, $last_name, $email, $pwd );
+        $stmt->prepare ( "call createClient (?, ?, ?, ?, ?, ?)" );
+        $stmt->bind_param ( 'isssss', $title_type_id, $first_name, $last_name, $email, $pwd, $scsOpt);
         $stmt->execute ();
         
         $error_msg;
@@ -321,6 +321,33 @@ class MysqliConn {
         $stmt->execute ();
 
         return $stmt->get_result ();
+    }
+    
+    public function forgetPassword($email) {
+    	$stmt = $this->conn->stmt_init ();
+    	$stmt->prepare ( "call forgetPassword(?)" );
+    	$stmt->bind_param ( 's', $email);
+    	$stmt->execute ();
+    
+    	return $stmt->get_result ();
+    }  
+    
+    public function resetPassword($email, $token, $hashedPW) {
+    	$stmt = $this->conn->stmt_init ();
+    	$stmt->prepare ( "call resetPassword(?,?,?)" );
+    	$stmt->bind_param ( 'sss', $email, $token, $hashedPW);
+    	$stmt->execute ();
+    
+    	return $stmt->get_result ();
+    }
+    
+    public function getClientPaswordToken($email) {
+    	$stmt = $this->conn->stmt_init ();
+    	$stmt->prepare ( "call getClientPaswordToken(?)" );
+    	$stmt->bind_param ( 's', $email);
+    	$stmt->execute ();
+    
+    	return $stmt->get_result ();
     }
 }
 

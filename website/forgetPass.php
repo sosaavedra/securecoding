@@ -1,26 +1,7 @@
-<?php
-
-include_once "includes/checkLogin.php";
-
-/*Delete this*/
-
-require_once "includes/utils.php";
-require_once "includes/config.php";
-require_once "classes/mysqliconn.php";
-
-$mysqli = new MysqliConn ();
-$mysqli->connect ();
-        
-$resultset = $mysqli->getClientTransationNumbers ( 3 );
-
-createPDF("Mr. Victor Sosa", "500004", $resultset);
-
-/*Detete this*/
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Login</title>
+<title>Forget password</title>
 <meta charset="utf-8">
 <link rel="stylesheet" href="css/reset.css" type="text/css" media="all">
 <link rel="stylesheet" href="css/layout.css" type="text/css" media="all">
@@ -37,20 +18,57 @@ createPDF("Mr. Victor Sosa", "500004", $resultset);
 <![endif]-->
 </head>
 <body id="page4">
+
+<?php
+
+require_once "includes/config.php";
+require_once "classes/mysqliconn.php";
+require_once "sendEmail.php";
+
+// define variables for form values validation and set to empty values
+$emailErr = "";
+$formValid = true;
+
+// checking if request is posted
+if ($_POST) {
+    
+   
+    if (empty ( $_POST ['username'] ) || ! filter_var ( $_POST ['username'], FILTER_VALIDATE_EMAIL )) {
+        $emailErr = "Email is not valid";
+        $formValid = false;
+    }
+    
+    
+    if ($formValid) {
+    	
+    	$mysqli = new MysqliConn ();
+    	$mysqli->connect ();
+    	
+       		// escape variables for security
+        	$email = $mysqli->escape ( $_POST ['username'] );
+        	
+        	
+        	
+        	if($mysqli->forgetPassword ($email))
+        	{
+        		//send email
+        		sendTokenEMail($email);
+        		header ( 'Location: resetPass.php?email='.$email);
+        	}else{
+        		$emailErr = "Email does not exist.";
+        	}
+            $mysqli->close ();
+        }
+    }
+
+?>
+
 <div class="main">
 <!-- header -->
     <header>
         <div class="wrapper">
             <a href="index.html" id="logo">BankSys</a>
         </div>
-        <nav>
-            <ul id="menu">
-                <li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
-                <li><a href="registration.php"><span><span>Register</span></span></a></li>
-                <li id="menu_active"><a href="login.php"><span><span>Login</span></span> </a></li>
-                <li class="omega"><a href="forgetPass.php"><span><span>Forget password</span></span> </a></li>
-            </ul>
-        </nav>
     </header>
 <!-- / header -->
 <!-- content -->
@@ -58,7 +76,7 @@ createPDF("Mr. Victor Sosa", "500004", $resultset);
         <div class="wrapper">
             <div class="pad">
                 <div class="wrapper">
-                    <article class="col1"><h2>User Login</h2></article>
+                    <article class="col1"><h2>Forget password</h2></article>
                     <article class="col2 pad_left1"><h2>Contact us</h2></article>
                 </div>
             </div>
@@ -66,22 +84,17 @@ createPDF("Mr. Victor Sosa", "500004", $resultset);
                 <div class="pad marg_top">
                     <article class="col1">
                         <form id="login" class="formstyle" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+                         <p>Please type your email, we will send a temporary code to you, which you can use on next page to reset your password.
+                            </p>
                             <div>
-                                <div class="wrapper">
+                               <div class="wrapper">
                                 <div class="wrapper">
                                     <div class="bg"><input class="input" type="text" name="username" id="username"></div>E-Mail:
                                 </div>
-                                <div class="wrapper">
-                                    <div class="bg"><input class="input" autocomplete="off" type="password" name="password" id="password"></div>Password:
-                                </div>
-                                    <div class="bg" style="background: none; border:none; box-shadow: none;">
-                                        <input class="input" type="checkbox" name="employee" id="employee" value="1" />I work here!
-                                    </div>
-                                   
-                                </div> <span class="error"><?php echo $pageErr;?></span>
+                                </div> <span class="error"><?php echo $emailErr;?></span>
                                 <div class="wrapper">
                                     <div style="margin-right: 100px">
-                                    <input class='button' type='submit' name='login' value='Login' id='login'>
+                                    <input class='button' type='submit' name='submit' value='Submit' id='submit'>
                                     </div>
                                 </div>
                             </div>

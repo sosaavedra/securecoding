@@ -70,7 +70,7 @@ if ($_POST) {
     if (empty ( $_POST ['cpassword'] )) {
         $cpassErr = "Retype password is required";
         $formValid = false;
-    } else if (strcmp ( $_POST ['password'], $_POST ['cpassword'] ) != 0) {
+    } else if (!($_POST ['password'] === $_POST ['cpassword'])) {
         $passMatchErr = "Passwords do not match";
         $formValid = false;
     }
@@ -91,15 +91,19 @@ if ($_POST) {
         $cpassword = $mysqli->escape ( $_POST ['cpassword'] );
         $tanOption = $mysqli->escape ( $_POST ['tanOption'] );
         
+        $scsOpt = 'N';
+        if($tanOption === "scs"){
+        	$scsOpt = 'Y';
+        }
+        
         $hashedPW = hash ( 'sha256', $password );
         
-        if ($mysqli->createClient ( $title, $firstname, $lastname, $email, $hashedPW )) {
-            $mysqli->close ();
-            
+        if ($mysqli->createClient ( $title, $firstname, $lastname, $email, $hashedPW, $scsOpt )) {
             header ( 'Location: registerSuccess.html' );
         } else {
             $alreadyRegisteredErr = "Email id already registered!";
         }
+        $mysqli->close ();
     }
 }
 
@@ -190,7 +194,7 @@ if ($_POST) {
                                     <div class="wrapper">
 										<div class="bg">
 											<input type="radio" name="tanOption"
-											<?php if (isset($_POST ['tanOption']) && $_POST ['tanOption']=="email") echo "checked";?>
+											<?php if (isset($_POST ['tanOption']) && $_POST ['tanOption']==="email") echo "checked";?>
 											value="email">Send me TAN via email 
 										
 										</div>
@@ -200,7 +204,7 @@ if ($_POST) {
 									<div class="wrapper">
 										<div class="bg">
 											<input type="radio"	name="tanOption"
-											<?php if (isset($_POST ['tanOption']) && $_POST ['tanOption']=="scs") echo "checked";?>
+											<?php if (isset($_POST ['tanOption']) && $_POST ['tanOption']==="scs") echo "checked";?>
 											value="scs">Download SCS(smart card simulator)
 										
 										</div>

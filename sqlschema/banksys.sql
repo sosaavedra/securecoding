@@ -479,13 +479,13 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = '' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `createClient`(IN `in_title_type_id` int(8), IN `in_first_name` varchar(128), IN `in_last_name` varchar(128), IN `in_email` varchar(64), IN `in_pwd` varchar(64))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `createClient`(IN `in_title_type_id` int(8), IN `in_first_name` varchar(128), IN `in_last_name` varchar(128), IN `in_email` varchar(64), IN `in_pwd` varchar(64), IN `in_scsOpt` CHAR(1))
 BEGIN
     DECLARE EXIT HANDLER FOR 1062 SELECT 'Duplicate entry!' AS error_msg;
     DECLARE EXIT HANDLER FOR SQLEXCEPTION SELECT 'SQLException found!' AS error_msg;
 
-    INSERT INTO client(first_name, last_name, email, title_type_id)
-    VALUES (in_first_name, in_last_name, in_email, in_title_type_id);
+    INSERT INTO client(first_name, last_name, email, title_type_id, use_scs)
+    VALUES (in_first_name, in_last_name, in_email, in_title_type_id, in_scsOpt);
 
     INSERT INTO user(person_id, pwd, user_type_id)
     SELECT LAST_INSERT_ID() AS last_client_id,
