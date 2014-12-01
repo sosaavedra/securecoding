@@ -305,6 +305,7 @@ CREATE TABLE `user` (
   `pwd` varchar(64) NOT NULL,
   `user_type_id` int(8) NOT NULL,
   `last_login` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `token` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_ukey` (`person_id`,`user_type_id`),
   KEY `user_k1` (`user_type_id`),
@@ -318,7 +319,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,1,'5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',2,'0000-00-00 00:00:00');
+INSERT INTO `user` VALUES (1,1,'5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',2,'0000-00-00 00:00:00',NULL);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -479,7 +480,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = '' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `createClient`(IN `in_title_type_id` int(8), IN `in_first_name` varchar(128), IN `in_last_name` varchar(128), IN `in_email` varchar(64), IN `in_pwd` varchar(64), IN `in_scsOpt` CHAR(1))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `createClient`(IN `in_title_type_id` int(8), IN `in_first_name` varchar(128), IN `in_last_name` varchar(128), IN `in_email` varchar(64), IN `in_pwd` varchar(64), IN `in_scsOpt` char(1))
 BEGIN
     DECLARE EXIT HANDLER FOR 1062 SELECT 'Duplicate entry!' AS error_msg;
     DECLARE EXIT HANDLER FOR SQLEXCEPTION SELECT 'SQLException found!' AS error_msg;
@@ -587,10 +588,10 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getAccountDetails`(IN `in_account_number` varchar(8))
 BEGIN
-    SELECT tt.description, c.first_name, c.last_name, c.email, a.account_number, a.balance
+    SELECT c.id, tt.description, c.first_name, c.last_name, c.email, a.account_number, a.balance, c.use_scs
     FROM account a, client c, title_type tt
     WHERE a.account_number = in_account_number AND a.client_id = c.id
-        AND c.title_type_id = tt.id;    SELECT * FROM client WHERE id = in_client_id;
+        AND c.title_type_id = tt.id;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -673,9 +674,9 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = '' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `getClientTransationNumbers`(IN `in_client_id` INT(8))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getClientTransationNumbers`(IN `in_client_id` int(8))
 BEGIN
-    SELECT code from tan_code where client_id=in_client_id;
+    SELECT code FROM tan_code WHERE client_id=in_client_id LIMIT 100;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -909,4 +910,4 @@ DELIMITER ;
 GRANT EXECUTE ON banksys.* TO 'webuser'@'localhost' IDENTIFIED BY 'kubruf#eGa4e';
 GRANT EXECUTE ON banksys.* TO 'parser'@'localhost' IDENTIFIED BY 'vEq7saf@&eVU';
 
--- Dump completed on 2014-12-01 17:54:31
+-- Dump completed on 2014-12-01 22:49:24
