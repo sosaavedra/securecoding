@@ -63,6 +63,7 @@
                         <article class="col1">
                         
                         <?php
+                        require_once "includes/utils.php";
                         require_once "includes/config.php";
                         require_once "classes/mysqliconn.php";
                         
@@ -105,7 +106,7 @@
                                 printf("<td>%s</td><td>%s</td><td>%s</td><td>%s</td>",
                                     $row ["destination"],
                                     $row ["approved_date"] ? $row ["approved_date"] : $row ["created_date"],
-                                    $row ["amount"],
+                                    moneyFormat($row ["amount"]),
                                     $row ["description"]);
                                 echo "</tr>";
                             }

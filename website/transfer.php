@@ -145,10 +145,10 @@ if ($_POST) {
                 <div class="pad">
                     <div class="wrapper">
                         <article class="col1">
-                            <h2>Make a transaction</h2>
+                            <h2>Single Transaction</h2>
                         </article>
                         <article class="col2 pad_left1">
-                            <h2>Contact us</h2>
+                            <h2>Batch Transactions</h2>
                         </article>
                     </div>
                 </div>
@@ -197,51 +197,28 @@ if ($_POST) {
                                 </div>
                             </form>
 
+                        </article>
+                        <article class="col2" style="width:330px">
                             <form class="formstyle" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post" enctype="multipart/form-data">
-                                <div>
-
+                                    <div class="wrapper">
+                                            <label for="uploadFile">
+                                                Please choose a file:
+                                            </label>
+                                            <input type="file" name="uploadFile" id="uploadFile" style="float:none" class="bg">
+                                    </div>
+                                    <div style="font-style:italic;font-weight:normal; height:73px">
                                     <span>
-                                        OR you can also make transaction by uploading a file in below format:
+                                        Format file:
                                         <br/>
                                         &lt;Destination Account&gt;@&lt;Amount&gt;@&lt;TAN Code&gt;
                                     </span>
-                                    <p>
-                                        <ul>
-                                            <li>One transaction per line.</li>
-                                            <li>Use '@' as separator between fields.</li>
-                                            <li>&lt;Destination Account&gt;: Account number that will receive the transaction</li>
-                                            <li>&lt;Amount&gt;: The amount of money to be transferred</li>
-                                            <li>&lt;TAN Code&gt;: One security codes that has not been used before.</li>
-                                        </ul>
-                                    </p>
-
-                                    <div class="wrapper">
-                                        <div class="bg">
-                                            <input type="file" name="uploadFile" id="uploadFile">
-                                        </div>
-                                        Please choose a file:
                                     </div>
                                     <span class="error"><?php echo $uploadErr;?></span>
 
                                     <div class="wrapper">
-                                        <div style="margin-right: 100px">
-                                            <input class='button' type='submit' name='upload' value='Go' id='upload'>
-                                        </div>
+                                        <input class='button' type='submit' name='upload' value='Go' id='upload'>
                                     </div>
-                                </div>
                             </form>
-
-                        </article>
-                        <article class="col2 pad_left1">
-                            <div class="wrapper">
-                                <p class="cols pad_bot3">
-                                    <strong> Country:<br> City:<br> Telephone:<br> Email:
-                                    </strong>
-                                </p>
-                                <p class="pad_bot3">
-                                    Germany<br> Munich<br> +49 1234567890<br> <a href="mailto:">scteam17@gmail.com</a>
-                                </p>
-                            </div>
                         </article>
                     </div>
                 </div>

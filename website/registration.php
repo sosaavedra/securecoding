@@ -23,7 +23,7 @@
 <?php
 
 // define variables for form values validation and set to empty values
-$fnameErr = $lnameErr = $emailErr = $passErr = $cpassErr = $passMatchErr = $titleErr = "";
+$fnameErr = $lnameErr = $emailErr = $passErr = $cpassErr = $passMatchErr = $titleErr = $tanOptionErr = "";
 $formValid = true;
 $alreadyRegisteredErr = "";
 
