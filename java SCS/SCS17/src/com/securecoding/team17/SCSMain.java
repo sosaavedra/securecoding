@@ -13,11 +13,13 @@ public class SCSMain {
 		// prepare the GUI
 		SCSPrepareUI.prepareUI();
 
-		// all logic related to generating TAN is here
+		// all logic related to generating TAN is in SCSGenerateTAN
 		// generate TAN Button's action
-		SCSPrepareUI.btnGenerateTAN.addActionListener(new SCSGenerateTAN()); // Register
-																				// action
+		SCSPrepareUI.btnGenerateTAN.addActionListener(new SCSGenerateTAN()); // Register action
+																				
 
+		// copy to clipboard action
+		SCSPrepareUI.btnCopyTAN.addActionListener(new SCSCopyTAN());
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.securecoding.team17;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigInteger;
@@ -59,14 +60,44 @@ public class SCSGenerateTAN implements ActionListener {
 			SCSPrepareUI.lblTANCode.setVisible(true);
 			SCSPrepareUI.txtTANCode.setVisible(true);
 			SCSPrepareUI.txtTANCode.setText(generateTAN());
+			SCSPrepareUI.txtTANCode.setForeground(Color.BLUE);
+			SCSPrepareUI.btnCopyTAN.setVisible(true);
 			SCSPrepareUI.lblTANInfo.setVisible(true);
 			SCSPrepareUI.lblTANInfo.setText("Copy the above TAN on web transfer page");
+			SCSPrepareUI.lblTANInfo.setForeground(Color.BLACK);
+			
+			SCSPrepareUI.txtPIN.setForeground(Color.BLACK);
+			SCSPrepareUI.txtAccountNumber.setForeground(Color.BLACK);
+			SCSPrepareUI.txtAmount.setForeground(Color.BLACK);
 		} else {
 			// input not valid, show error message
 			SCSPrepareUI.lblTANCode.setVisible(false);
 			SCSPrepareUI.txtTANCode.setVisible(false);
+			SCSPrepareUI.btnCopyTAN.setVisible(false);
 			SCSPrepareUI.lblTANInfo.setVisible(true);
 			SCSPrepareUI.lblTANInfo.setText(SCSInputVerifier.errorMessage);
+			SCSPrepareUI.lblTANInfo.setForeground(Color.RED);
+
+			// bring focus for user convenience
+			if (SCSInputVerifier.errorCode == 1) {
+				// pin code wrong
+				SCSPrepareUI.txtPIN.requestFocus();
+				SCSPrepareUI.txtPIN.setForeground(Color.RED);
+				SCSPrepareUI.txtAccountNumber.setForeground(Color.BLACK);
+				SCSPrepareUI.txtAmount.setForeground(Color.BLACK);
+			} else if (SCSInputVerifier.errorCode == 2) {
+				// account wrong
+				SCSPrepareUI.txtAccountNumber.requestFocus();
+				SCSPrepareUI.txtAccountNumber.setForeground(Color.RED);
+				SCSPrepareUI.txtPIN.setForeground(Color.BLACK);
+				SCSPrepareUI.txtAmount.setForeground(Color.BLACK);
+			} else if (SCSInputVerifier.errorCode == 3) {
+				// amount wrong
+				SCSPrepareUI.txtAmount.requestFocus();
+				SCSPrepareUI.txtAmount.setForeground(Color.RED);
+				SCSPrepareUI.txtPIN.setForeground(Color.BLACK);
+				SCSPrepareUI.txtAccountNumber.setForeground(Color.BLACK);
+			}
 		}
 	}
 

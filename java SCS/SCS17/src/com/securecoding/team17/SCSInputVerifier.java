@@ -14,7 +14,20 @@ public class SCSInputVerifier {
 	/**
 	 * to show the error message to user
 	 */
-	public static String errorMessage;
+	public static String errorMessage = "";
+	public static int errorCode = 0; // 1 = PIN, 2 = account, 3 = amount 
+
+	/*
+	^                   # Start of string.
+	[0-9]*              # Must have one or more numbers.
+	(                   # Begin optional group.
+	    \.              # The decimal point, . must be escaped, 
+	                    # or it is treated as "any character".
+	    [0-9]{1,2}      # One or two numbers.
+	)?                  # End group, signify it's optional with ?
+	$                   # End of string.
+	*/
+	public static final String PATTERN = "^[0-9]*(\\.[0-9]{1,2})?$";
 
 	/**
 	 * validate user input
@@ -23,7 +36,7 @@ public class SCSInputVerifier {
 	 */
 	public static boolean verifyInput() {
 
-		errorMessage = null;
+		errorMessage = "";
 
 		// check PIN
 		boolean isValid = false;
@@ -58,6 +71,7 @@ public class SCSInputVerifier {
 			isValid = NumberUtils.isDigits(pin);
 		} else {
 			errorMessage = "PIN invalid";
+			errorCode = 1;
 		}
 		return isValid;
 	}
@@ -73,14 +87,16 @@ public class SCSInputVerifier {
 		// get the account number
 		String accountNumber = SCSPrepareUI.txtAccountNumber.getText();
 		// check for length range and numeric
-		if (accountNumber != null && accountNumber.length() > 1 && accountNumber.length() < 20) {
+		if (accountNumber != null && accountNumber.length() > 7 && accountNumber.length() < 15) {
 			if (NumberUtils.isDigits(accountNumber)) {
 				isValid = true;
 			} else {
 				errorMessage = "account number not proper";
+				errorCode = 2;
 			}
 		} else {
 			errorMessage = "account number not in range";
+			errorCode = 2;
 		}
 		return isValid;
 	}
@@ -96,14 +112,16 @@ public class SCSInputVerifier {
 		// get the amount
 		String amount = SCSPrepareUI.txtAmount.getText();
 		// check length and numeric
-		if (amount != null && amount.length() > 0 && amount.length() < 20) {
-			if (NumberUtils.isDigits(amount)) {
+		if (amount != null && amount.length() > 0 && amount.length() < 15) {
+			if (amount.matches(PATTERN)) {
 				isValid = true;
 			} else {
 				errorMessage = "amount not proper";
+				errorCode = 3;
 			}
 		} else {
 			errorMessage = "amount not in range";
+			errorCode = 3;
 		}
 		return isValid;
 	}
