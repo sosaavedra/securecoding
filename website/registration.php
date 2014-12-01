@@ -174,14 +174,14 @@ if ($_POST) {
                                      <span class="error"><?php echo $alreadyRegisteredErr;?></span>
                                     <div class="wrapper">
                                         <div class="bg">
-                                            <input class="input" type="password" name="password" id="password">
+                                            <input class="input" autocomplete="off" type="password" name="password" id="password">
                                         </div>
                                         Password:
                                     </div>
                                     <span class="error"><?php echo $passErr;?></span>
                                     <div class="wrapper">
                                         <div class="bg">
-                                            <input class="input" type="password" name="cpassword" id="cpassword">
+                                            <input class="input" autocomplete="off" type="password" name="cpassword" id="cpassword">
                                         </div>
                                         Retype Password:
                                     </div>
