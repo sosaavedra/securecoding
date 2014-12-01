@@ -37,7 +37,6 @@ CREATE TABLE `account` (
   `account_number` varchar(8) NOT NULL,
   `client_id` int(8) NOT NULL,
   `balance` double unsigned NOT NULL DEFAULT '50000',
-  `use_scs` char(1) NOT NULL DEFAULT 'N',
   `created_date` datetime NOT NULL,
   `updated_date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -70,6 +69,7 @@ CREATE TABLE `client` (
   `last_name` varchar(128) NOT NULL,
   `email` varchar(64) NOT NULL,
   `title_type_id` int(8) DEFAULT NULL,
+  `use_scs` char(1) NOT NULL DEFAULT 'N',
   `created_date` datetime NOT NULL,
   `activation_date` datetime NOT NULL,
   `activated_by` int(8) NOT NULL,
@@ -309,7 +309,7 @@ CREATE TABLE `user` (
   UNIQUE KEY `user_ukey` (`person_id`,`user_type_id`),
   KEY `user_k1` (`user_type_id`),
   CONSTRAINT `user_user_type` FOREIGN KEY (`user_type_id`) REFERENCES `user_type` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -909,4 +909,4 @@ DELIMITER ;
 GRANT EXECUTE ON banksys.* TO 'webuser'@'localhost' IDENTIFIED BY 'kubruf#eGa4e';
 GRANT EXECUTE ON banksys.* TO 'parser'@'localhost' IDENTIFIED BY 'vEq7saf@&eVU';
 
--- Dump completed on 2014-12-01  4:20:40
+-- Dump completed on 2014-12-01 17:54:31
