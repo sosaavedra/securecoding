@@ -347,6 +347,14 @@ echo $success;
     
     	return $stmt->get_result ();
     }
+    
+    public function getSCSPin($client_id) {
+    	$stmt = $this->conn->stmt_init ();
+    	$stmt->prepare ( "call getSCSPin(?)" );
+    	$stmt->bind_param ( 's', $client_id);
+    	$stmt->execute ();
+    	return $stmt->get_result ();
+    }
 }
 
 ?>
