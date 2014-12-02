@@ -115,12 +115,7 @@ if ($_POST) {
             // Check if $uploadOk is set to 0 by an error
             if ($fileValid) {
                 if (move_uploaded_file ( $_FILES ["uploadFile"] ["tmp_name"], $target_dir )) {
-                    $output = "";
-                    ob_start();
-                    $uploadErr = system("./c-parser/parser $target_dir $client_id", $output);
-                    $content = ob_get_contents();
-
-                    $uploadErr = $content;
+                    $uploadErr = shell_exec("./c-parser/parser $target_dir $client_id 2>&1");
 
                     if($uploadErr == ""){
                         header ( 'Location: transferSuccess.html' );
