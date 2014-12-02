@@ -828,6 +828,8 @@ BEGIN
     DECLARE origin_account_id int(8);
     DECLARE origin_account_number VARCHAR(8);
     DECLARE destination_account_id int(8);
+    DECLARE is_scs_used CHAR(1);
+    DECLARE scs_code VARCHAR(15);
     
     DECLARE EXIT HANDLER FOR SQLEXCEPTION, SQLWARNING
     BEGIN
@@ -840,7 +842,7 @@ BEGIN
                 CASE error
                 WHEN 1 THEN 'Unknown client!'
                 WHEN 2 THEN 'Unknown account number!'
-                WHEN 3 THEN 'Tan code does not exist or has been used before'
+                WHEN 3 THEN 'Invalid TAN Code'
                 WHEN 4 THEN 'Account does not have enough money!'
                 WHEN 5 THEN 'Unknown transaction type!'
                 WHEN 6 THEN 'Destination account does not exist!' END AS Message;
@@ -853,25 +855,37 @@ BEGIN
     
     START TRANSACTION;
 
+        SELECT use_scs INTO is_scs_used FROM client WHERE id = in_client_id;
+
+        IF is_scs_used = 'Y' THEN
+            SELECT SUBSTR(MD5(CONCAT(a.account_number, CAST(s.pin_code AS CHAR(6)), CAST(in_amount AS CHAR(100)), 'secureCodingTeam17')), 1, 15) INTO scs_code
+            FROM account a, scs s WHERE a.client_id = in_client_id AND a.client_id = s.client_id;
+        END IF;
+
+
         IF (EXISTS (SELECT id FROM client WHERE id = in_client_id)) THEN
             SELECT account_number, id INTO origin_account_number, origin_account_id FROM account WHERE client_id = in_client_id;
 
             IF origin_account_number IS NOT NULL THEN
-                IF (EXISTS (SELECT code
-                            FROM tan_code
-                            WHERE client_id = in_client_id AND code = in_tan_code
-                                AND valid = 'Y')) THEN
+                IF (EXISTS (
+                        SELECT code FROM tan_code
+                        WHERE client_id = in_client_id AND code = in_tan_code AND valid = 'Y')
+                    OR (is_scs_used = 'Y' AND scs_code = in_tan_code)) THEN
 
-                    UPDATE tan_code SET valid = 'N' WHERE client_id = in_client_id AND code = in_tan_code;
+                    IF is_scs_used = 'N' THEN
+                        UPDATE tan_code SET valid = 'N' WHERE client_id = in_client_id AND code = in_tan_code;
+                    END IF;
 
                     IF in_transaction_type_id = 1 THEN
                         IF in_amount < 10000 THEN
                             UPDATE account SET balance = balance + in_amount
                             WHERE client_id = in_client_id AND account_number = origin_account_number;
 
-                            INSERT INTO transaction_history(origin_account_id, amount, transaction_type_id, created_date)                     VALUES(origin_account_id, in_amount, in_transaction_type_id, now());
+                            INSERT INTO transaction_history(origin_account_id, amount, transaction_type_id, created_date)
+                            VALUES(origin_account_id, in_amount, in_transaction_type_id, now());
                         ELSE
-                                INSERT INTO transaction(origin_account_id, amount, transaction_type_id, created_date)                             VALUES(origin_account_id, in_amount, in_transaction_type_id, now());
+                                INSERT INTO transaction(origin_account_id, amount, transaction_type_id, created_date)
+                                VALUES(origin_account_id, in_amount, in_transaction_type_id, now());
                         END IF;
                     ELSE
                         IF (EXISTS (SELECT balance FROM account
@@ -1029,4 +1043,4 @@ DELIMITER ;
 GRANT EXECUTE ON banksys.* TO 'webuser'@'localhost' IDENTIFIED BY 'kubruf#eGa4e';
 GRANT EXECUTE ON banksys.* TO 'parser'@'localhost' IDENTIFIED BY 'vEq7saf@&eVU';
 
--- Dump completed on 2014-12-02  0:58:07
+-- Dump completed on 2014-12-02  1:57:09
