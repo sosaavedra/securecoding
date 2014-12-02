@@ -137,10 +137,13 @@
                                         <div class='datagrid'><table>
                                         <thead>
                                             <tr>
+                                                <td>From Account</td>
+                                                <td>Name</td>
                                                 <td>To Account</td>
-                                                <td>Date</td>
+                                                <td>Name</td>
                                                 <td>Amount</td>
-                                                <td>Type</td>
+                                                <td>Description</td>
+                                                <td>Date</td>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -148,11 +151,14 @@
                                             // output data of each row
                                             while ( $row = $result->fetch_assoc () ) {
                                                 echo "<tr class='alt'>";
-                                                printf("<td>%s</td><td>%s</td><td>%s</td><td>%s</td>",
+                                                printf("<td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>",
+                                                    $row ["origin"],
+                                                    $row ["origin_name"],
                                                     $row ["destination"],
-                                                    $row ["approved_date"] ? $row ["approved_date"] : $row ["created_date"],
+                                                    $row ["destination_name"],
                                                     moneyFormat($row ["amount"]),
-                                                    $row ["description"]);
+                                                    $row ["description"],
+                                                    $row ["rejected_date"] ? $row ["rejected_date"] : $row ["approved_date"] ? $row ["approved_date"] : $row ["created_date"]);
                                                 echo "</tr>";
                                             }
                                             echo "</tbody>";

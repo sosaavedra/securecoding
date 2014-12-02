@@ -99,8 +99,6 @@ class MysqliConn {
         $stmt->prepare ( "call createClient (?, ?, ?, ?, ?, ?)" );
         $stmt->bind_param ( 'isssss', $title_type_id, $first_name, $last_name, $email, $pwd, $scsOpt);
         $success = $stmt->execute ();
-       echo "call createClient ($title_type_id, $first_name, $last_name, $email, $pwd, $scsOpt)"; 
-echo $success;
         return $success;
     }
     
@@ -140,11 +138,8 @@ echo $success;
         $stmt->prepare ( "call performTransaction(?, ?, ?, ?, ?)" );
         $stmt->bind_param ( 'isdsi', $client_id, $toAccount, $amount, $transNo, $transactionType );
         $stmt->execute ();
-        
-        $error_msg;
-        $stmt->bind_result ( $error_msg );
-        
-        return ! $stmt->fetch ();
+
+        return $stmt->get_result ();
     }
     
     /**
@@ -271,10 +266,7 @@ echo $success;
         $stmt->bind_param ( 'ii', $id, $employee_id );
         $stmt->execute ();
         
-        $error_msg;
-        $stmt->bind_result ( $error_msg );
-        
-        return ! $stmt->fetch ();
+        return $stmt->get_result ();
     }
     
     /**
@@ -286,7 +278,6 @@ echo $success;
     public function rejectTransaction($id, $employee_id) {
         $stmt = $this->conn->stmt_init ();
         $stmt->prepare ( "call rejectTransaction (?, ?)" );
-        echo "call rejectTransaction ($id, $employee_id)";
         $stmt->bind_param ( 'ii', $id, $employee_id );
         $stmt->execute ();
         

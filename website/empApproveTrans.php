@@ -84,7 +84,8 @@
                                     if (isset ( $_POST ['approve'] )) {
 
                                         // approve-button was clicked
-                                        if (!$mysqli->approveTransaction ( $id, $employee_id )) {
+                                        $result = $mysqli->approveTransaction ( $id, $employee_id );
+                                        if ($result && $result->num_rows > 0) {
                                             die ( "Error: in approving!" );
                                         }
                                         // move the data to transaction history table

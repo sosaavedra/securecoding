@@ -74,10 +74,17 @@ if ($_POST) {
             $amount = $mysqli->escape ( $_POST ['amount'] );
             $toAccount = $mysqli->escape ( $_POST ['toAccount'] );
             
-            $mysqli->performTransaction ( $client_id, $toAccount, $amount, $transNo, $transactionType );
+            $result = $mysqli->performTransaction ( $client_id, $toAccount, $amount, $transNo, $transactionType );
+
+            if($result && $result->num_rows > 0){
+                $row = $result->fetch_assoc();
+                $transNoErr = $row ['Message'];
+            } else {
+                header ( 'Location: transferSuccess.html' );
+            }
+            
             $mysqli->close ();
             // echo "Transfer Success";
-            header ( 'Location: transferSuccess.html' );
         }
     } else if (isset ( $_POST ['upload'] )) {
         // upload-button was clicked
