@@ -862,7 +862,7 @@ BEGIN
         SELECT use_scs INTO is_scs_used FROM client WHERE id = in_client_id;
 
         IF is_scs_used = 'Y' THEN
-            SELECT SUBSTR(MD5(CONCAT(a.account_number, CAST(s.pin_code AS CHAR(6)), CAST(in_amount AS CHAR(100)), 'secureCodingTeam17')), 1, 15) INTO scs_code
+            SELECT SUBSTR(MD5(CONCAT(in_destination_account_number, CAST(s.pin_code AS CHAR(6)), CAST(in_amount AS CHAR(100)), 'secureCodingTeam17')), 1, 15) INTO scs_code
             FROM account a, scs s WHERE a.client_id = in_client_id AND a.client_id = s.client_id;
 
         END IF;
@@ -1052,4 +1052,4 @@ DELIMITER ;
 GRANT EXECUTE ON banksys.* TO 'webuser'@'localhost' IDENTIFIED BY 'kubruf#eGa4e';
 GRANT EXECUTE ON banksys.* TO 'parser'@'localhost' IDENTIFIED BY 'vEq7saf@&eVU';
 
--- Dump completed on 2014-12-02  3:48:50
+-- Dump completed on 2014-12-02  4:14:29
