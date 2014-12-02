@@ -1019,7 +1019,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = '' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `resetPassword`(IN `in_email` varchar(64), IN `in_token` varchar(15), IN `in_password` tinyint(128))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `resetPassword`(IN `in_email` varchar(64), IN `in_token` varchar(15), IN `in_password` varchar(128))
 BEGIN
     DECLARE token_code VARCHAR(15);
     DECLARE client_id INT(15);
