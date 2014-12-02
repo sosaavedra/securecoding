@@ -25,6 +25,8 @@ void freeTransactions(Transaction *transactions);
 
 void printTransactions (Transaction * transactions);
 
+void printTransactionError (Transaction * transactions);
+
 int saveTransactions(Transaction *transactions, char *client_id);
 
 MYSQL_BIND *prepareInParameters(char *client_id, Transaction *transaction);

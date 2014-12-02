@@ -281,10 +281,7 @@ class MysqliConn {
         $stmt->bind_param ( 'ii', $id, $employee_id );
         $stmt->execute ();
         
-        $error_msg;
-        $stmt->bind_result ( $error_msg );
-        
-        return ! $stmt->fetch ();
+        return $stmt->get_result ();
     }
 
         /**

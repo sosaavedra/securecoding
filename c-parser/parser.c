@@ -98,14 +98,10 @@ int main (int argc, char **argv){
         return EXIT_FAILURE;
     }
 
-    printTransactions(transactions); 
-
-    if(saveTransactions(transactions, client_id)){
-        return EXIT_FAILURE;
-    }
+    saveTransactions(transactions, client_id);
+    printTransactionError(transactions);
 
     freeTransactions(transactions);
-    free(line);
 
     fclose(transactionFile);
 

@@ -75,7 +75,8 @@ void addTransaction(Transaction *transactions, Transaction *transaction){
     }
 }
 
-void freeTransactions(Transaction *transactions){}
+void freeTransactions(Transaction *transactions){
+}
 
 void printTransactions (Transaction * transactions){
     printf("Printing values...\n");
@@ -87,11 +88,33 @@ void printTransactions (Transaction * transactions){
             printf("Destination: %s\n", transaction->destination);
             printf("Amount: %s\n", transaction->amount);
             printf("Tan code: %s\n", transaction->tanCode);
+            printf("Success: %d\n", transaction->success);
+            printf("Level: %s\n", transaction->level);
+            printf("Code: %d\n", transaction->code);
+            printf("Message: %s\n", transaction->message);
 
             transaction = transaction->next;
         } while(transaction);
     }
 }
+
+void printTransactionError (Transaction * transactions){
+    Transaction *transaction = transactions;
+
+    int lineNumber = 1;
+
+    if(transaction){
+        do{
+            if(!transaction->success){
+                printf("Error in transaction #: %d - %s\n", lineNumber, transaction->message);
+            }
+
+            lineNumber++;
+            transaction = transaction->next;
+        } while(transaction);
+    }
+}
+
 
 int saveTransactions(Transaction *transactions, char *client_id){
     char *performTransaction =  "call performTransaction(?, ?, ?, ?, 3)";
@@ -109,7 +132,6 @@ int saveTransactions(Transaction *transactions, char *client_id){
         return EXIT_FAILURE;
     } 
 
-    printf("init stmt\n");
     stmt = mysql_stmt_init(mysql);
  
     if(!stmt){
@@ -118,7 +140,6 @@ int saveTransactions(Transaction *transactions, char *client_id){
         return EXIT_FAILURE;
     }
 
-    printf("prepare stmt\n");
     status = mysql_stmt_prepare(stmt, performTransaction, strlen(performTransaction));
 
     if(test_stmt_error(stmt, status)){
@@ -132,22 +153,18 @@ int saveTransactions(Transaction *transactions, char *client_id){
 
     if(transaction){
         do{
-            printf("call performTransaction(%s, %s, %s, %s, 3)\n", client_id, transaction->destination, transaction->amount, transaction->tanCode);
-
             in_params = prepareInParameters(client_id, transaction);
 
             if(in_params == NULL){
                 return EXIT_FAILURE;
             }
  
-            printf("bind_param\n");
             status = mysql_stmt_bind_param(stmt, in_params);
 
             if(test_stmt_error(stmt, status)){
                 return EXIT_FAILURE;
             }
            
-            printf("execute\n");
             status = mysql_stmt_execute(stmt);
     
             if(test_stmt_error(stmt, status)){
@@ -167,19 +184,21 @@ int saveTransactions(Transaction *transactions, char *client_id){
                     return EXIT_FAILURE;
                 }
 
-                printf("bind_result\n");
                 status = mysql_stmt_bind_result(stmt, out_params);
 
                 if(test_stmt_error(stmt, status)){
                     return EXIT_FAILURE;
                 }
 
-                printf("fetch\n");
                 status = mysql_stmt_fetch(stmt);
 
                 if(test_stmt_error(stmt, status)){
                     return EXIT_FAILURE;
                 }
+
+                releaseParameters(out_params);
+            } else {
+                transaction->success = 1;
             }
 
             while(mysql_stmt_next_result(stmt) == 0);
@@ -187,15 +206,12 @@ int saveTransactions(Transaction *transactions, char *client_id){
             transaction = transaction->next;
 
             releaseParameters(in_params);
-            releaseParameters(out_params);
 
         } while(transaction);
     }
 
-    printf("close stmt\n");
     mysql_stmt_close(stmt);
 
-    printf("close mysql\n");
 
     closeConnection(mysql);
 

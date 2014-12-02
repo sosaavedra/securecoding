@@ -121,7 +121,7 @@
                                     $row ["destination_name"],
                                     moneyFormat($row ["amount"]),
                                     $row ["description"],
-                                    $row ["rejected_date"] ? $row ["rejected_date"] : $row ["approved_date"] ? $row ["approved_date"] : $row ["created_date"]);
+                                    $row ["rejected_date"] ? $row ["rejected_date"] : ($row ["approved_date"] ? $row ["approved_date"] : $row ["created_date"]));
                                 echo "</tr>";
                             }
                             echo "</tbody>";

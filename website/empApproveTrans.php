@@ -92,7 +92,8 @@
                                     } else if (isset ( $_POST ['reject'] )) {
                                         // reject-button was clicked
                                         // delete from transaction table and refund balance to client
-                                        if (!$mysqli->rejectTransaction ( $id, $employee_id )) {
+                                        $result = $mysqli->rejectTransaction ( $id, $employee_id );
+                                        if ($result && $result->num_rows > 0 ) {
                                             die ( "Error:  in rejecting!" );
                                         }
                                     }
