@@ -556,13 +556,12 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `forgetPassword`(IN `in_email` varchar(64))
 BEGIN
     DECLARE token_code VARCHAR(15);
-
     DECLARE EXIT HANDLER FOR SQLEXCEPTION SELECT 'SQLException found!' AS error_msg;
 
     SELECT UPPER(SUBSTR(MD5(UUID()), 1, 10)) INTO token_code;
 
-    UPDATE user set token = token_code WHERE person_id = (SELECT id from client WHERE email = in_email);
-
+    UPDATE user SET token = token_code
+    WHERE person_id = (SELECT id from client WHERE email = in_email) AND user_type_id = 1;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -1023,17 +1022,16 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `resetPassword`(IN `in_email` varchar(64), IN `in_token` varchar(15), IN `in_password` tinyint(128))
 BEGIN
     DECLARE token_code VARCHAR(15);
-
+    DECLARE client_id INT(15);
     DECLARE EXIT HANDLER FOR SQLEXCEPTION SELECT 'SQLException found!' AS error_msg;
 
-   
-    SELECT token FROM user WHERE person_id=(SELECT id FROM client WHERE email = in_email) INTO token_code;
+    SELECT id INTO client_id FROM client WHERE email = in_email;
+    SELECT token INTO token_code FROM user WHERE person_id = client_id AND user_type_id = 1;
 
     IF(token_code = in_token) THEN
-        UPDATE user SET pwd = in_password;
-        UPDATE user SET token = NULL;
+        UPDATE user SET pwd = in_password,token = NULL
+        WHERE user_type_id = 1 AND person_id = client_id;
     END IF;
-  
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -1054,4 +1052,4 @@ DELIMITER ;
 GRANT EXECUTE ON banksys.* TO 'webuser'@'localhost' IDENTIFIED BY 'kubruf#eGa4e';
 GRANT EXECUTE ON banksys.* TO 'parser'@'localhost' IDENTIFIED BY 'vEq7saf@&eVU';
 
--- Dump completed on 2014-12-02  3:40:24
+-- Dump completed on 2014-12-02  3:48:50
