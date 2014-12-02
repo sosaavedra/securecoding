@@ -241,7 +241,7 @@ DROP TABLE IF EXISTS `transaction_history`;
 CREATE TABLE `transaction_history` (
   `id` int(8) NOT NULL AUTO_INCREMENT,
   `origin_account_id` int(8) NOT NULL,
-  `destination_account_id` int(8) NOT NULL,
+  `destination_account_id` int(8) DEFAULT NULL,
   `amount` double NOT NULL,
   `transaction_type_id` int(8) NOT NULL,
   `created_date` datetime NOT NULL,
@@ -310,7 +310,7 @@ CREATE TABLE `user` (
   UNIQUE KEY `user_ukey` (`person_id`,`user_type_id`),
   KEY `user_k1` (`user_type_id`),
   CONSTRAINT `user_user_type` FOREIGN KEY (`user_type_id`) REFERENCES `user_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -651,12 +651,17 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `getAccountTransactionHistory`(IN `in_account_number` varchar(8))
 BEGIN
-    SELECT a1.account_number AS origin, a2.account_number AS destination,
-        th.created_date, th.amount, th.approved_date, tt.description
-    FROM transaction_history th, account a1, account a2, transaction_type tt
+    SELECT a1.account_number AS origin, CONCAT(c1.first_name, ' ', c1.last_name) AS origin_name,
+        a2.account_number AS destination, CONCAT(c2.first_name, ' ', c2.last_name) AS destination_name,
+        th.amount, th.created_date, th.approved_date, th.rejected_date,
+        CONCAT(tt.description, ' - ', CASE WHEN th.rejected_date IS NULL THEN 'Approved' ELSE 'Rejected' END) AS description
+    FROM transaction_history th
+        LEFT OUTER JOIN account a2 ON th.destination_account_id = a2.id
+        LEFT OUTER JOIN client c2 ON a2.client_id = c2.id,
+        account a1, transaction_type tt, client c1
     WHERE a1.account_number = in_account_number
+        AND a1.client_id = c1.id
         AND a1.id = th.origin_account_id
-        AND th.destination_account_id = a2.id
         AND th.transaction_type_id = tt.id;
 END ;;
 DELIMITER ;
@@ -860,6 +865,7 @@ BEGIN
         IF is_scs_used = 'Y' THEN
             SELECT SUBSTR(MD5(CONCAT(a.account_number, CAST(s.pin_code AS CHAR(6)), CAST(in_amount AS CHAR(100)), 'secureCodingTeam17')), 1, 15) INTO scs_code
             FROM account a, scs s WHERE a.client_id = in_client_id AND a.client_id = s.client_id;
+
         END IF;
 
 
@@ -867,6 +873,7 @@ BEGIN
             SELECT account_number, id INTO origin_account_number, origin_account_id FROM account WHERE client_id = in_client_id;
 
             IF origin_account_number IS NOT NULL THEN
+
                 IF (EXISTS (
                         SELECT code FROM tan_code
                         WHERE client_id = in_client_id AND code = in_tan_code AND valid = 'Y')
@@ -877,13 +884,17 @@ BEGIN
                     END IF;
 
                     IF in_transaction_type_id = 1 THEN
+
                         IF in_amount < 10000 THEN
+
                             UPDATE account SET balance = balance + in_amount
                             WHERE client_id = in_client_id AND account_number = origin_account_number;
 
                             INSERT INTO transaction_history(origin_account_id, amount, transaction_type_id, created_date)
                             VALUES(origin_account_id, in_amount, in_transaction_type_id, now());
+
                         ELSE
+
                                 INSERT INTO transaction(origin_account_id, amount, transaction_type_id, created_date)
                                 VALUES(origin_account_id, in_amount, in_transaction_type_id, now());
                         END IF;
@@ -1043,4 +1054,4 @@ DELIMITER ;
 GRANT EXECUTE ON banksys.* TO 'webuser'@'localhost' IDENTIFIED BY 'kubruf#eGa4e';
 GRANT EXECUTE ON banksys.* TO 'parser'@'localhost' IDENTIFIED BY 'vEq7saf@&eVU';
 
--- Dump completed on 2014-12-02  1:57:09
+-- Dump completed on 2014-12-02  3:40:24
