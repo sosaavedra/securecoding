@@ -76,6 +76,14 @@
                                 $row = $result->fetch_assoc ();
                                 echo "<h3>Your account number: $accountNumber</h3>";
                                 echo "<h3>Your balance: ". moneyFormat($row ["balance"])."</h3>";
+                                if($row['use_scs'] === 'Y'){
+                                	echo "<h3><a href='download.php?download_file=SCSTeam17.jar'>Download SCS</a> </h3>";
+                                	$scsresult = $mysqli->getSCSPin ( $customerId );
+                                	if (!empty($scsresult) && $scsresult->num_rows > 0) {
+                                		$scsrow = $scsresult->fetch_assoc ();
+                                		echo "<h3>Your PIN for SCS:".$scsrow["pin_code"]."</h3>";
+                                	}
+                                }
                         }
                         
                         $result = $mysqli->getAccountTransactionHistory ( $accountNumber );
