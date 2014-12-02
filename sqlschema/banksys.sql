@@ -661,6 +661,32 @@ BEGIN
     WHERE a1.account_number = in_account_number
         AND a1.client_id = c1.id
         AND a1.id = th.origin_account_id
+        AND th.transaction_type_id = tt.id
+     UNION
+     SELECT a1.account_number, CONCAT(c1.first_name, ' ', c1.last_name),
+        a2.account_number, CONCAT(c2.first_name, ' ', c2.last_name),
+        t.amount, t.created_date, NULL, NULL,
+        CONCAT(tt.description, ' - Pending') AS description
+    FROM transaction t
+        LEFT OUTER JOIN account a2 ON t.destination_account_id = a2.id
+        LEFT OUTER JOIN client c2 ON a2.client_id = c2.id,
+        account a1, transaction_type tt, client c1
+    WHERE a1.account_number = in_account_number
+        AND a1.client_id = c1.id
+        AND a1.id = t.origin_account_id
+        AND t.transaction_type_id = tt.id
+    UNION
+    SELECT a1.account_number, CONCAT(c1.first_name, ' ', c1.last_name),
+        a2.account_number, CONCAT(c2.first_name, ' ', c2.last_name),
+        th.amount, th.created_date, th.approved_date, th.rejected_date,
+        CONCAT(tt.description, ' - ', CASE WHEN th.rejected_date IS NULL THEN 'Approved' ELSE 'Rejected' END)
+    FROM transaction_history th, account a2, client c2,
+        account a1, transaction_type tt, client c1
+    WHERE a2.account_number = in_account_number
+        AND th.destination_account_id = a2.id
+        AND a2.client_id = c2.id
+        AND a1.client_id = c1.id
+        AND a1.id = th.origin_account_id
         AND th.transaction_type_id = tt.id;
 END ;;
 DELIMITER ;
@@ -1052,4 +1078,4 @@ DELIMITER ;
 GRANT EXECUTE ON banksys.* TO 'webuser'@'localhost' IDENTIFIED BY 'kubruf#eGa4e';
 GRANT EXECUTE ON banksys.* TO 'parser'@'localhost' IDENTIFIED BY 'vEq7saf@&eVU';
 
--- Dump completed on 2014-12-02  4:14:29
+-- Dump completed on 2014-12-02  4:51:49
