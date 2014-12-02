@@ -128,7 +128,7 @@ function sendTokenEMail($email) {
         $message = Swift_Message::newInstance (EMAIL_HEADER)
             
         ->setFrom ( array ( SYSTEM_EMAIL_ID => EMAIL_FROM) )
-        ->setTo ( array ( $row ["email"] ) )
+        ->setTo ( array ( $email ) )
         ->setBody ( $emailBody, 'text/html' );
             
         // echo $emailBody;
