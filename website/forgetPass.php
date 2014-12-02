@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Forget password</title>
+<title>forgot password</title>
 <meta charset="utf-8">
 <link rel="stylesheet" href="css/reset.css" type="text/css" media="all">
 <link rel="stylesheet" href="css/layout.css" type="text/css" media="all">
@@ -68,7 +68,7 @@ if ($_POST) {
                 <li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
                 <li><a href="registration.php"><span><span>Register</span></span></a></li>
                 <li><a href="login.php"><span><span>Login</span></span> </a></li>
-                <li id="menu_active" class="omega"><a href="forgetPass.php"><span><span>Forget password</span></span> </a></li>
+                <li id="menu_active" class="omega"><a href="forgetPass.php"><span><span>Forgot password?</span></span> </a></li>
             </ul>
         </nav>
     </header>
@@ -78,7 +78,7 @@ if ($_POST) {
         <div class="wrapper">
             <div class="pad">
                 <div class="wrapper">
-                    <article class="col1"><h2>Forget password</h2></article>
+                    <article class="col1"><h2>Reset password</h2></article>
                     <article class="col2 pad_left1"><h2>Contact us</h2></article>
                 </div>
             </div>
