@@ -1,4 +1,8 @@
 **/*.d
 **/*.o
-**/parser
 **/*.swp
+**/*.bckp
+sites/
+uploads/
+tmp_dir/
+**/info.php

@@ -1,13 +1,10 @@
 #include "transaction.h"
-#include "utils.h"
+#include "mysqllib.h"
 #include "constants.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <mysql.h>
-
-
 
 Transaction *createTransaction(char *line){
     char *value;
@@ -21,6 +18,7 @@ Transaction *createTransaction(char *line){
     }
 
     value = strtok(line, "@");
+
     if(!value || strlen(value) != 8){
         fprintf(stderr, "There's a problem with the destination account number: \"%s\"\n", value);
 
@@ -35,6 +33,7 @@ Transaction *createTransaction(char *line){
 
     value = strtok(NULL, "@");
     strtod(value, &end);
+
     if(end != NULL && strlen(end) > 0){
         fprintf(stderr, "Invalid amount %s\n", value);
 
@@ -46,6 +45,7 @@ Transaction *createTransaction(char *line){
     transaction->amount[strlen(value)] = '\0';
 
     value = strtok(NULL, "@");
+
     if(!value || strlen(value) != 15){
         fprintf(stderr, "There's a problem with the tan code: \"%s\"\n", value);
 
@@ -59,138 +59,252 @@ Transaction *createTransaction(char *line){
     return transaction;
 }
 
-void freeTransactions(Transaction *transactions){}
+void addTransaction(Transaction *transactions, Transaction *transaction){
+    if(transactions->destination == NULL){
+        transactions = transaction;
+    } else {
+        if(transactions->prev == NULL){
+            transactions->prev = transaction;
+            transactions->next = transaction;
+            transaction->prev = transactions;
+        } else {
+            transaction->prev = transactions->prev;
+            transactions->prev->next = transaction;
+            transactions->prev = transaction;
+        }
+    }
+}
+
+void freeTransactions(Transaction *transactions){
+}
 
 void printTransactions (Transaction * transactions){
     printf("Printing values...\n");
 
-    Transaction *next = transactions;
+    Transaction *transaction = transactions;
 
-    if(next){
+    if(transaction){
         do{
-            printf("Destination: %s\n", next->destination);
-            printf("Amount: %s\n", next->amount);
-            printf("Tan code: %s\n", next->tanCode);
+            printf("Destination: %s\n", transaction->destination);
+            printf("Amount: %s\n", transaction->amount);
+            printf("Tan code: %s\n", transaction->tanCode);
+            printf("Success: %d\n", transaction->success);
+            printf("Level: %s\n", transaction->level);
+            printf("Code: %d\n", transaction->code);
+            printf("Message: %s\n", transaction->message);
 
-            next = next->next;
-        } while(next);
+            transaction = transaction->next;
+        } while(transaction);
     }
 }
 
-char *saveTransactions(Transaction *transactions, char *client_id){
+void printTransactionError (Transaction * transactions){
+    Transaction *transaction = transactions;
+
+    int lineNumber = 1;
+
+    if(transaction){
+        do{
+            if(!transaction->success){
+                printf("Error in transaction #: %d - %s\n", lineNumber, transaction->message);
+            }
+
+            lineNumber++;
+            transaction = transaction->next;
+        } while(transaction);
+    }
+}
+
+
+int saveTransactions(Transaction *transactions, char *client_id){
     char *performTransaction =  "call performTransaction(?, ?, ?, ?, 3)";
 
-    MYSQL mysql;
+    MYSQL *mysql;
     MYSQL_STMT *stmt;
-    MYSQL_BIND sp_params[4];
-    MYSQL_BIND sp_result[3];
+    MYSQL_BIND *in_params;
+    MYSQL_BIND *out_params;
 
     int status;
+    
+    mysql = openConnection();
+
+    if(mysql == NULL){
+        return EXIT_FAILURE;
+    } 
+
+    stmt = mysql_stmt_init(mysql);
+ 
+    if(!stmt){
+        fprintf(stderr, "Could not initialize statement\n");
+    
+        return EXIT_FAILURE;
+    }
+
+    status = mysql_stmt_prepare(stmt, performTransaction, strlen(performTransaction));
+
+    if(test_stmt_error(stmt, status)){
+        return EXIT_FAILURE;
+    }
+
+    Transaction *transaction = transactions;
+    unsigned long length[3];
+    my_bool is_null[3];
+    my_bool error[3];
+
+    if(transaction){
+        do{
+            in_params = prepareInParameters(client_id, transaction);
+
+            if(in_params == NULL){
+                return EXIT_FAILURE;
+            }
+ 
+            status = mysql_stmt_bind_param(stmt, in_params);
+
+            if(test_stmt_error(stmt, status)){
+                return EXIT_FAILURE;
+            }
+           
+            status = mysql_stmt_execute(stmt);
+    
+            if(test_stmt_error(stmt, status)){
+                return EXIT_FAILURE;
+            }
+
+            int num_fields;
+
+            num_fields = mysql_stmt_field_count(stmt);
+
+            if(num_fields > 0){
+                transaction->success = 0;
+
+                out_params = prepareOutParameters(transaction, length, is_null, error);
+
+                if(out_params == NULL){
+                    return EXIT_FAILURE;
+                }
+
+                status = mysql_stmt_bind_result(stmt, out_params);
+
+                if(test_stmt_error(stmt, status)){
+                    return EXIT_FAILURE;
+                }
+
+                status = mysql_stmt_fetch(stmt);
+
+                if(test_stmt_error(stmt, status)){
+                    return EXIT_FAILURE;
+                }
+
+                releaseParameters(out_params);
+            } else {
+                transaction->success = 1;
+            }
+
+            while(mysql_stmt_next_result(stmt) == 0);
+
+            transaction = transaction->next;
+
+            releaseParameters(in_params);
+
+        } while(transaction);
+    }
+
+    mysql_stmt_close(stmt);
+
+
+    closeConnection(mysql);
+
+    return EXIT_SUCCESS;
+}
+
+MYSQL_BIND *prepareInParameters(char *client_id, Transaction *transaction){
+    MYSQL_BIND *in_params;
+
     unsigned long client_id_length;
     unsigned long destination_length;
     unsigned long amount_length;
     unsigned long tancode_length;
 
-    char level[RESPONSE_LENGTH];
-    int code;
-    char message[RESPONSE_LENGTH];
+    in_params = malloc(sizeof(MYSQL_BIND) * 4);
 
-    unsigned long length[3];
-    my_bool is_null[3];
-    my_bool error[3];
-
-    if(mysql_init(&mysql)==NULL){
-        printf("Failed to initate MySQL connection\n");
-
-        return NULL;
-    } 
-
-    if (!mysql_real_connect(&mysql,"localhost","webuser","katanaX","banksys",0,NULL,0)){
-        printf( "Failed to connect to MySQL: Error: %s\n", mysql_error(&mysql)); 
+    if(in_params == NULL){
+        fprintf(stderr, "Insufficient memory at line #%d\n", __LINE__);
 
         return NULL;
     }
 
-    stmt = mysql_stmt_init(&mysql);
-
-    if(!stmt){
-        fprintf(stderr, "Could not initialize statement\n");
-
-        return NULL;
-    }
-
-    status = mysql_stmt_prepare(stmt, performTransaction, strlen(performTransaction));
-    test_stmt_error(stmt, status);
-
-    printf("call performTransaction(%s, %s, %s, %s, 3)\n", client_id, transactions->destination, transactions->amount, transactions->tanCode);
-
-    memset(sp_params, 0, sizeof(sp_params));
+    memset(in_params, 0, sizeof(MYSQL_BIND) * 4);
 
     client_id_length = strlen(client_id);
-    sp_params[0].buffer_type = MYSQL_TYPE_STRING;
-    sp_params[0].buffer = (char *)client_id;
-    sp_params[0].buffer_length = client_id_length;
-
-    destination_length = strlen(transactions->destination);
-    sp_params[1].buffer_type = MYSQL_TYPE_STRING;
-    sp_params[1].buffer = (char *)transactions->destination;
-    sp_params[1].buffer_length = destination_length; 
-
-    amount_length = strlen(transactions->amount);
-    sp_params[2].buffer_type = MYSQL_TYPE_STRING;
-    sp_params[2].buffer = (char *)transactions->amount;
-    sp_params[2].buffer_length = amount_length;
+ 
+    in_params[0].buffer_type = MYSQL_TYPE_STRING;
+    in_params[0].buffer = (char *)client_id;
+    in_params[0].buffer_length = client_id_length;
     
-    tancode_length = strlen(transactions->tanCode);
-    sp_params[3].buffer_type = MYSQL_TYPE_STRING;
-    sp_params[3].buffer = (char *)transactions->tanCode;
-    sp_params[3].buffer_length = tancode_length;
+    destination_length = strlen(transaction->destination);
+    in_params[1].buffer_type = MYSQL_TYPE_STRING;
+    in_params[1].buffer = (char *)transaction->destination;
+    in_params[1].buffer_length = destination_length; 
+    
+    amount_length = strlen(transaction->amount);
+    in_params[2].buffer_type = MYSQL_TYPE_STRING;
+    in_params[2].buffer = (char *)transaction->amount;
+    in_params[2].buffer_length = amount_length;
+    
+    tancode_length = strlen(transaction->tanCode);
+    in_params[3].buffer_type = MYSQL_TYPE_STRING;
+    in_params[3].buffer = (char *)transaction->tanCode;
+    in_params[3].buffer_length = tancode_length;
 
-    status = mysql_stmt_bind_param(stmt, sp_params);
-    test_stmt_error(stmt, status);
+    return in_params;
+}
 
-    status = mysql_stmt_execute(stmt);
-    test_stmt_error(stmt, status);
+MYSQL_BIND *prepareOutParameters(Transaction *transaction, unsigned long length[], my_bool is_null[], my_bool error[]){
+    MYSQL_BIND *out_params;
 
-    memset(sp_result, 0, sizeof(sp_result));
+    out_params = malloc(sizeof(MYSQL_BIND) * 3);
 
-    sp_result[0].buffer_type = MYSQL_TYPE_STRING;
-    sp_result[0].buffer = &level;
-    sp_result[0].buffer_length = RESPONSE_LENGTH;
-    sp_result[0].length = &length[0];
-    sp_result[0].is_null = &is_null[0];
-    sp_result[0].error = &error[0];
+    if(out_params == NULL){
+        fprintf(stderr, "Insufficient memory at line #%d\n", __LINE__);
 
-    sp_result[1].buffer_type = MYSQL_TYPE_LONG;
-    sp_result[1].buffer = &code;
-    sp_result[1].length = &length[1];
-    sp_result[1].is_null = &is_null[1];
-    sp_result[1].error = &error[1];
+        return NULL;
+    }
 
-    sp_result[2].buffer_type = MYSQL_TYPE_STRING;
-    sp_result[2].buffer = &message;
-    sp_result[2].buffer_length = RESPONSE_LENGTH;
-    sp_result[2].length = &length[2];
-    sp_result[2].is_null = &is_null[2];
-    sp_result[2].error = &error[2];
+    memset(out_params, 0, sizeof(MYSQL_BIND) * 3);
 
+    transaction->level = malloc(sizeof(char) * RESPONSE_LENGTH);
+    transaction->message = malloc(sizeof(char) * RESPONSE_LENGTH);
 
-    status = mysql_stmt_bind_result(stmt, sp_result);
-    test_stmt_error(stmt, status);
+    if(transaction->level == NULL || transaction->message == NULL){
+        fprintf(stderr, "Insufficient memory at line #%d\n", __LINE__);
 
-    status = mysql_stmt_store_result(stmt);
-    test_stmt_error(stmt, status);
+        return NULL;
+    }
 
-    status = mysql_stmt_fetch(stmt);
-    test_stmt_error(stmt, status);
+    out_params[0].buffer_type = MYSQL_TYPE_STRING;
+    out_params[0].buffer = transaction->level;
+    out_params[0].buffer_length = RESPONSE_LENGTH;
+    out_params[0].length = &length[0];
+    out_params[0].is_null = &is_null[0];
+    out_params[0].error = &error[0];
 
-    printf("Level: %s\n", level);
-    printf("Code: %d\n", code);
-    printf("Message: %s\n", message);
+    out_params[1].buffer_type = MYSQL_TYPE_LONG;
+    out_params[1].buffer = &transaction->code;
+    out_params[1].length = &length[1];
+    out_params[1].is_null = &is_null[1];
+    out_params[1].error = &error[1];
 
-    mysql_stmt_close(stmt);
+    out_params[2].buffer_type = MYSQL_TYPE_STRING;
+    out_params[2].buffer = transaction->message;
+    out_params[2].buffer_length = RESPONSE_LENGTH;
+    out_params[2].length = &length[2];
+    out_params[2].is_null = &is_null[2];
+    out_params[2].error = &error[2];
 
-    mysql_close(&mysql);
+    return out_params;
+}
 
-    return NULL;
+void releaseParameters(MYSQL_BIND *params){
+    free(params);
 }

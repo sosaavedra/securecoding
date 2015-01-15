@@ -27,14 +27,14 @@ include_once "includes/checkLogin.php";
 <!-- header -->
     <header>
         <div class="wrapper">
-            <h1><a href="index.html" id="logo">Banksys</a></h1>
+            <a href="index.html" id="logo">BankSys</a>
         </div>
         <nav>
             <ul id="menu">
                 <li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
-                <li><a href="registration.php"><span><span>Registration</span></span></a></li>
+                <li><a href="registration.php"><span><span>Register</span></span></a></li>
                 <li id="menu_active"><a href="login.php"><span><span>Login</span></span> </a></li>
-                <li class="omega"><a href="#"><span><span>Something</span></span></a></li>
+                <li class="omega"><a href="forgetPass.php"><span><span>forgot password?</span></span> </a></li>
             </ul>
         </nav>
     </header>
@@ -58,7 +58,7 @@ include_once "includes/checkLogin.php";
                                     <div class="bg"><input class="input" type="text" name="username" id="username"></div>E-Mail:
                                 </div>
                                 <div class="wrapper">
-                                    <div class="bg"><input class="input" type="password" name="password" id="password"></div>Password:
+                                    <div class="bg"><input class="input" autocomplete="off" type="password" name="password" id="password"></div>Password:
                                 </div>
                                     <div class="bg" style="background: none; border:none; box-shadow: none;">
                                         <input class="input" type="checkbox" name="employee" id="employee" value="1" />I work here!

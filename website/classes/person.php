@@ -3,15 +3,15 @@
 require_once "inexistentPropertyException.php";
 
 abstract class Person{
-    private $id;
-    private $title_type_id;
-    private $title_type;
-    private $first_name;
-    private $last_name;
-    private $email;
-    private $user_type_id;
-    private $user_type;
-    private $last_login;
+    protected $id;
+    protected $title_type_id;
+    protected $title_type;
+    protected $first_name;
+    protected $last_name;
+    protected $email;
+    protected $user_type_id;
+    protected $user_type;
+    protected $last_login;
 
     function __get($property){
         if(property_exists($this, $property)){
