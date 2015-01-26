@@ -38,13 +38,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['username'])) {
             $employee = $mysqli->employeeLogin($username, $hashedPW);
             $mysqli->close();
 
-            if($employee){
+            if($employee && $employee->getClassName() == "Employee"){
             	$sess_name = session_name();
             	setcookie($sess_name, session_id(), null, '/', null, null, true);
                 $_SESSION['user_type'] = "employee";
                 $_SESSION['logged_user'] = $employee;
 
                 header ( 'Location: empApproveTrans.php' );
+            } if($employee && $employee->getClassName() == "MySQLError"){
+                $pageErr = $employee->message;
             } else {
                 $pageErr = "Invalid email/password";
             }
@@ -52,13 +54,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['username'])) {
             $client = $mysqli->clientLogin($username, $hashedPW);
             $mysqli->close();
 
-            if($client){
+            if($client && $client->getClassName() == "Client"){
             	$sess_name = session_name();
             	setcookie($sess_name, session_id(), null, '/', null, null, true);
                 $_SESSION['user_type'] = "client";
                 $_SESSION['logged_user'] = $client;
 
                 header ( 'Location: customerPage.php');
+            } if($client && $client->getClassName() == "MySQLError"){
+                $pageErr = $client->message;
             } else {
                 $pageErr = "Invalid email/password";
             }

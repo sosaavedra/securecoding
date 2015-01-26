@@ -2,16 +2,10 @@
 
 require_once "inexistentPropertyException.php";
 
-abstract class Person{
-    protected $id;
-    protected $title_type_id;
-    protected $title_type;
-    protected $first_name;
-    protected $last_name;
-    protected $email;
-    protected $user_type_id;
-    protected $user_type;
-    protected $last_login;
+class MySQLError{
+    private $level;
+    private $code;
+    private $message;
 
     public function __get($property){
         if(property_exists($this, $property)){
@@ -20,7 +14,7 @@ abstract class Person{
             throw new InexistentPropertyException("Inexistent property: $property");
         }
     }
-    
+
     public function getClassName(){
         return get_class($this);
     }

@@ -305,6 +305,8 @@ CREATE TABLE `user` (
   `pwd` varchar(64) NOT NULL,
   `token` varchar(20) DEFAULT NULL,
   `user_type_id` int(8) NOT NULL,
+  `failed_login_attempts` tinyint(4) NOT NULL DEFAULT '0',
+  `locked_until` datetime DEFAULT NULL,
   `last_login` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_ukey` (`person_id`,`user_type_id`),
@@ -419,6 +421,53 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `clientLogin`(IN `in_email` varchar(64), IN `in_pwd` varchar(64))
 BEGIN
+    DECLARE error TINYINT DEFAULT 0;
+    DECLARE user_id INT(8);
+    DECLARE login_attempts TINYINT;
+    DECLARE locked DATETIME;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION, SQLWARNING
+    BEGIN
+        IF(error > 0 AND error < 7) THEN
+            SELECT 'Error' AS level,
+                error AS code,
+                CASE error
+                    WHEN 1 THEN 'For your own safety, your account has been locked out for 20 minutes.' 
+                    WHEN 2 THEN 'For your own safety, your account has been locked out for 20 minutes.' 
+                END AS message;
+        ELSE
+           SHOW ERRORS;
+        END IF;
+    END;
+
+    SELECT u.id, u.failed_login_attempts, u.locked_until INTO user_id, login_attempts, locked
+    FROM client c, user u
+    WHERE c.id = u.person_id AND u.user_type_id = 1
+    AND c.email = in_email;
+
+    IF locked IS NOT NULL THEN
+        IF locked < NOW() THEN
+            SET login_attempts = 0, locked = NULL;
+            UPDATE user SET failed_login_attempts = 0, locked_until = NULL WHERE id = user_id;
+        ELSE
+            SET error = 1;
+            CALL raise_error;
+        END IF;
+    END IF;
+
+    IF(NOT EXISTS (SELECT u.id FROM user u WHERE u.id = user_id AND u.pwd = in_pwd)) THEN
+        SET login_attempts = login_attempts + 1;
+        UPDATE user SET failed_login_attempts = login_attempts WHERE id = user_id;
+
+        IF login_attempts = 3 THEN
+            SET error = 2;
+            UPDATE user SET locked_until = NOW() + INTERVAL 20 MINUTE WHERE id = user_id;
+            CALL raise_error;
+        END IF;
+    ELSEIF login_attempts > 0 THEN
+        UPDATE user SET failed_login_attempts = 0, locked_until = NULL WHERE id = user_id;
+    END IF;
+
     SELECT c.id, c.title_type_id, tt.description title_type, c.first_name, c.last_name,
     c.email, a.account_number, a.balance, u.user_type_id, ut.description user_type, u.last_login
     FROM client c, title_type tt,
@@ -531,6 +580,53 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `employeeLogin`(IN `in_email` varchar(64), IN `in_pwd` varchar(64))
 BEGIN
+    DECLARE error TINYINT DEFAULT 0;
+    DECLARE user_id INT(8);
+    DECLARE login_attempts TINYINT;
+    DECLARE locked DATETIME;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION, SQLWARNING
+    BEGIN
+        IF(error > 0 AND error < 7) THEN
+            SELECT 'Error' AS level,
+                error AS code,
+                CASE error
+                    WHEN 1 THEN 'For your own safety, your account has been locked out for 20 minutes.' 
+                    WHEN 2 THEN 'For your own safety, your account has been locked out for 20 minutes.' 
+                END AS message;
+        ELSE
+           SHOW ERRORS;
+        END IF;
+    END;
+
+    SELECT u.id, u.failed_login_attempts, u.locked_until INTO user_id, login_attempts, locked
+    FROM employee e, user u
+    WHERE e.id = u.person_id AND u.user_type_id = 2
+    AND e.email = in_email;
+
+    IF locked IS NOT NULL THEN
+        IF locked < NOW() THEN
+            SET login_attempts = 0, locked = NULL;
+            UPDATE user SET failed_login_attempts = 0, locked_until = NULL WHERE id = user_id;
+        ELSE
+            SET error = 1;
+            CALL raise_error;
+        END IF;
+    END IF;
+
+    IF(NOT EXISTS (SELECT u.id FROM user u WHERE u.id = user_id AND u.pwd = in_pwd)) THEN
+        SET login_attempts = login_attempts + 1;
+        UPDATE user SET failed_login_attempts = login_attempts WHERE id = user_id;
+
+        IF login_attempts = 3 THEN
+            SET error = 2;
+            UPDATE user SET locked_until = NOW() + INTERVAL 20 MINUTE WHERE id = user_id;
+            CALL raise_error;
+        END IF;
+    ELSEIF login_attempts > 0 THEN
+        UPDATE user SET failed_login_attempts = 0, locked_until = NULL WHERE id = user_id;
+    END IF;
+
     SELECT e.id, e.title_type_id, tt.description title_type, e.first_name, e.last_name,
         e.email, u.user_type_id, ut.description user_type, u.last_login
     FROM employee e left join title_type tt ON e.title_type_id = tt.id,

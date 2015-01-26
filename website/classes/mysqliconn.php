@@ -2,6 +2,7 @@
 require_once 'inexistentPropertyException.php';
 require_once 'classes/employee.php';
 require_once 'classes/client.php';
+require_once 'classes/MySQLError.php';
 
 class MysqliConn {
     private $host;
@@ -82,7 +83,12 @@ class MysqliConn {
         $stmt->execute ();
         
         $result = $stmt->get_result ();
+        $cols = $result->field_count;
         
+        if($cols == 3) {
+            $objectType = "MySQLError";
+        }
+
         return $result->fetch_object ( $objectType );
     }
 
