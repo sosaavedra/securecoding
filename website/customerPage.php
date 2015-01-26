@@ -1,7 +1,7 @@
 <?php
 
+    require_once "includes/checkOrigin.php";
     require_once 'includes/checkSession.php';
-    
     require_once 'includes/customerAccessOnly.php';
     
     $customerId = $_SESSION ['logged_user']-> id;
@@ -34,7 +34,7 @@
         <!-- header -->
         <header>
             <div class="wrapper">
-                <a href="index.html" id="logo">BankSys</a>
+                <a href="index.php" id="logo">BankSys</a>
             </div>
             <nav>
                 <ul id="menu">

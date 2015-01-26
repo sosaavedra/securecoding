@@ -1,3 +1,6 @@
+<?php 
+	require_once "includes/checkOrigin.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,23 +86,15 @@ if ($_POST) {
     
     if ($formValid) {
         // escape variables for security
-        $title = $mysqli->escape ( $_POST ['title'] );
-        $firstname = $mysqli->escape ( $_POST ['firstname'] );
-        $lastname = $mysqli->escape ( $_POST ['lastname'] );
-        $email = $mysqli->escape ( $_POST ['email'] );
-        $password = $mysqli->escape ( $_POST ['password'] );
-        $cpassword = $mysqli->escape ( $_POST ['cpassword'] );
-        $tanOption = $mysqli->escape ( $_POST ['tanOption'] );
+        $title = htmlspecialchars ( $_POST ['title'] );
+        $firstname = htmlspecialchars ( $_POST ['firstname'] );
+        $lastname = htmlspecialchars ( $_POST ['lastname'] );
+        $email = htmlspecialchars ( $_POST ['email'] );
+        $tanOption = htmlspecialchars ( $_POST ['tanOption'] );
+        $password = $_POST ['password'];
         
-        $scsOpt = 'N';
-        if($tanOption === "scs"){
-        	$scsOpt = 'Y';
-        }
-        
-        $hashedPW = hash ( 'sha256', $password );
-        
-        if ($mysqli->createClient ( $title, $firstname, $lastname, $email, $hashedPW, $scsOpt )) {
-            header ( 'Location: registerSuccess.html' );
+        if ($mysqli->createClient ( $title, $firstname, $lastname, $email, $password, $scsOpt )) {
+            header ( 'Location: registerSuccess.php' );
         } else {
             $alreadyRegisteredErr = "Email id already registered!";
         }
@@ -112,11 +107,11 @@ if ($_POST) {
         <!-- header -->
         <header>
             <div class="wrapper">
-                <a href="index.html" id="logo">BankSys</a>
+                <a href="index.php" id="logo">BankSys</a>
             </div>
             <nav>
                 <ul id="menu">
-                    <li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
+                    <li class="alpha"><a href="index.php"><span><span>Home</span></span></a></li>
                     <li id="menu_active"><a href="registration.php"><span><span>Register</span></span></a></li>
                     <li><a href="login.php"><span><span>Login</span></span> </a></li>
                     <li class="omega"><a href="forgetPass.php"><span><span>Forgot password?</span></span> </a></li>
@@ -147,7 +142,12 @@ if ($_POST) {
                                             <select name="title" id="title" class="bg">
                                     <?php
                                         while ( $row = $titleTypes->fetch_assoc () ) {
-                                            echo "<option value='" . $row ["id"] . "'>" . $row ["description"] . "</option>";
+                                        	$selected = "";
+                                        	if (isset($_POST ['title']) && $row ["id"] == $_POST ['title']){
+                                        		$selected = "selected";
+                                        	}
+                                        	
+                                            echo "<option value='" . $row ["id"] . "' $selected>" . $row ["description"] . "</option>";
                                         }
                                     ?>
                                     </select>
@@ -157,21 +157,21 @@ if ($_POST) {
                                     <span class="error"><?php echo $titleErr;?></span>
                                     <div class="wrapper">
                                         <div class="bg">
-                                            <input class="input" type="text" name="firstname" id="firstname" value="<?php if(isset($_POST ['firstname'])) echo $_POST ['firstname']; ?>">
+                                            <input class="input" type="text" name="firstname" id="firstname" value="<?php if(isset($_POST ['firstname'])) echo htmlspecialchars($_POST ['firstname']); ?>">
                                         </div>
                                         First Name:
                                     </div>
                                     <span class="error"><?php echo $fnameErr;?></span>
                                     <div class="wrapper">
                                         <div class="bg">
-                                            <input class="input" type="text" name="lastname" id="lastname" value="<?php if(isset($_POST ['lastname']))echo $_POST ['lastname']; ?>">
+                                            <input class="input" type="text" name="lastname" id="lastname" value="<?php if(isset($_POST ['lastname']))echo htmlspecialchars($_POST ['lastname']); ?>">
                                         </div>
                                         Last Name:
                                     </div>
                                     <span class="error"><?php echo $lnameErr;?></span>
                                     <div class="wrapper">
                                         <div class="bg">
-                                            <input class="input" type="text" name="email" id="email" value="<?php if(isset($_POST ['email']))echo $_POST ['email']; ?>">
+                                            <input class="input" type="text" name="email" id="email" value="<?php if(isset($_POST ['email']))echo htmlspecialchars($_POST ['email']); ?>">
                                         </div>
                                         Email:
                                     </div>

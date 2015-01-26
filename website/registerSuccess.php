@@ -1,3 +1,6 @@
+<?php 
+	require_once "includes/checkOrigin.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,11 +25,11 @@
 <!-- header -->
     <header>
         <div class="wrapper">
-            <a href="index.html" id="logo">BankSys</a>
+            <a href="index.php" id="logo">BankSys</a>
         </div>
         <nav>
             <ul id="menu">
-                <li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
+                <li class="alpha"><a href="index.php"><span><span>Home</span></span></a></li>
                 <li><a href="registration.php"><span><span>Register</span></span></a></li>
                 <li class="omega"><a href="login.php"><span><span>Login</span></span> </a></li>
             </ul>
@@ -38,14 +41,15 @@
         <div class="wrapper">
             <div class="pad">
                 <div class="wrapper">
-                    <article class="col1"><h2>Password changed successfully.</h2></article>
+                    <article class="col1"><h2>Registration Success.</h2></article>
                     <article class="col2 pad_left1"><h2>Contact us</h2></article>
                 </div>
             </div>
             <div class="box pad_bot1">
                 <div class="pad marg_top">
                     <article class="col1">
-                     Please login using your new password.
+                        Thanks you for registering.<br>
+                        We are verifying your details. You will be able to login after you receive a confirmation email with transaction codes.
                     </article>
                     <article class="col2 pad_left1">
                         <div class="wrapper">

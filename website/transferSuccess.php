@@ -1,3 +1,8 @@
+<?php 
+	require_once "includes/checkOrigin.php";
+	require_once 'includes/checkSession.php';
+	require_once 'includes/customerAccessOnly.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,13 +27,13 @@
 <!-- header -->
 	<header>
 		<div class="wrapper">
-			<h1><a href="index.html" id="logo">Smart Biz</a></h1>
+			<h1><a href="index.php" id="logo">BankSys</a></h1>
 		</div>
 		<nav>
 			<ul id="menu">
-					<li class="alpha"><a href="customerPage.php"><span><span>My Dashboard</span></span></a></li>
-					<li><a href="transfer.php"><span><span>Transfer Money</span></span></a></li>
-					<li class="omega"><a href="logout.php"><span><span>Logout</span></span></a></li>
+				<li class="alpha"><a href="customerPage.php"><span><span>My Dashboard</span></span></a></li>
+				<li><a href="transfer.php"><span><span>Transfer Money</span></span></a></li>
+				<li class="omega"><a href="logout.php"><span><span>Logout</span></span></a></li>
 			</ul>
 		</nav>
 	</header>

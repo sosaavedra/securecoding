@@ -1,6 +1,6 @@
 <?php
+require_once "includes/checkOrigin.php";
 require_once 'includes/checkSession.php';
-
 require_once 'includes/customerAccessOnly.php';
 ?>
 
@@ -80,7 +80,7 @@ if ($_POST) {
                 $row = $result->fetch_assoc();
                 $transNoErr = $row ['Message'];
             } else {
-                header ( 'Location: transferSuccess.html' );
+                header ( 'Location: transferSuccess.php' );
             }
             
             $mysqli->close ();
@@ -89,16 +89,16 @@ if ($_POST) {
     } else if (isset ( $_POST ['upload'] )) {
         // upload-button was clicked
         
-        if (! empty ( $_FILES ['uploadFile'] ['name'] )) {
-            
+        if (! empty ( $_FILES ['uploadFile'] ) && $_FILES ['uploadFile'] ['error'] == 0) {
+
             $target_dir = "uploads/";
-            $target_dir = $target_dir . basename ( $_FILES ["uploadFile"] ["name"] );
+            //$target_dir = $target_dir . basename ( $_FILES ["uploadFile"] ["name"] );
+            $fileName = basename ( $_FILES ["uploadFile"] ["name"] );
+            $newFileName = md5( $fileName );
             $fileValid = true;
-            
-            // Check if file already exists
-            if (file_exists ( $target_dir . $_FILES ["uploadFile"] ["name"] )) {
-                $uploadErr = "Sorry, file already exists.";
-            }
+            $uploadFile_size = $_FILES ['uploadFile']['size'];
+            $uploadFile_type = $_FILES ['uploadFile']['type'];
+            $ext = substr($fileName, strrpos($fileName, '.') + 1);
             
             // Check file size 500 KB
             if (isset ( $uploadFile_size ) && $uploadFile_size > 500000) {
@@ -107,18 +107,18 @@ if ($_POST) {
             }
             
             // Only txt files allowed
-            if (isset ( $uploadFile_type ) && ! ($uploadFile_type == "text/plain")) {
+            if ((isset ( $uploadFile_type ) && ! ($uploadFile_type == "text/plain")) || $ext != "txt") {
                 $uploadErr = "Sorry, only txt files are allowed.";
                 $fileValid = false;
             }
             
             // Check if $uploadOk is set to 0 by an error
             if ($fileValid) {
-                if (move_uploaded_file ( $_FILES ["uploadFile"] ["tmp_name"], $target_dir )) {
-                    $uploadErr = shell_exec("./c-parser/parser $target_dir $client_id 2>&1");
+                if (move_uploaded_file ( $_FILES ["uploadFile"] ["tmp_name"], $target_dir.$newFileName )) {
+                    $uploadErr = shell_exec("./c-parser/parser $target_dir.$newFileName $client_id 2>&1");
 
                     if($uploadErr == ""){
-                        header ( 'Location: transferSuccess.html' );
+                        header ( 'Location: transferSuccess.php' );
                     }
                 } else {
                     $uploadErr = "Sorry, there was an error uploading your file.";
@@ -136,7 +136,7 @@ if ($_POST) {
         <!-- header -->
         <header>
             <div class="wrapper">
-                <a href="index.html" id="logo">BankSys</a>
+                <a href="index.php" id="logo">BankSys</a>
             </div>
             <nav>
                 <ul id="menu">

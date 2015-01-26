@@ -12,7 +12,7 @@ if(isset($_SESSION['user_type'])){
 
     //TODO check again in database
 } else {
-    header ("Location: index.html");
+    header ("Location: index.php");
 }
 
 ?>

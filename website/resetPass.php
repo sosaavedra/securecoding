@@ -1,4 +1,6 @@
-
+<?php 
+require_once "includes/checkOrigin.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -72,7 +74,7 @@ if ($_POST) {
         
         $hashedPW = hash ( 'sha256', $password );
         $mysqli->resetPassword ($email, $token, $hashedPW);
-        header ( 'Location: passwordSuccess.html' );
+        header ( 'Location: passwordSuccess.php' );
         $mysqli->close ();
     }
 }
@@ -82,7 +84,7 @@ if ($_POST) {
 <!-- header -->
     <header>
         <div class="wrapper">
-            <a href="index.html" id="logo">BankSys</a>
+            <a href="index.php" id="logo">BankSys</a>
         </div>
     </header>
 <!-- / header -->

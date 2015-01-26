@@ -1,3 +1,6 @@
+<?php 
+require_once "includes/checkOrigin.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -61,11 +64,11 @@ if ($_POST) {
 <!-- header -->
     <header>
         <div class="wrapper">
-            <a href="index.html" id="logo">BankSys</a>
+            <a href="index.php" id="logo">BankSys</a>
         </div>
         <nav>
             <ul id="menu">
-                <li class="alpha"><a href="index.html"><span><span>Home</span></span></a></li>
+                <li class="alpha"><a href="index.php"><span><span>Home</span></span></a></li>
                 <li><a href="registration.php"><span><span>Register</span></span></a></li>
                 <li><a href="login.php"><span><span>Login</span></span> </a></li>
                 <li id="menu_active" class="omega"><a href="forgetPass.php"><span><span>Forgot password?</span></span> </a></li>

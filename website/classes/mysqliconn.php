@@ -94,7 +94,19 @@ class MysqliConn {
         return $this->login ( $user, $password, true );
     }
 
-    public function createClient($title_type_id, $first_name, $last_name, $email, $pwd, $scsOpt) {
+    public function createClient($titleId, $firstName, $lastName, $e_mail, $password, $tanOption) {
+    	$title_type_id = $this->escape ( $titleId );
+    	$first_name = $this->escape ( $firstName );
+    	$last_name = $this->escape ( $lastName );
+    	$email = $this->escape ( $e_mail );
+
+    	$scsOpt = 'N';
+    	if($tanOption === "scs"){
+    		$scsOpt = 'Y';
+    	}
+    	
+    	$pwd = hash ( 'sha256', $password );
+    	
         $stmt = $this->conn->stmt_init ();
         $stmt->prepare ( "call createClient (?, ?, ?, ?, ?, ?)" );
         $stmt->bind_param ( 'isssss', $title_type_id, $first_name, $last_name, $email, $pwd, $scsOpt);
